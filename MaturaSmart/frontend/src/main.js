@@ -3,6 +3,8 @@ import { createPinia } from 'pinia'
 import { router } from '@/router/index.js'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { plugin, defaultConfig } from '@formkit/vue'
+import './assets/main.css'
+
 
 import App from '@/App.vue'
 
