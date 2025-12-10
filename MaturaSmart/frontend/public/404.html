@@ -9,7 +9,31 @@
     <link rel="stylesheet" href="../src/assets/style.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'], 
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#0f172a',
+                        accent: '#6366f1',
+                    },
+                    animation: {
+                        'dead-float': 'deadFloat 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        deadFloat: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-15px) rotate(5deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-50 dark:bg-[#020617] text-gray-900 dark:text-white min-h-screen flex items-center justify-center overflow-hidden relative transition-colors duration-300">
 
