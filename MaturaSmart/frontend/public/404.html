@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Hoppá! | MaturaSmart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../src/assets/style.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+</head>
+<body class="bg-gray-50 dark:bg-[#020617] text-gray-900 dark:text-white min-h-screen flex items-center justify-center overflow-hidden relative transition-colors duration-300">
+
+    <div class="grid-bg fixed inset-0 z-0 pointer-events-none opacity-30"></div>
+
+    <button id="theme-toggle" class="absolute top-5 right-5 w-10 h-10 rounded-full border border-gray-300 dark:border-white/20 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition z-50">
+        <span>🌓</span>
+    </button>
+
+    <div class="relative z-10 text-center p-8 max-w-2xl w-full">
+        
+        <div class="text-[6rem] md:text-[8rem] font-extrabold leading-none mb-4 text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-500/20 drop-shadow-sm select-none">
+            404
+        </div>
+        
+        <div class="flex justify-center mb-6">
+            <img src="axel404.png" 
+                 class="w-40 animate-dead-float drop-shadow-[0_0_20px_rgba(239,68,68,0.3)]" 
+                 alt="K.O. Axel"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <div class="text-6xl hidden animate-pulse">🦎💀</div>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white text-gray-800">
+            Itt még a puskák se segítenek...
+        </h1>
+        
+        <p class="text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed max-w-md mx-auto">
+            Ez az oldal úgy eltűnt, mint a motiváció hétfő reggel. <br>
+            Vagy lehet, hogy Axel megette a házival együtt. 🦎😢
+        </p>
+
+        <a href="index.html" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg transition transform hover:-translate-y-1 shadow-[0_10px_30px_rgba(99,102,241,0.3)]">
+            <span>🏃</span> Menekülés a főoldalra
+        </a>
+
+    </div>
+
+    <footer class="absolute bottom-4 text-center text-sm text-gray-400 dark:text-gray-600 z-10">
+        MaturaSmart • Hiba történt a mátrixban
+    </footer>
+
+    <script src="../src/assets/script.js"></script> 
+    </body>
+</html>
