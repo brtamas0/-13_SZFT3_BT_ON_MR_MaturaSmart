@@ -6,76 +6,80 @@
     <title>404 - Hoppá! | MaturaSmart</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="../src/assets/style.css">
+    <link rel="stylesheet" href="../src/assets/main.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: ['class', '[data-theme="dark"]'], 
+            darkMode: ['class', '[data-theme="dark"]'],
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        darkBg: '#0f172a',
-                        accent: '#6366f1',
-                    },
-                    animation: {
-                        'dead-float': 'deadFloat 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        deadFloat: {
-                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
-                            '50%': { transform: 'translateY(-15px) rotate(5deg)' },
-                        }
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { darkBg: '#0f172a' }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-[#020617] text-gray-900 dark:text-white min-h-screen flex items-center justify-center overflow-hidden relative transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-[#020617] text-slate-800 dark:text-white min-h-screen flex items-center justify-center overflow-hidden relative transition-colors duration-300">
 
-    <div class="grid-bg fixed inset-0 z-0 pointer-events-none opacity-30"></div>
+    <div class="grid-bg"></div>
 
-    <button id="theme-toggle" class="absolute top-5 right-5 w-10 h-10 rounded-full border border-gray-300 dark:border-white/20 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition z-50">
-        <span>🌓</span>
+    <button id="theme-toggle" class="absolute top-5 right-5 w-10 h-10 rounded-full border border-gray-300 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition z-50 shadow-sm">
+        <span class="text-xl">🌓</span>
     </button>
 
     <div class="relative z-10 text-center p-8 max-w-2xl w-full">
         
-        <div class="text-[6rem] md:text-[8rem] font-extrabold leading-none mb-4 text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-500/20 drop-shadow-sm select-none">
+        <div class="text-gradient-404 mb-4">
             404
         </div>
         
         <div class="flex justify-center mb-6">
             <img src="axel404.png" 
-                 class="w-40 animate-dead-float drop-shadow-[0_0_20px_rgba(239,68,68,0.3)]" 
+                 class="axel-dead-animation" 
                  alt="K.O. Axel"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
             <div class="text-6xl hidden animate-pulse">🦎💀</div>
         </div>
         
-        <h1 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white text-gray-800">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-slate-900 dark:text-white transition-colors">
             Itt még a puskák se segítenek...
         </h1>
         
-        <p class="text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed max-w-md mx-auto">
+        <p class="text-slate-600 dark:text-gray-400 mb-10 text-lg leading-relaxed max-w-md mx-auto transition-colors">
             Ez az oldal úgy eltűnt, mint a motiváció hétfő reggel. <br>
             Vagy lehet, hogy Axel megette a házival együtt. 🦎😢
         </p>
 
-        <a href="index.html" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg transition transform hover:-translate-y-1 shadow-[0_10px_30px_rgba(99,102,241,0.3)]">
+        <a href="../index.html" class="btn-shadow-404 inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg">
             <span>🏃</span> Menekülés a főoldalra
         </a>
 
     </div>
 
-    <footer class="absolute bottom-4 text-center text-sm text-gray-400 dark:text-gray-600 z-10">
+    <footer class="absolute bottom-4 text-center text-sm text-slate-500 dark:text-gray-600 z-10 w-full">
         MaturaSmart • Hiba történt a mátrixban
     </footer>
 
-    <script src="../src/assets/script.js"></script> 
-    </body>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        
+        htmlElement.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') htmlElement.classList.add('dark');
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            if (newTheme === 'dark') htmlElement.classList.add('dark');
+            else htmlElement.classList.remove('dark');
+        });
+    </script>
+</body>
 </html>
