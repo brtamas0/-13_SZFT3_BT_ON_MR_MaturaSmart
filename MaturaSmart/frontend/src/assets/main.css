@@ -123,3 +123,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.grid-bg {
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(60deg);
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+    opacity: 0.3;
+}
+
+[data-theme="light"] .grid-bg {
+    background-image: 
+        linear-gradient(rgba(37, 99, 235, 0.3) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(37, 99, 235, 0.3) 1px, transparent 1px);
+    opacity: 0.6;
+}
+
+@keyframes gridMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 40px; }
+}
