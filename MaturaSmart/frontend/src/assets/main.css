@@ -1,18 +1,14 @@
 @import "tailwindcss";
 
-/* --- TE EREDETI STYLE.CSS TARTALMAD --- */
-
 :root {
     --font-family: 'Inter', system-ui, -apple-system, sans-serif;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- GÖRGETŐSÁV STABILIZÁLÁS --- */
 html {
     overflow-y: scroll;
 }
 
-/* --- TÉMÁK --- */
 [data-theme="light"] {
     --bg-color: #f3f4f6;
     --text-primary: #111827;
