@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -42,6 +41,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-blue: var(--neon-blue);
+
+  --animate-float: float 6s ease-in-out infinite;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
 }
 
 :root {
@@ -78,6 +87,9 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  --neon-purple: #a855f7;
+  --neon-blue: #6366f1;
 }
 
 .dark {
@@ -120,16 +132,20 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 }
 
+.glass-panel {
+  @apply backdrop-blur-xl border border-border/50 shadow-lg;
+}
+.dark .glass-panel {
+  @apply bg-[#0f172a]/70 border-white/10;
+}
+:not(.dark) .glass-panel {
+  @apply bg-white/70 border-gray-200;
+}
 
-/* =========================================
-   404 HIBAOLDAL STÍLUSOK
-   ========================================= */
-
-/* --- 1. HÁTTÉR RÁCS (GRID) --- */
 .grid-bg {
     position: fixed;
     width: 200%;
@@ -162,10 +178,8 @@
     mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, black 60%, black 100%);
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, black 60%, black 100%);
     opacity: 1;
-} 
 }
 
-/* --- 2. HALOTT AXEL ANIMÁCIÓ --- */
 .axel-dead-animation {
     width: 160px;
     animation: deadFloat 6s ease-in-out infinite;
@@ -181,7 +195,6 @@
     50% { transform: translateY(-15px) rotate(5deg); }
 }
 
-/* --- 3. 404 SZÖVEG --- */
 .text-gradient-404 {
     background-clip: text;
     -webkit-background-clip: text;
@@ -196,17 +209,14 @@
     .text-gradient-404 { font-size: 9rem; }
 }
 
-/* Sötét mód gradiens (Vörös -> Sötét) */
 [data-theme="dark"] .text-gradient-404 {
     background-image: linear-gradient(to bottom, #ef4444, rgba(239, 68, 68, 0.1));
 }
 
-/* Világos mód gradiens (Vörös -> Halványabb Vörös) */
 [data-theme="light"] .text-gradient-404 {
     background-image: linear-gradient(to bottom, #dc2626, #fca5a5);
 }
 
-/* --- 4. GOMB ÁRNYÉKOK --- */
 .btn-shadow-404 {
     box-shadow: 0 10px 25px rgba(79,70,229,0.3);
     transition: transform 0.2s, box-shadow 0.2s;
