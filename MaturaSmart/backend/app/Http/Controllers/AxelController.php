@@ -7,16 +7,18 @@ use Illuminate\Support\Facades\Http;
 
 class AxelController extends Controller
 {
+    
     public function ask(Request $request)
     {
         try {
-            //Adatok fogadása
+            // 1. Adatok fogadása
             $message = $request->input('message');
+            $history = $request->input('history', []);
             $subject = $request->input('subject', 'Általános');
             $topic = $request->input('topic', 'Általános');
             $notes = $request->input('notes') ?: "Nincs megadva konkrét tananyag.";
 
-            //Alap prompt, Ai tanítás
+            // 2. Alap prompt, Ai tanítás
             $systemPrompt = <<<EOT
             SZEREP:
 Te Axel vagy, a MaturaSmart érettségi felkészítő oldal intelligens, fiatalos és türelmes kabalája, aki segít a tanulónak, ha kérdése lenne, segítségre lenne szüksége. 🤖🎓
@@ -42,27 +44,41 @@ INSTRUKCIÓK:
 
 EOT;
 
-            //API Kulcs
+            // API Kulcs ellenőrzés
             $apiKey = env('GROQ_API_KEY');
             if (!$apiKey) {
                 return response()->json(['error' => 'Hiányzik a GROQ_API_KEY!'], 500);
             }
+            
+            $messagesPayload = [];
 
-            // GROQ API Request
+            $messagesPayload[] = ['role' => 'system', 'content' => $systemPrompt];
+
+            if (!empty($history) && is_array($history)) {
+                foreach ($history as $msg) {
+                    if (isset($msg['role'], $msg['content'])) {
+                        $messagesPayload[] = [
+                            'role' => $msg['role'], 
+                            'content' => $msg['content']
+                        ];
+                    }
+                }
+            }
+
+            $messagesPayload[] = ['role' => 'user', 'content' => $message];
+
+
+            //Küldés a GROQ API-nak
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'llama-3.3-70b-versatile',  //model
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $message]
-                ],
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => $messagesPayload,
                 'temperature' => 0.7,
                 'max_tokens' => 1024
             ]);
 
-            //Válasz a chatre
             if ($response->successful()) {
                 $data = $response->json();
                 $answer = $data['choices'][0]['message']['content'] ?? 'Nem kaptam választ.';
@@ -73,7 +89,6 @@ EOT;
                     'details' => $response->json()
                 ], 500);
             }
-
         } catch (\Exception $e) {
             return response()->json(['error' => 'Szerver Hiba', 'msg' => $e->getMessage()], 500);
         }

@@ -1,8 +1,21 @@
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
+
+const toggleTheme = () => {
+  const html = document.documentElement
+  const currentTheme = html.getAttribute('data-theme')
+  const newTheme = (currentTheme === 'dark' || !currentTheme) ? 'light' : 'dark'
+  html.setAttribute('data-theme', newTheme)
+  localStorage.setItem('theme', newTheme)
+}
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme') || 'dark'
+  document.documentElement.setAttribute('data-theme', saved)
+})
 
 const messages = ref([
-  { id: 1, sender: 'ai', text: 'Szia! 👋 Én vagyok Axel tesztüzemmódban. Állítsd be a kontextust fent, és teszteljük a tudásomat!' }
+  { id: 1, sender: 'ai', text: 'Szia! 👋 Én vagyok Axel. Miben segíthetek? 😉' }
 ])
 const userInput = ref('')
 const isLoading = ref(false)
@@ -12,65 +25,53 @@ const testContext = ref({
   subject: 'Történelem',
   topic: 'Honfoglalás',
   chapter: 'A törzsek vándorlása',
-  notes: 'A magyar törzsek vándorlása során érintették Levédiát és Etelközt. A hét vezér szövetséget kötött (vérszerződés).'
+  notes: 'A magyar törzsek vándorlása során érintették Levédiát és Etelközt...'
 })
 
 const renderMarkdown = (text) => {
   if (window.markdownit) {
-    const md = window.markdownit({
-      html: true,
-      linkify: true,
-      typographer: true
-    });
-    return md.render(text);
+    return window.markdownit({ html: true, linkify: true, typographer: true }).render(text)
   }
-  return text;
+  return text
 }
 
 const scrollToBottom = async () => {
   await nextTick()
-  if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-  }
+  if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
 }
 
 const sendMessage = async () => {
   if (!userInput.value.trim() || isLoading.value) return
-
+  
   const userMsg = userInput.value
+  
   messages.value.push({ id: Date.now(), sender: 'user', text: userMsg })
   userInput.value = ''
   scrollToBottom()
   isLoading.value = true
 
+  const history = messages.value.slice(0, -1).map(msg => ({
+    role: msg.sender === 'user' ? 'user' : 'assistant',
+    content: msg.text
+  }))
+
   try {
     const res = await fetch('http://backend.vm1.test/api/ask-axel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: userMsg,
-        subject: testContext.value.subject,
-        topic: testContext.value.topic,
-        chapter: testContext.value.chapter,
-        notes: testContext.value.notes
+      body: JSON.stringify({ 
+        message: userMsg, 
+        history: history,
+        ...testContext.value 
       })
     })
 
     const data = await res.json()
-
-    messages.value.push({ 
-      id: Date.now() + 1, 
-      sender: 'ai', 
-      text: data.answer || 'Hiba: Nem érkezett válasz.' 
-    })
-
-  } catch (error) {
-    console.error(error)
-    messages.value.push({ 
-      id: Date.now() + 1, 
-      sender: 'ai', 
-      text: '⚠️ Hiba történt a kommunikációban. Fut a backend?' 
-    })
+    messages.value.push({ id: Date.now()+1, sender: 'ai', text: data.answer })
+  
+  } catch (e) {
+    console.error(e)
+    messages.value.push({ id: Date.now()+1, sender: 'ai', text: '⚠️ Hiba: Nem értem el a szervert.' })
   } finally {
     isLoading.value = false
     scrollToBottom()
@@ -79,134 +80,228 @@ const sendMessage = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 text-slate-900 p-4 flex flex-col items-center">
-    
-    <div class="w-full max-w-4xl flex flex-col gap-4 h-[90vh]">
-      
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h1 class="text-xl font-bold mb-4 text-indigo-700">🛠️ Axel AI Playground</h1>
+  <div class="page-container">
+    <div class="ambient-background"></div>
+
+    <nav class="glass-nav">
+        <div class="nav-top">
+            <div class="logo">Matura<span class="accent-text">Smart</span> <small style="opacity: 0.7; font-size: 0.6em">| AI Teszt</small></div>
+            <button @click="toggleTheme" class="theme-btn" title="Témaváltás">🌓</button>
+        </div>
+    </nav>
+
+    <main class="container chat-layout">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-          <div>
-            <label class="block text-slate-500 mb-1">Tantárgy</label>
-            <input v-model="testContext.subject" class="w-full p-2 rounded bg-slate-50 border border-slate-300 focus:border-indigo-500 outline-none" />
-          </div>
-          <div>
-            <label class="block text-slate-500 mb-1">Témakör</label>
-            <input v-model="testContext.topic" class="w-full p-2 rounded bg-slate-50 border border-slate-300 focus:border-indigo-500 outline-none" />
-          </div>
-          <div>
-            <label class="block text-slate-500 mb-1">Fejezet</label>
-            <input v-model="testContext.chapter" class="w-full p-2 rounded bg-slate-50 border border-slate-300 focus:border-indigo-500 outline-none" />
-          </div>
-        </div>
-        <div class="mt-3">
-            <label class="block text-slate-500 mb-1">Jegyzet / Tananyag (RAG forrás)</label>
-            <textarea v-model="testContext.notes" rows="2" class="w-full p-2 rounded bg-slate-50 border border-slate-300 text-xs focus:border-indigo-500 outline-none"></textarea>
-        </div>
-      </div>
-
-      <div 
-        ref="chatContainer"
-        class="flex-grow bg-white rounded-xl shadow-inner border border-slate-200 overflow-y-auto p-4 space-y-4"
-      >
-        <div 
-          v-for="msg in messages" 
-          :key="msg.id" 
-          :class="['flex', msg.sender === 'user' ? 'justify-end' : 'justify-start']"
-        >
-          <div 
-            :class="[
-              'max-w-[85%] p-4 rounded-2xl leading-relaxed shadow-sm',
-              msg.sender === 'user' 
-                ? 'bg-indigo-600 text-white rounded-br-none'
-                : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200'
-            ]"
-          >
-            <div v-if="msg.sender === 'ai'" 
-                 v-html="renderMarkdown(msg.text)" 
-                 class="markdown-body text-sm">
-            </div>
-            <div v-else class="text-sm whitespace-pre-wrap">
-                {{ msg.text }}
+        <aside class="card-3d sidebar">
+            <h3 class="sidebar-title">🛠️ Kontextus</h3>
+            
+            <div class="input-group">
+                <label>Tantárgy</label>
+                <input v-model="testContext.subject" class="glass-input" placeholder="Pl. Történelem" />
             </div>
 
-          </div>
-        </div>
-
-        <div v-if="isLoading" class="flex justify-start">
-            <div class="bg-slate-100 p-3 rounded-2xl rounded-bl-none text-slate-500 text-sm animate-pulse border border-slate-200">
-                Axel gondolkodik... 🧠
+            <div class="input-group">
+                <label>Témakör</label>
+                <input v-model="testContext.topic" class="glass-input" placeholder="Pl. Honfoglalás" />
             </div>
-        </div>
-      </div>
 
-      <form @submit.prevent="sendMessage" class="flex gap-2">
-        <input 
-          v-model="userInput" 
-          type="text" 
-          placeholder="Írj valamit..."
-          class="flex-grow p-4 rounded-xl bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
-        />
-        <button 
-          type="submit" 
-          :disabled="isLoading || !userInput"
-          class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 rounded-xl font-bold transition-colors shadow-sm"
-        >
-          Küldés
-        </button>
-      </form>
+            <div class="input-group">
+                <label>Fejezet</label>
+                <input v-model="testContext.chapter" class="glass-input" placeholder="Pl. Vándorlás" />
+            </div>
 
-    </div>
+            <div class="input-group full-height">
+                <label>Jegyzet / Forrás</label>
+                <textarea 
+                    v-model="testContext.notes" 
+                    class="glass-input textarea-resize" 
+                    rows="10" 
+                    placeholder="Másold ide a tananyagot..."
+                ></textarea>
+            </div>
+        </aside>
+
+        <section class="card-3d chat-window">
+            <div class="chat-messages" ref="chatContainer">
+                <div v-for="msg in messages" :key="msg.id" :class="['message-row', msg.sender]">
+                    <div class="message-bubble">
+                        <div v-if="msg.sender === 'ai'" v-html="renderMarkdown(msg.text)" class="markdown-body"></div>
+                        <div v-else>{{ msg.text }}</div>
+                    </div>
+                </div>
+
+                <div v-if="isLoading" class="typing-indicator">
+                    Axel gépel<span>.</span><span>.</span><span>.</span>
+                </div>
+            </div>
+
+            <form @submit.prevent="sendMessage" class="chat-input-area">
+                <input 
+                    v-model="userInput" 
+                    type="text" 
+                    placeholder="Írj valamit..." 
+                    class="glass-input chat-input-field" 
+                />
+                <button type="submit" :disabled="isLoading || !userInput" class="btn-primary">
+                    Küldés ➤
+                </button>
+            </form>
+        </section>
+
+    </main>
   </div>
 </template>
 
 <style>
 
-.markdown-body {
-  line-height: 1.6;
-  color: inherit;
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Címsorok */
-.markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  font-weight: 700;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  color: inherit;
+.chat-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    height: calc(100vh - 80px);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-sizing: border-box;
 }
 
-.markdown-body h1 { font-size: 1.4em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em; }
-.markdown-body h2 { font-size: 1.2em; }
-.markdown-body h3 { font-size: 1.1em; text-decoration: underline; }
+@media (min-width: 900px) {
+    .chat-layout {
+        grid-template-columns: 300px 1fr;
+    }
+}
 
-.markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-.markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-.markdown-body li { margin-bottom: 0.25em; }
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+}
 
-.markdown-body strong { font-weight: 800; color: inherit; }
-.markdown-body a { color: #2563eb; text-decoration: underline; }
+.sidebar-title {
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 1.1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.input-group label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.glass-input {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: inherit;
+    padding: 0.8rem;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.2s;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+[data-theme="light"] .glass-input {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(0,0,0,0.1);
+}
+.glass-input:focus {
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.textarea-resize {
+    resize: none;
+    height: 100%;
+}
+.full-height {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-row {
+    display: flex;
+    width: 100%;
+}
+.message-row.user { justify-content: flex-end; }
+.message-row.ai { justify-content: flex-start; }
+
+.message-bubble {
+    max-width: 80%;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.message-row.user .message-bubble {
+    background: var(--accent);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+.message-row.ai .message-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom-left-radius: 2px;
+}
+[data-theme="light"] .message-row.ai .message-bubble {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0,0,0,0.05);
+}
+
+.chat-input-area {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.02);
+}
+
+.typing-indicator {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-left: 1rem;
+}
+.typing-indicator span {
+    animation: blink 1.4s infinite both;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
 
 .markdown-body code {
-  background-color: rgba(0,0,0,0.05);
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-family: monospace;
-  font-weight: 600;
-  color: #db2777;
-}
-
-.markdown-body pre {
-  background-color: #1e293b;
-  color: #f1f5f9;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-.markdown-body pre code {
-  background-color: transparent;
-  color: inherit;
-  padding: 0;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 5px;
+    border-radius: 4px;
 }
 </style>
