@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 
 const messages = ref([
   { id: 1, sender: 'ai', text: 'Szia! 👋 Én vagyok Axel tesztüzemmódban. Állítsd be a kontextust fent, és teszteljük a tudásomat!' }
@@ -14,7 +14,17 @@ const testContext = ref({
   chapter: 'A törzsek vándorlása',
   notes: 'A magyar törzsek vándorlása során érintették Levédiát és Etelközt. A hét vezér szövetséget kötött (vérszerződés).'
 })
-
+const renderMarkdown = (text) => {
+  if (window.markdownit) {
+    const md = window.markdownit({
+      html: true,
+      linkify: true,
+      typographer: true
+    });
+    return md.render(text);
+  }
+  return text;
+}
 const scrollToBottom = async () => {
   await nextTick()
   if (chatContainer.value) {
@@ -111,7 +121,10 @@ const sendMessage = async () => {
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-bl-none'
             ]"
           >
-            {{ msg.text }}
+            <div 
+  v-html="renderMarkdown(msg.text)" 
+  class="markdown-body text-sm"
+></div>
           </div>
         </div>
 
