@@ -1,63 +1,27 @@
+<script setup>
+import { ref } from "vue"
+import BaseLayout from "@/layouts/BaseLayout.vue"
+
+const subjects = [
+  { title: "Matematika", subtitle: "Koordinátageometria", icon: "📐" },
+  { title: "Szoftverfejlesztés", subtitle: "Backend API", icon: "💻" },
+  { title: "Angol nyelv", subtitle: "Grammar", icon: "🗣️" },
+  { title: "Történelem", subtitle: "Hidegháború", icon: "📜" },
+  { title: "Magyar nyelv", subtitle: "Retorika", icon: "📖" }
+]
+</script>
+
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#0b1029] to-[#031625] text-white">
+  <BaseLayout>
 
-<header class="w-full flex items-center justify-between px-6 md:px-10 py-5 border-b border-white/10">
-
-  <div class="logo">
-    Matura<span class="accent-text">Smart</span>
-  </div>
-
-  <nav class="hidden md:flex gap-6 text-gray-300 text-sm items-center">
-
-    <span class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow-md">
-      Vezérlőpult
-    </span>
-
-    <span class="nav-item">Tantárgyak</span>
-    <span class="nav-item flex items-center gap-1">Naptár 📅</span>
-    <span class="nav-item">Eredmények</span>
-    <span class="nav-item flex items-center gap-1">Ranglista 🏆</span>
-    <span class="nav-item">Profil</span>
-  </nav>
-
-  <div class="flex items-center gap-4">
-
-    <div class="px-4 py-2 bg-black/40 rounded-2xl shadow-lg text-lg flex items-center gap-2">
-      <span>🔥</span> <span>23</span>
-    </div>
-
-    <button
-      class="md:hidden text-3xl"
-      @click="mobileOpen = !mobileOpen"
-    >
-      ☰
-    </button>
-  </div>
-</header>
-
-    <transition name="fade">
-      <div
-        v-if="mobileOpen"
-        class="md:hidden bg-[#0d1538] border-b border-white/10 px-6 py-4 flex flex-col gap-4 text-gray-300 text-sm"
-      >
-        <span class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow-md w-fit">
-          Vezérlőpult
-        </span>
-
-        <span class="nav-item">Tantárgyak</span>
-        <span class="nav-item flex items-center gap-1">Naptár 📅</span>
-        <span class="nav-item">Eredmények</span>
-        <span class="nav-item flex items-center gap-1">Ranglista 🏆</span>
-        <span class="nav-item">Profil</span>
-      </div>
-    </transition>
-
-    <section class="max-w-6xl mx-auto mt-10 p-6 md:p-0">
+    <!-- DASHBOARD TOP CARD -->
+    <section class="mt-4">
 
       <div class="bg-[#10194E]/70 border border-white/10 rounded-3xl p-8 shadow-2xl">
 
         <div class="flex flex-col md:flex-row justify-between gap-6">
 
+          <!-- LEFT SIDE -->
           <div>
             <h2 class="text-3xl font-bold">Szia Tamás! 👋</h2>
             <p class="text-gray-300 mt-2">Hátravan az írásbeliig:</p>
@@ -80,7 +44,7 @@
             </div>
           </div>
 
-
+          <!-- RIGHT SIDE -->
           <div class="bg-[#0f173d] border border-white/10 rounded-2xl p-6 w-full shadow-xl">
             <h3 class="text-sm text-gray-400">LEGUTÓBBI LECKE FOLYTATÁSA:</h3>
             <p class="text-lg font-semibold">Matematika: Koordinátageometria</p>
@@ -114,12 +78,12 @@
       </div>
     </section>
 
-    <section class="max-w-6xl mx-auto mt-12">
-      <h2 class="text-xl font-bold mb-6 tracking-wide px-4 md:px-0">
+    <section class="mt-12">
+      <h2 class="text-xl font-bold mb-6 tracking-wide">
         Tantárgyaid
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 md:px-0">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <div v-for="s in subjects" :key="s.title" class="subject-card">
           <div class="text-4xl mb-3">{{ s.icon }}</div>
@@ -134,32 +98,11 @@
       </div>
     </section>
 
-  </div>
+  </BaseLayout>
 </template>
 
-<script setup>
-import { ref } from "vue"
-
-const mobileOpen = ref(false)
-
-const subjects = [
-  { title: "Matematika", subtitle: "Koordinátageometria", icon: "📐" },
-  { title: "Szoftverfejlesztés", subtitle: "Backend API", icon: "💻" },
-  { title: "Angol nyelv", subtitle: "Grammar", icon: "🗣️" },
-  { title: "Történelem", subtitle: "Hidegháború", icon: "📜" },
-  { title: "Magyar nyelv", subtitle: "Retorika", icon: "📖" }
-]
-</script>
 
 <style scoped>
-.nav-item {
-  cursor: pointer;
-  transition: .2s;
-}
-.nav-item:hover {
-  color: white;
-}
-
 .time-box {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
@@ -225,15 +168,5 @@ const subjects = [
 .add-card:hover{
   background:rgba(255,255,255,.2);
   color:white;
-}
-
-/* MOBILE NAV ANIMATION */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .25s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

@@ -10,8 +10,10 @@ const mobileOpen = ref(false)
     class="w-full backdrop-blur-md bg-white/5 border-b border-white/10 shadow-lg px-6 md:px-10 py-5 flex items-center justify-between relative z-20"
   >
     <RouterLink to="/" class="text-2xl font-bold tracking-wide">
-      Matura<span class="text-blue-400">Smart</span>
+         Matura<span class="text-[#6CA6FF]">Smart</span>
     </RouterLink>
+
+
 
     <nav class="hidden md:flex gap-6 text-gray-300 text-sm items-center">
 

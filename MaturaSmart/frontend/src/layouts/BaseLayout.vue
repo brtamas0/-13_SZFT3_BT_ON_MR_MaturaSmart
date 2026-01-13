@@ -1,5 +1,5 @@
 <script setup>
-import BaseHeader from '@/components/layout/BaseHeader.vue'
+import BaseHeader from './BaseHeader.vue';
 </script>
 
 <template>
@@ -7,7 +7,7 @@ import BaseHeader from '@/components/layout/BaseHeader.vue'
 
     <BaseHeader />
 
-    <main class="flex-grow max-w-6xl mx-auto px-6 md:px-0 py-10 relative z-10">
+    <main class="flex-grow max-w-6xl mx-auto px-6 md:px-0 pt-20 pb-10 relative z-10">
       <slot />
     </main>
 
