@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue"
 import BaseLayout from "@/layouts/BaseLayout.vue"
+import BaseHeader from "@layouts/BaseHeader.vue";
 
 const subjects = [
   { title: "Matematika", subtitle: "Koordinátageometria", icon: "📐" },
@@ -13,15 +14,12 @@ const subjects = [
 
 <template>
   <BaseLayout>
-
-    <!-- DASHBOARD TOP CARD -->
+    <BaseHeader mode="app" />
     <section class="mt-4">
 
       <div class="bg-[#10194E]/70 border border-white/10 rounded-3xl p-8 shadow-2xl">
 
         <div class="flex flex-col md:flex-row justify-between gap-6">
-
-          <!-- LEFT SIDE -->
           <div>
             <h2 class="text-3xl font-bold">Szia Tamás! 👋</h2>
             <p class="text-gray-300 mt-2">Hátravan az írásbeliig:</p>
@@ -44,7 +42,6 @@ const subjects = [
             </div>
           </div>
 
-          <!-- RIGHT SIDE -->
           <div class="bg-[#0f173d] border border-white/10 rounded-2xl p-6 w-full shadow-xl">
             <h3 class="text-sm text-gray-400">LEGUTÓBBI LECKE FOLYTATÁSA:</h3>
             <p class="text-lg font-semibold">Matematika: Koordinátageometria</p>
