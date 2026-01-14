@@ -69,16 +69,30 @@ const closeMobile = () => (mobileOpen.value = false);
     </div>
 
     <transition name="fade">
-      <div
-        v-if="mobileOpen"
-        class="md:hidden bg-[#0b1029]/95 border-t border-white/10 px-6 py-6 space-y-4"
-      >
-        <RouterLink to="/#home" class="block nav-item" @click="closeMobile">Kezdőlap</RouterLink>
-        <RouterLink to="/#features" class="block nav-item" @click="closeMobile">Funkciók</RouterLink>
-        <RouterLink to="/#mission" class="block nav-item" @click="closeMobile">Célunk</RouterLink>
-        <RouterLink to="/#faq" class="block nav-item" @click="closeMobile">GYIK</RouterLink>
-      </div>
-    </transition>
+  <div
+    v-if="mobileOpen"
+    class="md:hidden bg-[#0b1029]/95 border-t border-white/10 px-6 py-6 space-y-4"
+  >
+    <!-- LANDING -->
+    <template v-if="props.mode === 'landing'">
+      <RouterLink to="/#home" class="block nav-item" @click="mobileOpen = false">Kezdőlap</RouterLink>
+      <RouterLink to="/#features" class="block nav-item" @click="mobileOpen = false">Funkciók</RouterLink>
+      <RouterLink to="/#mission" class="block nav-item" @click="mobileOpen = false">Célunk</RouterLink>
+      <RouterLink to="/#faq" class="block nav-item" @click="mobileOpen = false">GYIK</RouterLink>
+    </template>
+
+    <!-- APP -->
+    <template v-else>
+      <RouterLink to="/main" class="block nav-item" @click="mobileOpen = false">Vezérlőpult</RouterLink>
+      <RouterLink to="/subjects" class="block nav-item" @click="mobileOpen = false">Tantárgyak</RouterLink>
+      <RouterLink to="/calendar" class="block nav-item" @click="mobileOpen = false">Naptár 📅</RouterLink>
+      <RouterLink to="/results" class="block nav-item" @click="mobileOpen = false">Eredmények</RouterLink>
+      <RouterLink to="/leaderboard" class="block nav-item" @click="mobileOpen = false">Ranglista 🏆</RouterLink>
+      <RouterLink to="/profile" class="block nav-item" @click="mobileOpen = false">Profil</RouterLink>
+    </template>
+  </div>
+</transition>
+
   </header>
 </template>
 
