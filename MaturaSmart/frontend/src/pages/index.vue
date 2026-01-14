@@ -6,20 +6,9 @@ import BaseHeader from '@/layouts/BaseHeader.vue'
 
 const router = useRouter()
 
-// GYIK Logika
 const activeFaq = ref(null)
 const toggleFaq = (index) => {
   activeFaq.value = activeFaq.value === index ? null : index
-}
-
-// Téma Logika
-const toggleTheme = () => {
-  const html = document.documentElement
-  const currentTheme = html.getAttribute('data-theme')
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-  
-  html.setAttribute('data-theme', newTheme)
-  localStorage.setItem('theme', newTheme)
 }
 
 onMounted(() => {
@@ -27,31 +16,21 @@ onMounted(() => {
   document.documentElement.setAttribute('data-theme', saved)
 })
 
-// Scroll Logika
-const scrollToSection = (id) => {
-  const element = document.getElementById(id)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
-}
-
-// Navigáció
 const goToLogin = () => {
   router.push('/login')
 }
 </script>
 
+
 <template>
   <BaseLayout>
 
-    <!-- HEADER (landing mód) -->
     <BaseHeader mode="landing" />
 
     <div class="ambient-background"></div>
 
     <main class="container" id="home">
 
-      <!-- HERO -->
       <section class="hero-section">
         <div class="card-3d hero-card">
           <div class="landing-hero-content" style="flex: 1;">
@@ -80,8 +59,6 @@ const goToLogin = () => {
           </div>
         </div>
       </section>
-
-      <!-- STATOK -->
       <div class="grid-3" style="margin-bottom: 4rem;">
         <div class="card-3d" style="text-align: center;">
           <span class="stat-number">1.200+</span>
@@ -99,7 +76,6 @@ const goToLogin = () => {
         </div>
       </div>
 
-      <!-- MIÉRT A MATURASMART -->
       <div id="features" style="text-align: center; margin: 4rem 0 2rem;">
         <h2 style="font-size: 2rem; margin-bottom: 1rem;">Miért a MaturaSmart?</h2>
         <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
@@ -107,7 +83,6 @@ const goToLogin = () => {
         </p>
       </div>
 
-      <!-- FEATURE GRID -->
       <div class="grid-3">
         <div class="card-3d" style="text-align: center;">
           <div class="feature-icon-large">👾</div>
@@ -158,7 +133,6 @@ const goToLogin = () => {
         </div>
       </div>
 
-      <!-- MISSION -->
       <section id="mission" style="margin-top: 5rem;">
         <div class="card-3d mission-card">
           <div style="max-width: 800px; margin: 0 auto;">
@@ -176,7 +150,6 @@ const goToLogin = () => {
         </div>
       </section>
 
-      <!-- FAQ -->
       <div id="faq" style="margin-top: 5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
         <h2 style="font-size: 2rem; text-align: center; margin-bottom: 2rem;">Gyakori Kérdések</h2>
 
@@ -209,7 +182,6 @@ const goToLogin = () => {
         </div>
       </div>
 
-      <!-- CTA -->
       <div style="text-align: center; margin-top: 5rem; padding: 3rem; border-radius: 30px; border: 1px solid var(--glass-border);">
         <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Készen állsz az ötösre?</h2>
         <button @click="goToLogin" class="btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;">
@@ -219,7 +191,6 @@ const goToLogin = () => {
 
     </main>
 
-    <!-- FOOTER -->
     <footer class="footer">
       <div class="container" style="padding-bottom: 2rem;">
         <div class="logo" style="margin-bottom: 1rem;">

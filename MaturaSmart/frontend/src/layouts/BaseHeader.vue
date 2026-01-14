@@ -1,30 +1,55 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
+
 const props = defineProps({
   mode: {
     type: String,
-    default: "app" 
-  }
-})
+    default: "app", // landing | app
+  },
+});
 
-const mobileOpen = ref(false)
+const mobileOpen = ref(false);
+const closeMobile = () => (mobileOpen.value = false);
 </script>
 
 <template>
   <header
-    class="w-full backdrop-blur-md bg-white/5 border-b border-white/10 shadow-lg px-6 md:px-10 py-5 flex flex-col gap-4 relative z-20"
+    class="fixed top-0 left-0 w-full z-50
+           backdrop-blur-xl bg-[#0b1029]/70
+           border-b border-white/10"
   >
+    <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
 
-    <div class="flex items-center justify-between">
       <RouterLink to="/" class="text-2xl font-bold tracking-wide">
         Matura<span class="text-[#6CA6FF]">Smart</span>
       </RouterLink>
 
-      <div class="flex items-center gap-4">
+      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <template v-if="props.mode === 'landing'">
+          <RouterLink to="/#home" class="nav-item">Kezdőlap</RouterLink>
+          <RouterLink to="/#features" class="nav-item">Funkciók</RouterLink>
+          <RouterLink to="/#mission" class="nav-item">Célunk</RouterLink>
+          <RouterLink to="/#faq" class="nav-item">GYIK</RouterLink>
+        </template>
 
+        <template v-else>
+          <RouterLink
+            to="/main"
+            class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow-md hover:bg-blue-500 transition"
+          >
+            Vezérlőpult
+          </RouterLink>
+          <RouterLink to="/subjects" class="nav-item">Tantárgyak</RouterLink>
+          <RouterLink to="/calendar" class="nav-item">Naptár 📅</RouterLink>
+          <RouterLink to="/results" class="nav-item">Eredmények</RouterLink>
+          <RouterLink to="/leaderboard" class="nav-item">Ranglista 🏆</RouterLink>
+          <RouterLink to="/profile" class="nav-item">Profil</RouterLink>
+        </template>
+      </nav>
+
+      <div class="flex items-center gap-4">
         <template v-if="props.mode === 'landing'">
           <button class="text-xl hover:opacity-80 transition">🌓</button>
-
           <RouterLink
             to="/login"
             class="bg-[#6CA6FF] text-black font-semibold px-4 py-2 rounded-xl shadow-md hover:bg-[#8bb8ff] transition text-sm"
@@ -34,8 +59,8 @@ const mobileOpen = ref(false)
         </template>
 
         <template v-else>
-          <div class="px-4 py-2 bg-black/40 rounded-2xl shadow-lg text-lg flex items-center gap-2">
-            <span>🔥</span> <span>23</span>
+          <div class="px-4 py-2 bg-black/40 rounded-2xl shadow-lg text-sm flex items-center gap-2">
+            🔥 <span>23</span>
           </div>
         </template>
 
@@ -43,36 +68,24 @@ const mobileOpen = ref(false)
       </div>
     </div>
 
-    <nav class="hidden md:flex gap-6 text-gray-300 text-sm items-center">
-
-      <template v-if="props.mode === 'landing'">
-        <a href="#" class="hover:text-white transition">Kezdőlap</a>
-        <a href="#" class="hover:text-white transition">Funkciók</a>
-        <a href="#" class="hover:text-white transition">Célunk</a>
-        <a href="#" class="hover:text-white transition">GYIK</a>
-      </template>
-
-      <template v-else>
-         <RouterLink to="/main" class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow-md hover:bg-blue-500 transition">
-            Vezérlőpult
-        </RouterLink>
-        <RouterLink to="/subjects" class="nav-item">Tantárgyak</RouterLink>
-        <RouterLink to="/calendar" class="nav-item">Naptár 📅</RouterLink>
-        <RouterLink to="/results" class="nav-item">Eredmények</RouterLink>
-        <RouterLink to="/leaderboard" class="nav-item">Ranglista 🏆</RouterLink>
-        <RouterLink to="/profile" class="nav-item">Profil</RouterLink>
-      </template>
-
-    </nav>
-
+    <transition name="fade">
+      <div
+        v-if="mobileOpen"
+        class="md:hidden bg-[#0b1029]/95 border-t border-white/10 px-6 py-6 space-y-4"
+      >
+        <RouterLink to="/#home" class="block nav-item" @click="closeMobile">Kezdőlap</RouterLink>
+        <RouterLink to="/#features" class="block nav-item" @click="closeMobile">Funkciók</RouterLink>
+        <RouterLink to="/#mission" class="block nav-item" @click="closeMobile">Célunk</RouterLink>
+        <RouterLink to="/#faq" class="block nav-item" @click="closeMobile">GYIK</RouterLink>
+      </div>
+    </transition>
   </header>
 </template>
-
 
 <style scoped>
 .nav-item {
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
 }
 .nav-item:hover {
   color: white;
@@ -80,7 +93,7 @@ const mobileOpen = ref(false)
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .25s;
+  transition: opacity 0.25s;
 }
 .fade-enter-from,
 .fade-leave-to {
