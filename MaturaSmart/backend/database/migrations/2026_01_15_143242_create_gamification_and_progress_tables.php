@@ -6,22 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('gamification_and_progress_tables', function (Blueprint $table) {
+        // Felhasználói előrehaladás kérdésekben
+        Schema::create('user_progress', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('question_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_correct');
+            $table->text('user_answer')->nullable();
+            $table->integer('time_taken_seconds')->default(0);
+            $table->timestamp('created_at')->useCurrent(); // Mikor oldotta meg
         });
+
+        
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('gamification_and_progress_tables');
+        
+        Schema::dropIfExists('user_progress');
     }
 };
