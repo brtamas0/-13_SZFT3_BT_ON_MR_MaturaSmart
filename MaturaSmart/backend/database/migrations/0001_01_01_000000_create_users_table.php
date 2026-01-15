@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Felhasználók
+        // Felhasználók
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
@@ -33,10 +33,20 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        
+
+        // felhasználói beállítások
+        Schema::create('user_settings', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('key');
+            $table->string('value')->nullable();
+            $table->primary(['user_id', 'key']); 
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('user_settings');
         Schema::dropIfExists('users');
     }
 };
