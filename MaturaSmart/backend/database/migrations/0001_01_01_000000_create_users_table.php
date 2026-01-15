@@ -33,9 +33,24 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        
+        // Jelszó visszaállítási tokenek
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
 
-        // felhasználói beállítások
+        // Munkamenetek (Laravel)
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+
+        // Felhasználói beállítások
         Schema::create('user_settings', function (Blueprint $table) {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('key');
@@ -47,6 +62,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('user_settings');
+        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
     }
 };
