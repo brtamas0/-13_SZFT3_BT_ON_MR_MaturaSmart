@@ -24,27 +24,21 @@ class User extends Authenticatable
         'last_activity' => 'datetime',
     ];
 
-    // --- KAPCSOLATOK ---
-
-    // Egy usernek sok beállítása van
     public function settings()
     {
         return $this->hasMany(UserSetting::class);
     }
 
-    // Egy usernek sok megoldott feladata van
     public function progress()
     {
         return $this->hasMany(UserProgress::class);
     }
 
-    // Egy usernek sok tárgya van a leltárban
     public function inventory()
     {
         return $this->hasMany(UserInventory::class);
     }
 
-    // Egy usernek sok kitüntetése van
     public function achievements()
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')
