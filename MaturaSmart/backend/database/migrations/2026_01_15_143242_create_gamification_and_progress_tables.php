@@ -31,11 +31,28 @@ return new class extends Migration
             $table->unique(['user_id', 'flashcard_id']);
         });
 
+        // Eredmények, mérföldkövek
+        Schema::create('achievements', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('icon')->nullable();
+            $table->integer('xp_reward')->default(0);
+        });
+
+        Schema::create('user_achievements', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
+            $table->timestamp('earned_at')->useCurrent();
+        });
+
     }
 
     public function down(): void
     {
-        
+        Schema::dropIfExists('user_achievements');
+        Schema::dropIfExists('achievements');
         Schema::dropIfExists('user_flashcard_progress');
         Schema::dropIfExists('user_progress');
     }
