@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Felhasználói előrehaladás kérdésekben
+        // Kvíz progress
         Schema::create('user_progress', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -16,28 +16,30 @@ return new class extends Migration
             $table->boolean('is_correct');
             $table->text('user_answer')->nullable();
             $table->integer('time_taken_seconds')->default(0);
-            $table->timestamp('created_at')->useCurrent(); // Mikor oldotta meg
+            $table->timestamps();
         });
 
-        // Kártya előrehaladás
+        // 2. Flashcard előrehaladás (Leitner rendszer)
         Schema::create('user_flashcard_progress', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('flashcard_id')->constrained()->onDelete('cascade');
-            $table->integer('box')->default(1); // Leitner doboz (1-5)
+            $table->integer('box')->default(1); // Leitner doboz
             $table->timestamp('next_review_at')->useCurrent();
             $table->timestamp('last_reviewed_at')->nullable();
+            $table->timestamps();
             
             $table->unique(['user_id', 'flashcard_id']);
         });
 
-        // Eredmények, mérföldkövek
+        // Mérföldkövek
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('icon')->nullable();
             $table->integer('xp_reward')->default(0);
+            $table->timestamps();
         });
 
         Schema::create('user_achievements', function (Blueprint $table) {
@@ -47,13 +49,14 @@ return new class extends Migration
             $table->timestamp('earned_at')->useCurrent();
         });
 
-        // Bolt és Inventory
+        // Bolt, Inventory
         Schema::create('shop_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('cost'); // Ár
-            $table->string('type'); // pl. 'streak_freeze', 'avatar_frame'
+            $table->integer('cost'); 
+            $table->string('type'); 
             $table->string('icon')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('user_inventory', function (Blueprint $table) {
@@ -63,6 +66,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->boolean('is_active')->default(false);
             $table->timestamp('purchased_at')->useCurrent();
+            $table->timestamps();
         });
     }
 
