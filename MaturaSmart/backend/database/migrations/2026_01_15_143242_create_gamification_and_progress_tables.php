@@ -19,12 +19,24 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent(); // Mikor oldotta meg
         });
 
-        
+        // Kártya előrehaladás
+        Schema::create('user_flashcard_progress', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('flashcard_id')->constrained()->onDelete('cascade');
+            $table->integer('box')->default(1); // Leitner doboz (1-5)
+            $table->timestamp('next_review_at')->useCurrent();
+            $table->timestamp('last_reviewed_at')->nullable();
+            
+            $table->unique(['user_id', 'flashcard_id']);
+        });
+
     }
 
     public function down(): void
     {
         
+        Schema::dropIfExists('user_flashcard_progress');
         Schema::dropIfExists('user_progress');
     }
 };
