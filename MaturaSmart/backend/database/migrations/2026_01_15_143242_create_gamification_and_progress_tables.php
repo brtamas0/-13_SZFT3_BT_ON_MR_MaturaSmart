@@ -47,10 +47,29 @@ return new class extends Migration
             $table->timestamp('earned_at')->useCurrent();
         });
 
+        // Bolt és Inventory
+        Schema::create('shop_items', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('cost'); // Ár
+            $table->string('type'); // pl. 'streak_freeze', 'avatar_frame'
+            $table->string('icon')->nullable();
+        });
+
+        Schema::create('user_inventory', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('shop_item_id')->constrained()->onDelete('cascade');
+            $table->integer('quantity')->default(1);
+            $table->boolean('is_active')->default(false);
+            $table->timestamp('purchased_at')->useCurrent();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('user_inventory');
+        Schema::dropIfExists('shop_items');
         Schema::dropIfExists('user_achievements');
         Schema::dropIfExists('achievements');
         Schema::dropIfExists('user_flashcard_progress');
