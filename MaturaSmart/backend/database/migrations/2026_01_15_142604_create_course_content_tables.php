@@ -12,32 +12,35 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique(); // URL-barát név
+            $table->string('slug')->unique();
             $table->string('icon')->nullable();
+            $table->timestamps();
         });
 
-        // 2. Témakörök
+        // Témakörök
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->integer('order')->default(0); // Sorrendhez
+            $table->integer('order')->default(0);
+            $table->timestamps();
         });
 
-        // 3. KÉRDÉSEK (KVÍZ)
+        // Kérdések
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('topic_id')->constrained()->onDelete('cascade');
-            $table->string('type');
+            $table->string('type'); 
             $table->integer('difficulty')->default(1);
-            $table->longText('content'); // A kérdés szövege (Markdown/HTML)
+            $table->longText('content'); 
             $table->text('explanation')->nullable();
             $table->string('image_url')->nullable();
             $table->integer('points')->default(10);
+            $table->timestamps();
         });
 
-        // 4. Válaszok (feleletválasztós kérdésekhez)
+        // Válaszok
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
@@ -45,7 +48,7 @@ return new class extends Migration
             $table->boolean('is_correct')->default(false);
         });
 
-        // Címkék kérdésekhez
+        // Tagek
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
@@ -57,13 +60,14 @@ return new class extends Migration
             $table->primary(['question_id', 'tag_id']);
         });
 
-        // Tanulókártyák
+        // Flashcard
         Schema::create('flashcards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('topic_id')->constrained()->onDelete('cascade');
-            $table->text('front');
-            $table->text('back');
+            $table->text('front'); 
+            $table->text('back');  
             $table->string('image_url')->nullable();
+            $table->timestamps();
         });
     }
 
