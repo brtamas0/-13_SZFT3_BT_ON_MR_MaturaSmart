@@ -43,6 +43,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn([
+                'google_id', 'avatar_url', 'graduation_year', 'role',
+                'xp', 'level', 'streak_start', 'current_streak',
+                'lost_streak', 'last_activity', 'gems'
+            ]);
+            $table->renameColumn('password_hash', 'password');
+        });
+
+        Schema::dropIfExists('user_settings');
     }
 };
