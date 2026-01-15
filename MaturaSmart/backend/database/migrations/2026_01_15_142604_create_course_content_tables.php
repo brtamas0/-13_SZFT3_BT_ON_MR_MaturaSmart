@@ -16,11 +16,22 @@ return new class extends Migration
             $table->string('icon')->nullable();
         });
 
+        // 2. Témakörök
+        Schema::create('topics', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->integer('order')->default(0); // Sorrendhez
+        });
+
         
     }
 
     public function down(): void
     {
+        
+        Schema::dropIfExists('topics');
         Schema::dropIfExists('subjects');
     }
 };
