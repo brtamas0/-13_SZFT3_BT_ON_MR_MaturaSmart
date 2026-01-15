@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subject extends Model
 {
+    protected $guarded = [];
+
     public function topics()
     {
-        return $this->hasMany(Topic::class);
+        return $this->hasMany(Topic::class)->orderBy('order');
     }
 }
