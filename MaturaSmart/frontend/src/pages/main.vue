@@ -88,7 +88,6 @@ onUnmounted(() => {
             <p class="text-blue-200 text-lg mb-8 font-light">
               Már csak ennyi időd van felkészülni az írásbelire:
             </p>
-
             <div class="flex flex-wrap justify-center md:justify-start gap-4">
               
               <div class="time-box group">
