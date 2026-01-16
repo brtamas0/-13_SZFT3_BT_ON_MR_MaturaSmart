@@ -7,59 +7,62 @@ import BaseHeader from "@layouts/BaseHeader.vue"
 const route = useRoute()
 const topic = ref(null)
 const isLoading = ref(true)
-const selectedAnswers = ref({}) // Itt tároljuk, mit jelölt be a diák { question_id: answer_id }
+const selectedAnswers = ref({}) 
 
-// Az URL-ből vesszük ki az ID-t
-const topicId = route.params.id
+// URL paraméterek kinyerése
+// Mivel a mappa neve [subject], a fájl neve pedig [topic].vue:
+const subjectSlug = route.params.subject 
+const topicSlug = route.params.topic 
 
 onMounted(async () => {
   try {
-    // Fontos: A Backendben a 'show' metódusnál legyen ->with(['questions.answers', 'subject'])
-    const response = await fetch(`http://backend.vm1.test/api/temakorok/${topicId}`)
+    // Adatok lekérése a Backendről a topic slug alapján
+    const response = await fetch(`http://backend.vm1.test/api/topics/${topicSlug}`)
     
     if (!response.ok) throw new Error('Hiba a betöltéskor')
     
     topic.value = await response.json()
   } catch (error) {
-    console.error(error)
+    console.error("Hiba történt:", error)
   } finally {
     isLoading.value = false
   }
 })
 
-// Válasz kezelése (Azonnali visszajelzés)
+// --- KVÍZ LOGIKA ---
+
+// Válasz kiválasztása
 const selectAnswer = (questionId, answer) => {
-  // Ha már válaszolt erre, ne engedjük módosítani (opcionális)
+  // Ha már válaszolt erre a kérdésre, nem engedjük újra
   if (selectedAnswers.value[questionId]) return;
 
+  // Eltároljuk a választást
   selectedAnswers.value[questionId] = {
     id: answer.id,
     isCorrect: answer.is_correct
   }
 }
 
-// Segédfüggvény a gombok színezéséhez
+// Gombok színezése az eredmény alapján
 const getAnswerClass = (questionId, answer) => {
   const selection = selectedAnswers.value[questionId]
   
-  // Ha még nincs kiválasztva semmi
-  if (!selection) {
-    return 'bg-white/5 hover:bg-white/10 border-white/10 text-gray-300'
-  }
+  // 1. Alapállapot (még nem válaszolt)
+  if (!selection) return 'bg-white/5 hover:bg-white/10 border-white/10 text-gray-300'
 
-  // Ha ezt a választ választottuk
+  // 2. Ezt a gombot nyomta meg a felhasználó
   if (selection.id === answer.id) {
     return answer.is_correct 
-      ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' // Helyes
-      : 'bg-red-500/20 border-red-500 text-red-400' // Helytelen
+      ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' // Helyes volt
+      : 'bg-red-500/20 border-red-500 text-red-400' // Helytelen volt
   }
 
-  // Ha nem ezt választottuk, de ez lett volna a helyes (megmutatjuk a megoldást)
+  // 3. Ez a gomb a helyes válasz (de a felhasználó mást nyomott) -> Megmutatjuk a megoldást
   if (answer.is_correct && selection.id !== answer.id) {
     return 'bg-green-500/10 border-green-500/50 text-green-500/70' 
   }
 
-  // Minden más inaktív
+  // 4. Egyéb gombok inaktívvá tétele
   return 'opacity-50 cursor-not-allowed border-transparent'
 }
 </script>
@@ -78,13 +81,11 @@ const getAnswerClass = (questionId, answer) => {
         <RouterLink to="/" class="hover:text-white transition-colors">Vezérlőpult</RouterLink>
         <span>/</span>
         <RouterLink 
-          v-if="topic.subject" 
-          :to="`/tantargyak/${topic.subject.slug}`" 
-          class="hover:text-white transition-colors"
+          :to="`/tantargyak/${subjectSlug}`" 
+          class="hover:text-white transition-colors capitalize"
         >
-          {{ topic.subject.name }}
+          {{ subjectSlug }}
         </RouterLink>
-        <span v-else>Tantárgy</span>
         <span>/</span>
         <span class="text-white font-medium">{{ topic.title }}</span>
       </nav>
@@ -103,29 +104,26 @@ const getAnswerClass = (questionId, answer) => {
         <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
       </div>
 
-      <div class="prose prose-invert prose-lg max-w-none mb-16">
-        <div class="bg-[#1e293b]/50 border-l-4 border-blue-500 p-6 rounded-r-xl">
-          <h3 class="text-white font-bold text-xl mb-2">👋 Üdvözlünk a leckében!</h3>
-          <p class="text-gray-300">
-            Ez itt a tananyag helye. Jelenleg ez egy statikus szöveg, de később ide fogjuk renderelni 
-            az adatbázisban tárolt <strong>Markdown</strong> tartalmat.
-          </p>
-          <p class="text-gray-300 mt-2">
-            Olvasd el figyelmesen az alábbiakat, majd oldd meg a feladatokat a lap alján!
-          </p>
-        </div>
+      <div class="prose prose-invert prose-lg max-w-none mb-16 text-gray-300">
         
-        <div class="mt-8 text-gray-300 space-y-4 leading-relaxed">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <div class="bg-[#1e293b]/50 border-l-4 border-blue-500 p-6 rounded-r-xl mb-8">
+          <h3 class="text-white font-bold text-xl mb-2">👋 Tanuljunk!</h3>
+          <p>Olvasd el az anyagot, majd válaszolj a lenti kérdésekre.</p>
         </div>
+
+        <div v-if="topic.content" v-html="topic.content"></div>
+        
+        <div v-else class="text-gray-500 italic p-4 border border-dashed border-gray-600 rounded-lg text-center">
+          Ehhez a leckéhez még nincs feltöltve részletes tananyag.
+        </div>
+
       </div>
 
       <div class="w-full h-px bg-white/10 my-12"></div>
 
       <div>
         <div class="flex items-center justify-between mb-8">
-          <h2 class="text-3xl font-bold text-white">Gyakorló feladatok 📝</h2>
+          <h2 class="text-3xl font-bold text-white">Gyakorlás 📝</h2>
           <span class="bg-white/10 text-white px-3 py-1 rounded-full text-sm">
             {{ topic.questions.length }} kérdés
           </span>
@@ -135,7 +133,7 @@ const getAnswerClass = (questionId, answer) => {
           <div 
             v-for="(question, index) in topic.questions" 
             :key="question.id" 
-            class="bg-[#1e293b] border border-white/5 rounded-2xl p-6 md:p-8 transition-all hover:border-white/10"
+            class="bg-[#1e293b] border border-white/5 rounded-2xl p-6 md:p-8 hover:border-white/10 transition-colors"
           >
             <div class="flex gap-4 mb-6">
               <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 font-bold text-sm">
@@ -153,7 +151,6 @@ const getAnswerClass = (questionId, answer) => {
                 class="text-left p-4 rounded-xl border transition-all duration-200 relative overflow-hidden group"
               >
                 <span class="relative z-10">{{ answer.text }}</span>
-
                 <span v-if="selectedAnswers[question.id]?.id === answer.id" class="absolute right-4 top-1/2 -translate-y-1/2">
                   <span v-if="answer.is_correct">✅</span>
                   <span v-else>❌</span>
@@ -163,40 +160,27 @@ const getAnswerClass = (questionId, answer) => {
             
             <div 
               v-if="selectedAnswers[question.id] && question.explanation" 
-              class="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg text-sm text-blue-200 animate-fade-in"
+              class="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg text-sm text-blue-200"
             >
               <strong>💡 Magyarázat:</strong> {{ question.explanation }}
             </div>
-
           </div>
         </div>
 
         <div class="mt-16 flex justify-center pb-20">
-          <button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-lg hover:shadow-blue-500/25 transition-all transform hover:-translate-y-1">
+          <button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-lg transition-transform hover:-translate-y-1">
             Lecke befejezése 🎉
           </button>
         </div>
-
       </div>
 
     </div>
 
     <div v-else class="text-center py-20">
       <h1 class="text-3xl font-bold text-white mb-4">Hoppá! 😕</h1>
-      <p class="text-gray-400 mb-6">Ez a lecke nem található.</p>
-      <RouterLink to="/" class="text-blue-400 hover:underline">Vissza a vezérlőpultra</RouterLink>
+      <p class="text-gray-400">Nem sikerült betölteni a leckét.</p>
+      <RouterLink to="/" class="text-blue-400 hover:underline mt-4 inline-block">Vissza a főoldalra</RouterLink>
     </div>
 
   </BaseLayout>
 </template>
-
-<style scoped>
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>

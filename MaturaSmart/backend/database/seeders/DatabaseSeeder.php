@@ -40,7 +40,18 @@ class DatabaseSeeder extends Seeder
         $pythagoras = Topic::create([
             'subject_id' => $math->id,
             'title' => 'A Pitagorasz-tétel',
+            'slug' => 'pitagorasz-tetel',
             'description' => 'Ismerd meg a derékszögű háromszögek titkát.',
+
+            'content' => '
+        <p>A Pitagorasz-tétel a geometria egyik alappillére. Azt mondja ki, hogy derékszögű háromszögben a két befogó négyzetének összege egyenlő az átfogó négyzetével.</p>
+        
+        <h3 class="text-xl font-bold text-white mt-4">A képlet</h3>
+        <p class="font-mono bg-black/30 p-4 rounded inline-block mt-2 text-blue-300">a² + b² = c²</p>
+        
+        <p class="mt-4">Ez a tétel csak és kizárólag <strong>derékszögű</strong> háromszögekre igaz.</p>
+    ',
+
             'order' => 1,
         ]);
 
@@ -94,7 +105,7 @@ class DatabaseSeeder extends Seeder
             'shop_item_id' => 1,
             'quantity' => 2,
         ]);
-        
+
         echo "Adatok feltöltve! Belépés: admin@teszt.hu / password\n";
     }
 }

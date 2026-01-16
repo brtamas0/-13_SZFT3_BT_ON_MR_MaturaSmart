@@ -8,7 +8,7 @@ const route = useRoute()
 const subject = ref(null)
 const isLoading = ref(true)
 
-const slug = route.params.slug
+const slug = route.params.subject
 
 //ideiglenes, majd a backendről jönnek ezek az adatok, tesztadatok a designhoz
 const mockStats = {
@@ -126,7 +126,7 @@ const progressColor = computed(() => {
 
               <div class="flex flex-col items-end gap-2">
                 <RouterLink 
-                  :to="`/temakorok/${topic.id}`"
+                  :to="`/tantargyak/${slug}/${topic.slug}`"
                   class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-900/20 whitespace-nowrap"
                 >
                   Indítás

@@ -19,13 +19,16 @@ return new class extends Migration
 
         // Témakörök
         Schema::create('topics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->integer('order')->default(0);
-            $table->timestamps();
-        });
+    $table->id();
+    $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+    $table->string('title');
+    $table->string('slug')->unique();
+    $table->text('description')->nullable();
+    $table->longText('content')->nullable(); 
+    
+    $table->integer('order')->default(0);
+    $table->timestamps();
+});
 
         // Kérdések
         Schema::create('questions', function (Blueprint $table) {
