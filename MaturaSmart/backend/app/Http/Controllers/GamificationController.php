@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TopicCompletion;
 use App\Models\Topic;
-use App\Models\User; // <--- EZT NE FELEJTSD EL!
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

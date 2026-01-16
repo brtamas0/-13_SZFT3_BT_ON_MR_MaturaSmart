@@ -10,7 +10,6 @@ const isLoading = ref(true)
 const user = ref(null)
 
 // --- ÉRETTSÉGI VISSZASZÁMLÁLÓ ---
-// Beállítjuk a dátumot 2026. május 4-re (matek érettségi várható ideje)
 const examDate = new Date('2026-05-04T08:00:00') 
 
 const remaining = ref({ days: 0, hours: 0, minutes: 0 })
@@ -44,14 +43,19 @@ onMounted(async () => {
   user.value = JSON.parse(storedUser)
 
   // 2. Visszaszámláló indítása
-  updateCountdown() // Azonnal fusson le egyszer
-  timerInterval = setInterval(updateCountdown, 1000) // Utána másodpercenként
+  updateCountdown()
+  timerInterval = setInterval(updateCountdown, 10000) //10mp
 
   // 3. Tantárgyak lekérése
   try {
-    const response = await fetch('http://backend.vm1.test/api/tantargyak', {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
+    const token = localStorage.getItem('token') // <--- Token kinyerése
+
+const response = await fetch('http://backend.vm1.test/api/tantargyak', {
+  headers: {
+    'Authorization': `Bearer ${token}`, // <--- Token küldése
+    'Accept': 'application/json'
+  }
+})
     if (response.ok) subjects.value = await response.json()
   } catch (error) {
     console.error(error)
@@ -209,7 +213,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Idődobozok stílusa - Nagyobb, szellősebb */
 .time-box {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 20px;
@@ -268,7 +271,7 @@ onUnmounted(() => {
 
 /* Kártyák */
 .subject-card {
-  height: 200px; /* Magasabb kártyák */
+  height: 200px;
   background: #1e293b;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.05);

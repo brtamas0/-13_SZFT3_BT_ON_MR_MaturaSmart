@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $user = User::create([
             'email' => 'tomi@maturasmart.hu',
-            'full_name' => 'Bíró Tamás',
+            'full_name' => 'Bíró Tamás Attila',
             'password' => Hash::make('jelszo1234'),
             'role' => 'admin',
             'xp' => 100,

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue' 
+import { ref, onMounted } from 'vue' 
 import { useRoute, useRouter } from 'vue-router' 
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
@@ -18,9 +18,30 @@ const subjectSlug = route.params.subject
 const topicSlug = route.params.topic 
 
 onMounted(async () => {
+  const token = localStorage.getItem('token')
+  
+  if (!token) {
+    router.push('/login')
+    return
+  }
+
   try {
-    const response = await fetch(`http://backend.vm1.test/api/topics/${topicSlug}`)
+    const response = await fetch(`http://backend.vm1.test/api/topics/${topicSlug}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    // Ha lejárt a token (401), kidobjuk a loginra
+    if (response.status === 401) {
+       localStorage.removeItem('token')
+       router.push('/login')
+       return
+    }
+
     if (!response.ok) throw new Error('Hiba a betöltéskor')
+    
     topic.value = await response.json()
   } catch (error) {
     console.error("Hiba történt:", error)
@@ -29,11 +50,13 @@ onMounted(async () => {
   }
 })
 
+// Válasz kiválasztása
 const selectAnswer = (questionId, answer) => {
   if (selectedAnswers.value[questionId]) return;
   selectedAnswers.value[questionId] = { id: answer.id, isCorrect: answer.is_correct }
 }
 
+// Stílusok a gombokhoz (Helyes/Helytelen)
 const getAnswerClass = (questionId, answer) => {
   const selection = selectedAnswers.value[questionId]
   if (!selection) return 'bg-white/5 hover:bg-white/10 border-white/10 text-gray-300'
@@ -42,16 +65,19 @@ const getAnswerClass = (questionId, answer) => {
   return 'opacity-50 cursor-not-allowed border-transparent'
 }
 
+// Lecke befejezése
 const finishLesson = async () => {
   const token = localStorage.getItem('token') 
 
   if (!token) {
     alert("Kérlek, jelentkezz be a pontszerzéshez!")
+    router.push('/login')
     return
   }
 
   isSubmitting.value = true
 
+  // Pontszámítás
   let correctCount = 0
   const totalQuestions = topic.value.questions.length
   
@@ -66,6 +92,7 @@ const finishLesson = async () => {
     : 100
 
   try {
+    // Mentés az adatbázisba
     const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
       method: 'POST',
       headers: {
@@ -83,6 +110,7 @@ const finishLesson = async () => {
 
     if (!response.ok) throw new Error(data.message || 'Hiba a mentéskor')
 
+    // Eredmény mentése a Modalhoz
     resultData.value = {
       xp: data.xp_gained,
       totalXp: data.total_xp,
@@ -149,7 +177,6 @@ const finishLesson = async () => {
         <div v-else class="text-gray-500 italic p-4 border border-dashed border-gray-600 rounded-lg text-center">
           Ehhez a leckéhez még nincs feltöltve részletes tananyag.
         </div>
-
       </div>
 
       <div class="w-full h-px bg-white/10 my-12"></div>
@@ -219,7 +246,8 @@ const finishLesson = async () => {
       <p class="text-gray-400">Nem sikerült betölteni a leckét.</p>
       <RouterLink to="/" class="text-blue-400 hover:underline mt-4 inline-block">Vissza a főoldalra</RouterLink>
     </div>
-<div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showSuccessModal = false"></div>
       
       <div class="relative bg-[#1e293b] border border-white/10 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">

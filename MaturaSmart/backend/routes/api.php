@@ -8,19 +8,41 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\AuthController;
 
+/*
+|--------------------------------------------------------------------------
+| PUBLIKUS ROUTE-OK (Bejelentkezés nélkül elérhető)
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-Route::post('/ask-axel', [AxelController::class, 'ask']);
+// Bejelentkezés
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/tantargyak', [SubjectController::class, 'index']);
-Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
-Route::get('/topics/{slug}', [TopicController::class, 'show']);
+
+
+/*
+|--------------------------------------------------------------------------
+| VÉDETT ROUTE-OK (Csak Tokennel érhető el)
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
-});
+    
+    // 1. Felhasználói adatok
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+    // 2. Kijelentkezés
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // 3. Tartalom (Tantárgyak és Témák)
+    Route::get('/tantargyak', [SubjectController::class, 'index']);
+    Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
+    Route::get('/topics/{slug}', [TopicController::class, 'show']);
+
+    // 4. Gamifikáció (XP szerzés)
+    Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
+
+    // 5. Axel AI
+    Route::post('/ask-axel', [AxelController::class, 'ask']);
+});

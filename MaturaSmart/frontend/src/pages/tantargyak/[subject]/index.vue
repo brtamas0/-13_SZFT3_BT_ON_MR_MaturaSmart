@@ -1,16 +1,17 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
 
 const route = useRoute()
+const router = useRouter()
 const subject = ref(null)
 const isLoading = ref(true)
 
 const slug = route.params.subject
 
-//ideiglenes, majd a backendről jönnek ezek az adatok, tesztadatok a designhoz
+// Ideiglenes mock adatok (később backendről jöhetnek)
 const mockStats = {
   progress: 35, // Százalékos haladás
   completed: 4,
@@ -20,9 +21,29 @@ const mockStats = {
 }
 
 onMounted(async () => {
+  const token = localStorage.getItem('token')
+  
+  if (!token) {
+    router.push('/login')
+    return
+  }
+
   try {
-    const response = await fetch(`http://backend.vm1.test/api/tantargyak/${slug}`)
+    const response = await fetch(`http://backend.vm1.test/api/tantargyak/${slug}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (response.status === 401) {
+       localStorage.removeItem('token')
+       router.push('/login')
+       return
+    }
+
     if (!response.ok) throw new Error('Nem található a tantárgy')
+    
     subject.value = await response.json()
   } catch (error) {
     console.error(error)
@@ -30,6 +51,7 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
 const progressColor = computed(() => {
   if (mockStats.progress < 30) return 'bg-red-500'
   if (mockStats.progress < 70) return 'bg-yellow-500'
@@ -181,9 +203,7 @@ const progressColor = computed(() => {
           </div>
 
         </div>
-
       </div>
-
     </div>
 
     <div v-else class="text-center py-20">
