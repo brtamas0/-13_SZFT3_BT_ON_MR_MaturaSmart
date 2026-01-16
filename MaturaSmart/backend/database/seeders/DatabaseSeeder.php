@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
             'title' => 'A Pitagorasz-tétel',
             'slug' => 'pitagorasz-tetel',
             'description' => 'Ismerd meg a derékszögű háromszögek titkát.',
+            
+            'xp' => 100,
 
             'content' => '
         <p>A Pitagorasz-tétel a geometria egyik alappillére. Azt mondja ki, hogy derékszögű háromszögben a két befogó négyzetének összege egyenlő az átfogó négyzetével.</p>
