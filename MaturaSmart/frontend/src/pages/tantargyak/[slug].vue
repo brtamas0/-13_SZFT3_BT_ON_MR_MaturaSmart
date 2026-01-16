@@ -21,7 +21,7 @@ const mockStats = {
 
 onMounted(async () => {
   try {
-    const response = await fetch(`http://backend.vm1.test/api/subjects/${slug}`)
+    const response = await fetch(`http://backend.vm1.test/api/tantargyak/${slug}`)
     if (!response.ok) throw new Error('Nem található a tantárgy')
     subject.value = await response.json()
   } catch (error) {
@@ -58,7 +58,7 @@ const progressColor = computed(() => {
             </div>
             <div>
               <div class="flex items-center gap-3 mb-1">
-                <RouterLink to="/" class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider transition-colors">
+                <RouterLink to="/main" class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider transition-colors">
                   ← Vissza
                 </RouterLink>
                 <span class="text-gray-600 text-xs">|</span>
@@ -126,7 +126,7 @@ const progressColor = computed(() => {
 
               <div class="flex flex-col items-end gap-2">
                 <RouterLink 
-                  :to="`/topic/${topic.id}`"
+                  :to="`/temakorok/${topic.id}`"
                   class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-900/20 whitespace-nowrap"
                 >
                   Indítás
@@ -188,8 +188,8 @@ const progressColor = computed(() => {
 
     <div v-else class="text-center py-20">
       <h1 class="text-3xl font-bold text-white mb-4">Hoppá! 😕</h1>
-      <p class="text-gray-400 mb-6">Ez a tantárgy nem létezik az adatbázisban.</p>
-      <RouterLink to="/" class="text-blue-400 hover:underline">Vissza a vezérlőpultra</RouterLink>
+      <p class="text-gray-400 mb-6">Axel nem talált ilyen tantárgyat az oldalon.</p>
+      <RouterLink to="/main" class="text-blue-400 hover:underline">Vissza a vezérlőpultra</RouterLink>
     </div>
 
   </BaseLayout>

@@ -8,7 +8,7 @@ const isLoading = ref(true)
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://backend.vm1.test/api/subjects')
+    const response = await fetch('http://backend.vm1.test/api/tantargyak')
     subjects.value = await response.json()
   } catch (error) {
     console.error("Hiba a tantárgyak betöltésekor:", error)
@@ -93,7 +93,7 @@ onMounted(async () => {
         <RouterLink 
           v-for="s in subjects" 
           :key="s.id" 
-          :to="`/subject/${s.slug}`"
+          :to="`/tantargyak/${s.slug}`"
           class="subject-card block group"
         >
           <div class="text-4xl mb-3">

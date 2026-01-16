@@ -10,5 +10,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::post('/ask-axel', [AxelController::class, 'ask']);
 
-Route::get('/subjects', [SubjectController::class, 'index']);
-Route::get('/subjects/{slug}', [SubjectController::class, 'show']);
+Route::get('/tantargyak', [SubjectController::class, 'index']);
+Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
+Route::get('/temakorok/{id}', [TopicController::class, 'show']);
