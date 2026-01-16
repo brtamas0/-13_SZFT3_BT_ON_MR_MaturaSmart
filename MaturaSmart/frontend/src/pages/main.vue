@@ -1,15 +1,21 @@
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue";
 
-const subjects = [
-  { title: "Matematika", subtitle: "Koordinátageometria", icon: "📐" },
-  { title: "Szoftverfejlesztés", subtitle: "Backend API", icon: "💻" },
-  { title: "Angol nyelv", subtitle: "Grammar", icon: "🗣️" },
-  { title: "Történelem", subtitle: "Hidegháború", icon: "📜" },
-  { title: "Magyar nyelv", subtitle: "Retorika", icon: "📖" }
-]
+const subjects = ref([])
+const isLoading = ref(true)
+
+onMounted(async () => {
+  try {
+    const response = await fetch('http://backend.vm1.test/api/subjects')
+    subjects.value = await response.json()
+  } catch (error) {
+    console.error("Hiba a tantárgyak betöltésekor:", error)
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
@@ -80,15 +86,27 @@ const subjects = [
         Tantárgyaid
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div v-if="isLoading" class="text-gray-400">Betöltés...</div>
 
-        <div v-for="s in subjects" :key="s.title" class="subject-card">
-          <div class="text-4xl mb-3">{{ s.icon }}</div>
-          <h4 class="text-lg font-semibold">{{ s.title }}</h4>
-          <p class="text-gray-300 text-sm">{{ s.subtitle }}</p>
-        </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div class="add-card">
+        <RouterLink 
+          v-for="s in subjects" 
+          :key="s.id" 
+          :to="`/subject/${s.slug}`"
+          class="subject-card block group"
+        >
+          <div class="text-4xl mb-3">
+             {{ s.icon ? s.icon : '📚' }}
+          </div>
+          
+          <h4 class="text-lg font-semibold group-hover:text-blue-300 transition-colors">
+            {{ s.name }}
+          </h4>
+          <p class="text-gray-400 text-xs mt-1">Kattints a tanuláshoz →</p>
+        </RouterLink>
+
+        <div class="add-card cursor-pointer">
           + Új tantárgy
         </div>
 
@@ -145,6 +163,8 @@ const subjects = [
   padding:25px;
   transition:.25s;
   cursor:pointer;
+  text-decoration: none; 
+  color: inherit;
 }
 .subject-card:hover{
   transform:translateY(-3px);

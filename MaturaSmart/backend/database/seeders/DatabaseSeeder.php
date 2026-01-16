@@ -28,13 +28,13 @@ class DatabaseSeeder extends Seeder
         $math = Subject::create([
             'name' => 'Matematika',
             'slug' => 'matematika',
-            'icon' => 'calculator-outline',
+            'icon' => '🧮',
         ]);
 
         $history = Subject::create([
             'name' => 'Történelem',
             'slug' => 'tortenelem',
-            'icon' => 'book-outline',
+            'icon' => '🏛️',
         ]);
 
         $pythagoras = Topic::create([
@@ -72,21 +72,21 @@ class DatabaseSeeder extends Seeder
             'name' => 'Streak Freeze',
             'cost' => 50,
             'type' => 'streak_freeze',
-            'icon' => 'ice-cube',
+            'icon' => '🧊',
         ]);
 
         ShopItem::create([
             'name' => 'Arany Keret',
             'cost' => 200,
             'type' => 'avatar_frame',
-            'icon' => 'frame-gold',
+            'icon' => '🪙',
         ]);
 
         Achievement::create([
             'name' => 'Első Lépések',
             'description' => 'Oldj meg egy feladatot hibátlanul.',
             'xp_reward' => 50,
-            'icon' => 'medal-first',
+            'icon' => '🥇',
         ]);
 
         \App\Models\UserInventory::create([
