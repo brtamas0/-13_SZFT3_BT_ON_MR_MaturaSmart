@@ -17,9 +17,25 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $user = User::create([
-            'email' => 'admin@teszt.hu',
-            'full_name' => 'Admin Ádám',
+            'email' => 'tomi@maturasmart.hu',
+            'full_name' => 'Bíró Tamás',
+            'password' => Hash::make('jelszo1234'),
+            'role' => 'admin',
+            'xp' => 100,
+            'gems' => 50,
+        ]);
+        $user = User::create([
+            'email' => 'nati@maturasmart.hu',
+            'full_name' => 'Ocskó Natasa',
             'password' => Hash::make('jelszo123'),
+            'role' => 'admin',
+            'xp' => 100,
+            'gems' => 50,
+        ]);
+        $user = User::create([
+            'email' => 'roli@maturasmart.hu',
+            'full_name' => 'Maródi Roland',
+            'password' => Hash::make('jelszo5342'),
             'role' => 'admin',
             'xp' => 100,
             'gems' => 50,

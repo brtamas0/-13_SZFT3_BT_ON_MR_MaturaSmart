@@ -1,21 +1,53 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
-const email = ref('')
+const router = useRouter()
+const email = ref('') 
 const password = ref('')
 const isLoading = ref(false)
 const isDark = ref(true)
+const errorMessage = ref('')
 
 const handleGoogleLogin = () => {
-  window.location.href = import.meta.env.VITE_BACKEND_URL + '/auth/google/redirect'
+  window.location.href = 'http://backend.vm1.test/auth/google/redirect'
 }
 
-const handleEmailLogin = () => {
+const handleEmailLogin = async () => {
   isLoading.value = true
-  setTimeout(() => {
+  errorMessage.value = ''
+
+  try {
+    const response = await fetch('http://backend.vm1.test/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Hiba a bejelentkezéskor')
+    }
+
+    localStorage.setItem('token', data.token) 
+    
+    localStorage.setItem('user', JSON.stringify(data.user))
+
+    router.push('/main')
+
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = error.message
+  } finally {
     isLoading.value = false
-    alert('Email bejelentkezés (még nincs bekötve backendre)')
-  }, 1000)
+  }
 }
 
 const toggleTheme = () => {
@@ -25,7 +57,6 @@ const toggleTheme = () => {
   
   html.setAttribute('data-theme', newTheme)
   localStorage.setItem('theme', newTheme)
-  
   isDark.value = newTheme === 'dark'
 }
 
@@ -51,7 +82,6 @@ onMounted(() => {
       <div class="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-[#020617]">
         
         <div class="hidden md:flex bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81] p-8 md:p-12 relative flex-col min-h-[600px] overflow-hidden">
-            
             <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-500/20 blur-[100px] rounded-full pointer-events-none"></div>
 
             <div class="relative z-20 self-start animate-fade-in-down">
@@ -91,6 +121,10 @@ onMounted(() => {
                 <p class="text-slate-400 text-sm mt-2">Add meg adataidat a belépéshez</p>
             </div>
 
+            <div v-if="errorMessage" class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm text-center w-full max-w-sm mx-auto">
+                ⚠️ {{ errorMessage }}
+            </div>
+
             <form @submit.prevent="handleEmailLogin" class="space-y-4 w-full max-w-sm mx-auto">
                 
                 <div class="space-y-1">
@@ -98,7 +132,7 @@ onMounted(() => {
                     <input 
                         v-model="email"
                         type="email" 
-                        placeholder="pelda@email.com"
+                        placeholder="test@example.com"
                         class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                         required
                     >

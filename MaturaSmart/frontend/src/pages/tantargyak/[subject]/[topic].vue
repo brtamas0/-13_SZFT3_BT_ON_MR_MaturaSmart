@@ -1,26 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue' 
+import { useRoute, useRouter } from 'vue-router' 
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
 
 const route = useRoute()
+const router = useRouter()
 const topic = ref(null)
 const isLoading = ref(true)
 const selectedAnswers = ref({}) 
 
-// URL paraméterek kinyerése
-// Mivel a mappa neve [subject], a fájl neve pedig [topic].vue:
+const isSubmitting = ref(false)
+const showSuccessModal = ref(false)
+const resultData = ref({ xp: 0, message: '', isFirstTime: true })
+
 const subjectSlug = route.params.subject 
 const topicSlug = route.params.topic 
 
 onMounted(async () => {
   try {
-    // Adatok lekérése a Backendről a topic slug alapján
     const response = await fetch(`http://backend.vm1.test/api/topics/${topicSlug}`)
-    
     if (!response.ok) throw new Error('Hiba a betöltéskor')
-    
     topic.value = await response.json()
   } catch (error) {
     console.error("Hiba történt:", error)
@@ -29,41 +29,74 @@ onMounted(async () => {
   }
 })
 
-// --- KVÍZ LOGIKA ---
-
-// Válasz kiválasztása
 const selectAnswer = (questionId, answer) => {
-  // Ha már válaszolt erre a kérdésre, nem engedjük újra
   if (selectedAnswers.value[questionId]) return;
-
-  // Eltároljuk a választást
-  selectedAnswers.value[questionId] = {
-    id: answer.id,
-    isCorrect: answer.is_correct
-  }
+  selectedAnswers.value[questionId] = { id: answer.id, isCorrect: answer.is_correct }
 }
 
-// Gombok színezése az eredmény alapján
 const getAnswerClass = (questionId, answer) => {
   const selection = selectedAnswers.value[questionId]
-  
-  // 1. Alapállapot (még nem válaszolt)
   if (!selection) return 'bg-white/5 hover:bg-white/10 border-white/10 text-gray-300'
-
-  // 2. Ezt a gombot nyomta meg a felhasználó
-  if (selection.id === answer.id) {
-    return answer.is_correct 
-      ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' // Helyes volt
-      : 'bg-red-500/20 border-red-500 text-red-400' // Helytelen volt
-  }
-
-  // 3. Ez a gomb a helyes válasz (de a felhasználó mást nyomott) -> Megmutatjuk a megoldást
-  if (answer.is_correct && selection.id !== answer.id) {
-    return 'bg-green-500/10 border-green-500/50 text-green-500/70' 
-  }
-
-  // 4. Egyéb gombok inaktívvá tétele
+  if (selection.id === answer.id) return answer.is_correct ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' : 'bg-red-500/20 border-red-500 text-red-400'
+  if (answer.is_correct && selection.id !== answer.id) return 'bg-green-500/10 border-green-500/50 text-green-500/70' 
   return 'opacity-50 cursor-not-allowed border-transparent'
+}
+
+const finishLesson = async () => {
+  const token = localStorage.getItem('token') 
+
+  if (!token) {
+    alert("Kérlek, jelentkezz be a pontszerzéshez!")
+    return
+  }
+
+  isSubmitting.value = true
+
+  let correctCount = 0
+  const totalQuestions = topic.value.questions.length
+  
+  if (totalQuestions > 0) {
+    topic.value.questions.forEach(q => {
+      if (selectedAnswers.value[q.id]?.isCorrect) correctCount++
+    })
+  }
+  
+  const percentage = totalQuestions > 0 
+    ? Math.round((correctCount / totalQuestions) * 100) 
+    : 100
+
+  try {
+    const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        topic_id: topic.value.id,
+        percentage: percentage
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) throw new Error(data.message || 'Hiba a mentéskor')
+
+    resultData.value = {
+      xp: data.xp_gained,
+      totalXp: data.total_xp,
+      message: data.message,
+      isFirstTime: data.first_time
+    }
+    showSuccessModal.value = true
+
+  } catch (error) {
+    console.error(error)
+    alert("Hiba történt: " + error.message)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -168,8 +201,13 @@ const getAnswerClass = (questionId, answer) => {
         </div>
 
         <div class="mt-16 flex justify-center pb-20">
-          <button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-lg transition-transform hover:-translate-y-1">
-            Lecke befejezése 🎉
+          <button 
+            @click="finishLesson"
+            :disabled="isSubmitting"
+            class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-lg transition-transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-wait flex items-center gap-3"
+          >
+            <span v-if="isSubmitting" class="animate-spin text-xl">⏳</span>
+            <span>{{ isSubmitting ? 'Mentés...' : 'Lecke befejezése 🎉' }}</span>
           </button>
         </div>
       </div>
@@ -180,6 +218,47 @@ const getAnswerClass = (questionId, answer) => {
       <h1 class="text-3xl font-bold text-white mb-4">Hoppá! 😕</h1>
       <p class="text-gray-400">Nem sikerült betölteni a leckét.</p>
       <RouterLink to="/" class="text-blue-400 hover:underline mt-4 inline-block">Vissza a főoldalra</RouterLink>
+    </div>
+<div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showSuccessModal = false"></div>
+      
+      <div class="relative bg-[#1e293b] border border-white/10 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">
+        
+        <div class="text-6xl mb-4 animate-bounce">
+          {{ resultData.isFirstTime ? '🏆' : '👍' }}
+        </div>
+        
+        <h2 class="text-3xl font-extrabold text-white mb-2">
+          {{ resultData.isFirstTime ? 'Lecke Teljesítve!' : 'Újra teljesítve!' }}
+        </h2>
+        
+        <p class="text-gray-400 mb-6">{{ resultData.message }}</p>
+
+        <div v-if="resultData.xp > 0" class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-xl p-4 mb-6">
+          <p class="text-yellow-400 font-bold text-xl uppercase tracking-widest">Megszerzett Jutalom</p>
+          <p class="text-4xl font-extrabold text-white mt-1">+{{ resultData.xp }} XP</p>
+        </div>
+        
+        <div v-else class="bg-white/5 rounded-xl p-4 mb-6">
+          <p class="text-gray-400 text-sm">Már megszerezted a pontokat ezért a leckéért.</p>
+        </div>
+
+        <div class="space-y-3">
+          <RouterLink 
+            :to="`/tantargyak/${subjectSlug}`" 
+            class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+          >
+            Vissza a témakörökhöz
+          </RouterLink>
+          
+          <button 
+            @click="showSuccessModal = false"
+            class="block w-full text-gray-400 hover:text-white py-2 transition-colors"
+          >
+            Maradok még itt
+          </button>
+        </div>
+      </div>
     </div>
 
   </BaseLayout>

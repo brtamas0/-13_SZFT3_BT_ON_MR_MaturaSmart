@@ -6,6 +6,8 @@ use App\Http\Controllers\AxelController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\GamificationController;
+use App\Http\Controllers\AuthController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -19,3 +21,6 @@ Route::get('/topics/{slug}', [TopicController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
 });
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
