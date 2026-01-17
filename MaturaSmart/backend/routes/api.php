@@ -19,6 +19,7 @@ Route::middleware('throttle:5,1')->group(function () { // Limitáljuk a kérése
     Route::post('/login', [AuthController::class, 'login']);
     //Regisztráció
     Route::post('/register', [AuthController::class, 'register']);
+    
 
 });
 /*
@@ -29,22 +30,29 @@ Route::middleware('throttle:5,1')->group(function () { // Limitáljuk a kérése
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    // 1. Felhasználói adatok
+    //Felhasználói adatok
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
-    // 2. Kijelentkezés
+    //Kijelentkezés
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // 3. Tartalom (Tantárgyak és Témák)
+    //Tartalom (Tantárgyak és Témák)
     Route::get('/tantargyak', [SubjectController::class, 'index']);
     Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
     Route::get('/topics/{slug}', [TopicController::class, 'show']);
 
-    // 4. Gamifikáció (XP szerzés)
+    //Gamifikáció (XP szerzés)
     Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
 
-    // 5. Axel AI
+    //Axel AI
     Route::post('/ask-axel', [AxelController::class, 'ask']);
+
+    //Felhasználói profil frissítése
+    Route::get('/user/profile', function (Request $request) {
+        return $request->user();
+    });
+    Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    
 });

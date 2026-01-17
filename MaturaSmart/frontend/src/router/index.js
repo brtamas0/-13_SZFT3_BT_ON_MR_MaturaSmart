@@ -1,30 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { setTitle } from '@/router/guards/SetTitleGuard.mjs'
-import { routes as autoRoutes } from 'vue-router/auto-routes' 
+import { routes as autoRoutes } from 'vue-router/auto-routes'
 
 const customRoutes = [
   {
     path: '/test-chat',
     name: 'test-chat',
-    component: () => import('@/views/TestChat.vue') 
+    component: () => import('@/views/TestChat.vue')
   },
   {
-      path: '/register',
-      name: 'register',
-      component: () => import('../pages/register.vue')
-    },
+    path: '/register',
+    name: 'register',
+    component: () => import('../pages/register.vue')
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../pages/profile.vue'),
+    meta: { requiresAuth: true }
+  },
 ]
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [...autoRoutes, ...customRoutes],
 
-scrollBehavior(to) {
+  scrollBehavior(to) {
     if (to.hash) {
       return {
         el: to.hash,
         behavior: 'smooth',
-        top: 80 
+        top: 80
       }
     }
 

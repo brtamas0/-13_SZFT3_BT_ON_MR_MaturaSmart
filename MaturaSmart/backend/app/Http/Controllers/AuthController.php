@@ -74,4 +74,23 @@ class AuthController extends Controller
             'token' => $token
         ], 201);
     }
+
+        // Profil frissítése (például a teljes név módosítása)
+        public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'full_name' => $request->full_name
+        ]);
+
+        return response()->json([
+            'message' => 'Profil sikeresen frissítve!',
+            'user' => $user
+        ]);
+    
+    }
 }
