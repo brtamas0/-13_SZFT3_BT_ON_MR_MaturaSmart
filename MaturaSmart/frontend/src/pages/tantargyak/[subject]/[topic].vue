@@ -68,31 +68,17 @@ const getAnswerClass = (questionId, answer) => {
 // Lecke befejezése
 const finishLesson = async () => {
   const token = localStorage.getItem('token') 
-
-  if (!token) {
-    alert("Kérlek, jelentkezz be a pontszerzéshez!")
-    router.push('/login')
-    return
-  }
+  if (!token) return router.push('/login')
 
   isSubmitting.value = true
 
-  // Pontszámítás
-  let correctCount = 0
-  const totalQuestions = topic.value.questions.length
+  const answersPayload = {}
   
-  if (totalQuestions > 0) {
-    topic.value.questions.forEach(q => {
-      if (selectedAnswers.value[q.id]?.isCorrect) correctCount++
-    })
-  }
-  
-  const percentage = totalQuestions > 0 
-    ? Math.round((correctCount / totalQuestions) * 100) 
-    : 100
+  Object.keys(selectedAnswers.value).forEach(questionId => {
+     answersPayload[questionId] = selectedAnswers.value[questionId].id
+  })
 
   try {
-    // Mentés az adatbázisba
     const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
       method: 'POST',
       headers: {
@@ -102,26 +88,24 @@ const finishLesson = async () => {
       },
       body: JSON.stringify({
         topic_id: topic.value.id,
-        percentage: percentage
+        answers: answersPayload 
       })
     })
 
     const data = await response.json()
 
-    if (!response.ok) throw new Error(data.message || 'Hiba a mentéskor')
+    if (!response.ok) throw new Error(data.message || 'Hiba')
 
-    // Eredmény mentése a Modalhoz
+    // Siker ablak megjelenítése
     resultData.value = {
       xp: data.xp_gained,
       totalXp: data.total_xp,
-      message: data.message,
-      isFirstTime: data.first_time
+      message: data.message
     }
     showSuccessModal.value = true
 
   } catch (error) {
-    console.error(error)
-    alert("Hiba történt: " + error.message)
+    alert("Hiba: " + error.message)
   } finally {
     isSubmitting.value = false
   }
@@ -139,7 +123,7 @@ const finishLesson = async () => {
     <div v-else-if="topic" class="max-w-5xl mx-auto px-4 py-8">
       
       <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
-        <RouterLink to="/" class="hover:text-white transition-colors">Vezérlőpult</RouterLink>
+        <RouterLink to="/main" class="hover:text-white transition-colors">Vezérlőpult</RouterLink>
         <span>/</span>
         <RouterLink 
           :to="`/tantargyak/${subjectSlug}`" 
@@ -244,7 +228,7 @@ const finishLesson = async () => {
     <div v-else class="text-center py-20">
       <h1 class="text-3xl font-bold text-white mb-4">Hoppá! 😕</h1>
       <p class="text-gray-400">Nem sikerült betölteni a leckét.</p>
-      <RouterLink to="/" class="text-blue-400 hover:underline mt-4 inline-block">Vissza a főoldalra</RouterLink>
+      <RouterLink to="/main" class="text-blue-400 hover:underline mt-4 inline-block">Vissza a főoldalra</RouterLink>
     </div>
 
     <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">

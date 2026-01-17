@@ -72,12 +72,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Kérdések a Matekhoz
-        $q1 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Melyik háromszögre igaz a Pitagorasz-tétel?', 'points' => 10, 'difficulty' => 1]);
+        $q1 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Melyik háromszögre igaz a Pitagorasz-tétel?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Derékszögű', 'is_correct' => true]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Egyenlő szárú', 'is_correct' => false]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Bármilyen', 'is_correct' => false]);
 
-        $q2 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Ha a befogók 3 és 4 cm hosszúak, mennyi az átfogó?', 'points' => 20, 'difficulty' => 2]);
+        $q2 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Ha a befogók 3 és 4 cm hosszúak, mennyi az átfogó?', 'xp' => 20, 'difficulty' => 2]);
         Answer::create(['question_id' => $q2->id, 'text' => '5', 'is_correct' => true]);
         Answer::create(['question_id' => $q2->id, 'text' => '7', 'is_correct' => false]);
         Answer::create(['question_id' => $q2->id, 'text' => '12', 'is_correct' => false]);
@@ -102,7 +102,7 @@ class DatabaseSeeder extends Seeder
         ]);
         
         // Kérdés Törihez
-        $q3 = Question::create(['topic_id' => $stateFoundation->id, 'type' => 'multiple_choice', 'content' => 'Mikor koronázták meg Szent Istvánt?', 'points' => 10, 'difficulty' => 1]);
+        $q3 = Question::create(['topic_id' => $stateFoundation->id, 'type' => 'multiple_choice', 'content' => 'Mikor koronázták meg Szent Istvánt?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q3->id, 'text' => '1000-ben', 'is_correct' => true]);
         Answer::create(['question_id' => $q3->id, 'text' => '896-ban', 'is_correct' => false]);
 
@@ -152,7 +152,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Kérdés Nyelvtanhoz
-        $q4 = Question::create(['topic_id' => $partsOfSpeech->id, 'type' => 'multiple_choice', 'content' => 'Milyen szófaj a "fut" szó?', 'points' => 10, 'difficulty' => 1]);
+        $q4 = Question::create(['topic_id' => $partsOfSpeech->id, 'type' => 'multiple_choice', 'content' => 'Milyen szófaj a "fut" szó?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Ige', 'is_correct' => true]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Főnév', 'is_correct' => false]);
 
@@ -188,7 +188,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         echo "Adatok feltöltve! \n";
-        echo "Tomi: tomi@maturasmart.hu)\n";
+        echo "Tomi: tomi@maturasmart.hu\n";
         echo "Nati: nati@maturasmart.hu\n";
         echo "Roli: roli@maturasmart.hu\n";
     }

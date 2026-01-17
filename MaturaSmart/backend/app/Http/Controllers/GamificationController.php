@@ -2,83 +2,97 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TopicCompletion;
-use App\Models\Topic;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Question;
+use App\Models\Topic;
+use Illuminate\Support\Facades\DB;
 
 class GamificationController extends Controller
 {
-    public function completeTopic(Request $request)
+    // --- RANGLISTA LEKÉRÉSE ---
+    public function leaderboard(Request $request)
     {
-        $userId = Auth::id(); 
+        // Top 50 felhasználó XP alapján
+        $leaderboard = User::select('id', 'full_name', 'xp', 'level')
+            ->orderBy('xp', 'desc')
+            ->take(50)
+            ->get();
+
+        $currentUser = $request->user();
         
-        if (!$userId) {
-            return response()->json(['message' => 'Nem vagy bejelentkezve!'], 401);
-        }
-
-        $request->validate([
-            'topic_id' => 'required|exists:topics,id',
-            'percentage' => 'integer|min:0|max:100'
-        ]);
-
-        $topicId = $request->topic_id;
-        $xpReward = 50;
-        $existingCompletion = TopicCompletion::where('user_id', $userId)
-                                           ->where('topic_id', $topicId)
-                                           ->first();
-
-        if ($existingCompletion) {
-            if ($request->percentage > $existingCompletion->score_percentage) {
-                $existingCompletion->update(['score_percentage' => $request->percentage]);
-            }
-            
-            $currentXp = User::where('id', $userId)->value('xp');
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Lecke frissítve (XP már megszerezve).',
-                'xp_gained' => 0, 
-                'total_xp' => $currentXp,
-                'first_time' => false
-            ]);
-        }
-
-        TopicCompletion::create([
-            'user_id' => $userId,
-            'topic_id' => $topicId,
-            'xp_earned' => $xpReward,
-            'score_percentage' => $request->percentage ?? 0
-        ]);
-        User::where('id', $userId)->increment('xp', $xpReward);
-        $newTotalXp = User::where('id', $userId)->value('xp');
+        $rank = User::where('xp', '>', $currentUser->xp)->count() + 1;
 
         return response()->json([
-            'success' => true,
-            'message' => 'Lecke teljesítve! Szép munka!',
-            'xp_gained' => $xpReward,
-            'total_xp' => $newTotalXp,
-            'first_time' => true
+            'leaderboard' => $leaderboard,
+            'user_rank' => $rank,
+            'user_xp' => $currentUser->xp
         ]);
     }
 
-    //toplista
-    public function leaderboard(Request $request)
-{
-    //Top 50
-    $topUsers = User::select('id', 'full_name', 'xp', 'level')
-        ->orderBy('xp', 'desc')
-        ->take(50)
-        ->get();
+    // --- Témakör befejezés pontozás ---
+    public function completeTopic(Request $request)
+    {
+        $user = $request->user();
+        $topicId = $request->input('topic_id');
+        $answers = $request->input('answers'); 
 
-    $currentUser = $request->user();
-    $currentRank = User::where('xp', '>', $currentUser->xp)->count() + 1;
+        $topic = Topic::findOrFail($topicId);
+        $questions = Question::where('topic_id', $topicId)->with('answers')->get();
 
-    return response()->json([
-        'leaderboard' => $topUsers,
-        'user_rank' => $currentRank,
-        'user_xp' => $currentUser->xp
-    ]);
-}
+        $xpGained = 0;
+        $correctCount = 0;
+        $alreadySolvedCount = 0;
+
+        foreach ($questions as $question) {
+            $userAnswerId = $answers[$question->id] ?? null;
+            $correctAnswer = $question->answers->where('is_correct', true)->first();
+            $isCorrectNow = false;
+
+            if ($userAnswerId && $correctAnswer && $userAnswerId == $correctAnswer->id) {
+                $isCorrectNow = true;
+                $correctCount++;
+
+                // Megnézzük, kapott-e már érte pontot régen
+                $alreadySolved = DB::table('question_user')
+                    ->where('user_id', $user->id)
+                    ->where('question_id', $question->id)
+                    ->where('is_correct', true)
+                    ->exists();
+
+                if ($alreadySolved) {
+                    $alreadySolvedCount++;
+                } else {
+                    $xpGained += $question->xp;
+                }
+            }
+
+            // Eredmény mentése
+            DB::table('question_user')->updateOrInsert(
+                ['user_id' => $user->id, 'question_id' => $question->id],
+                ['is_correct' => $isCorrectNow, 'updated_at' => now()]
+            );
+        }
+
+        if ($xpGained > 0) {
+            $user->increment('xp', $xpGained);
+        }
+        
+        $user->update(['last_topic_id' => $topic->id]);
+
+        $message = "";
+        if ($xpGained > 0) {
+            $message = "Szép munka! Szereztél {$xpGained} XP-t!";
+        } elseif ($correctCount > 0 && $alreadySolvedCount > 0) {
+            $message = "Hibátlan, de ezekért már kaptál pontot korábban!";
+        } else {
+            $message = "Gyakorlás befejezve.";
+        }
+
+        return response()->json([
+            'message' => $message,
+            'xp_gained' => $xpGained,
+            'total_xp' => $user->xp,
+        ]);
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,14 +18,16 @@ return new class extends Migration
             $table->string('google_id')->nullable()->unique();
             $table->string('avatar_url')->nullable();
             $table->integer('graduation_year')->nullable();
-            $table->string('role')->default('student'); // 'student', 'admin', később bővíthető
+            $table->string('role')->default('student'); // 'student', 'admin'
 
             // Gamifikáció
             $table->integer('xp')->default(0);
             $table->integer('level')->default(1);
             $table->integer('gems')->default(0);
+            
+            $table->unsignedBigInteger('last_topic_id')->nullable();
 
-            //Streak
+            // Streak
             $table->timestamp('streak_start')->nullable();
             $table->integer('current_streak')->default(0);
             $table->integer('lost_streak')->default(0);
