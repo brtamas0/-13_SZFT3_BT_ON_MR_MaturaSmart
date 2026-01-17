@@ -19,6 +19,12 @@ const customRoutes = [
     component: () => import('../pages/profile.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/leaderboard',
+      name: 'leaderboard',
+      component: () => import('../pages/leaderboard.vue'),
+      meta: { requiresAuth: true }
+  }
 ]
 
 export const router = createRouter({

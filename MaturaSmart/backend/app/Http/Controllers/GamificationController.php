@@ -62,4 +62,23 @@ class GamificationController extends Controller
             'first_time' => true
         ]);
     }
+
+    //toplista
+    public function leaderboard(Request $request)
+{
+    //Top 50
+    $topUsers = User::select('id', 'full_name', 'xp', 'level')
+        ->orderBy('xp', 'desc')
+        ->take(50)
+        ->get();
+
+    $currentUser = $request->user();
+    $currentRank = User::where('xp', '>', $currentUser->xp)->count() + 1;
+
+    return response()->json([
+        'leaderboard' => $topUsers,
+        'user_rank' => $currentRank,
+        'user_xp' => $currentUser->xp
+    ]);
+}
 }

@@ -44,7 +44,6 @@ onMounted(() => {
       user.value = JSON.parse(storedUser)
       formName.value = user.value.full_name || ''
       
-      // Adatok betöltése
       stats.value[0].value = user.value.xp || 0
       stats.value[1].value = levelInfo.value.level
       stats.value[2].value = (user.value.current_streak || 0) + ' nap'
@@ -58,7 +57,7 @@ onMounted(() => {
 
 const updateProfile = async () => {
   const token = localStorage.getItem('token')
-  message.value = '' // Töröljük az előző üzenetet
+  message.value = ''
 
   try {
     const response = await fetch('http://backend.vm1.test/api/user/profile', {
@@ -74,22 +73,18 @@ const updateProfile = async () => {
     const data = await response.json()
 
     if (!response.ok) {
-        // Ha validációs hiba van (pl. "Csak betűket tartalmazhat")
         if (data.errors?.full_name) {
             throw new Error(data.errors.full_name[0])
         }
-        // Ha Rate Limit hiba van (pl. "Várj még 15 percet")
         if (data.message) {
             throw new Error(data.message)
         }
         throw new Error('Hiba történt a mentéskor.')
     }
     
-    // SIKER
     user.value = data.user
     localStorage.setItem('user', JSON.stringify(data.user))
     
-    // ... statisztika frissítés ...
     stats.value[1].value = Math.floor(Math.sqrt((user.value.xp || 0) / 100)) + 1
 
     message.value = '✅ Sikeres mentés!'
@@ -97,7 +92,6 @@ const updateProfile = async () => {
     setTimeout(() => message.value = '', 3000)
 
   } catch (error) {
-    // Itt jelenítjük meg a Backendről jött pontos hibaüzenetet
     message.value = '⚠️ ' + error.message
   }
 }

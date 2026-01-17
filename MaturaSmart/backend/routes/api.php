@@ -55,4 +55,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
     
+    //Leaderboard
+    Route::get('/leaderboard', [GamificationController::class, 'leaderboard']);
 });
