@@ -6,18 +6,18 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Validálás
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Hitelesítés
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'message' => 'Hibás email cím vagy jelszó!'
@@ -37,27 +37,37 @@ class AuthController extends Controller
         ]);
     }
     
-    // Kijelentkezés
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
 
-    // Regisztráció
-
     public function register(Request $request)
     {
-        // Adatok validálása
         $fields = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'full_name' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $cleanName = Str::squish($value);
+                    
+                    if (!preg_match('/^[\p{L}\s\.]+$/u', $cleanName)) {
+                        $fail('A név csak betűket tartalmazhat!');
+                    }
+
+                    if (!str_contains($cleanName, ' ')) {
+                        $fail('Kérlek add meg a teljes nevedet (legalább 2 szó)!');
+                    }
+                },
+            ],
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|confirmed|min:6' 
         ]);
 
-        // Felhasználó létrehozása
         $user = User::create([
-            'full_name' => $fields['full_name'],
+            'full_name' => Str::squish($fields['full_name']),
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
             'xp' => 0,
@@ -65,7 +75,6 @@ class AuthController extends Controller
             'role' => 'student'
         ]);
 
-        // Azonnali beléptetés
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -75,22 +84,49 @@ class AuthController extends Controller
         ], 201);
     }
 
-        // Profil frissítése (például a teljes név módosítása)
-        public function updateProfile(Request $request)
+    public function updateProfile(Request $request)
     {
+        $user = $request->user();
+        
+        $key = 'profile-update:' . $user->id;
+
+        if (RateLimiter::tooManyAttempts($key, 1)) {
+            $seconds = RateLimiter::availableIn($key);
+            $minutes = ceil($seconds / 60);
+            
+            return response()->json([
+                'message' => "Túl gyakori módosítás! Kérlek várj még {$minutes} percet."
+            ], 429);
+        }
+
         $request->validate([
-            'full_name' => 'required|string|max:255',
+            'full_name' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $cleanName = Str::squish($value);
+                    
+                    if (!preg_match('/^[\p{L}\s\.]+$/u', $cleanName)) {
+                        $fail('A név csak betűket tartalmazhat!');
+                    }
+
+                    if (!str_contains($cleanName, ' ')) {
+                        $fail('Kérlek add meg a teljes nevedet (legalább 2 szó)!');
+                    }
+                },
+            ],
         ]);
 
-        $user = $request->user();
         $user->update([
-            'full_name' => $request->full_name
+            'full_name' => Str::squish($request->full_name)
         ]);
+        // Limitáljuk a profil frissítést 5 percenként egy alkalomra
+        RateLimiter::hit($key, 5 * 60);
 
         return response()->json([
             'message' => 'Profil sikeresen frissítve!',
             'user' => $user
         ]);
-    
     }
 }
