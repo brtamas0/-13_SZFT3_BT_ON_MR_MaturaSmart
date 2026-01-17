@@ -183,9 +183,11 @@ onMounted(() => {
             </div>
             
             <p class="text-center mt-8 text-sm text-slate-500">
-              Nincs még fiókod? 
-              <a href="#" class="text-indigo-400 font-bold hover:text-indigo-300 hover:underline">Regisztrálj ingyen</a>
-            </p>
+  Nincs még fiókod? 
+  <RouterLink to="/register" class="text-indigo-400 font-bold hover:text-indigo-300 hover:underline">
+    Regisztrálj ingyen
+  </RouterLink>
+</p>
 
             <router-link to="/" class="mt-4 text-xs text-center text-slate-600 hover:text-slate-400 transition-colors">
                 ← Vissza a főoldalra

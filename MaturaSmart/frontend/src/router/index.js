@@ -7,7 +7,12 @@ const customRoutes = [
     path: '/test-chat',
     name: 'test-chat',
     component: () => import('@/views/TestChat.vue') 
-  }
+  },
+  {
+      path: '/register',
+      name: 'register',
+      component: () => import('../pages/register.vue')
+    },
 ]
 
 export const router = createRouter({

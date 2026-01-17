@@ -13,7 +13,7 @@ const router = useRouter();
 const mobileOpen = ref(false);
 const user = ref(null);
 
-// 1. Felhasználó adatainak betöltése
+// Felhasználó adatainak betöltése
 onMounted(() => {
   const storedUser = localStorage.getItem('user');
   const token = localStorage.getItem('token');
@@ -27,13 +27,12 @@ onMounted(() => {
   }
 });
 
-// 2. Kijelentkezés logika
+// Kijelentkezés
 const handleLogout = async () => {
   const token = localStorage.getItem('token');
   
   if (token) {
     try {
-      // Backend értesítése (opcionális, de ajánlott)
       await fetch('http://backend.vm1.test/api/logout', {
         method: 'POST',
         headers: { 

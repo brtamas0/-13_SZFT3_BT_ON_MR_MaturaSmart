@@ -43,4 +43,35 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
+
+    // Regisztráció
+
+    public function register(Request $request)
+    {
+        // Adatok validálása
+        $fields = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|confirmed|min:6' 
+        ]);
+
+        // Felhasználó létrehozása
+        $user = User::create([
+            'full_name' => $fields['full_name'],
+            'email' => $fields['email'],
+            'password' => Hash::make($fields['password']),
+            'xp' => 0,
+            'level' => 1,
+            'role' => 'student'
+        ]);
+
+        // Azonnali beléptetés
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Sikeres regisztráció!',
+            'user' => $user,
+            'token' => $token
+        ], 201);
+    }
 }

@@ -14,11 +14,13 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-// Bejelentkezés
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:5,1')->group(function () { // Limitáljuk a kéréseket 10 per perc
+    // Bejelentkezés
+    Route::post('/login', [AuthController::class, 'login']);
+    //Regisztráció
+    Route::post('/register', [AuthController::class, 'register']);
 
-
-
+});
 /*
 |--------------------------------------------------------------------------
 | VÉDETT ROUTE-OK (Csak Tokennel érhető el)
