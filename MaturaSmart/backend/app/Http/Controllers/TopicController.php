@@ -7,14 +7,12 @@ use Illuminate\Http\Request;
 
 class TopicController extends Controller
 {
-
-    public function show($slug)
+    public function show($subjectSlug, $topicSlug)
     {
-
-        $topic = Topic::where('slug', $slug)
-                ->with(['questions.answers', 'subject'])
+        $topic = Topic::where('slug', $topicSlug)
+                ->with(['questions.answers', 'subject', 'flashcards'])
                 ->firstOrFail();
 
-        return $topic;
+        return response()->json($topic);
     }
 }

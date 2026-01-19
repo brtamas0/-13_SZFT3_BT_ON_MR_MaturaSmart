@@ -57,4 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     //Leaderboard
     Route::get('/leaderboard', [GamificationController::class, 'leaderboard']);
+
+    //Témák lekérése tantárgyanként
+    Route::get('/topics/{subject}/{topic}', [TopicController::class, 'show']);
 });
