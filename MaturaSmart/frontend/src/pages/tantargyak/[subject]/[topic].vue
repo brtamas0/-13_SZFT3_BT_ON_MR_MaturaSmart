@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue' 
 import { useRoute, useRouter } from 'vue-router' 
 import BaseLayout from "@/layouts/BaseLayout.vue"
-import BaseHeader from "@/components/layout/BaseHeader.vue"
+import BaseHeader from "@layouts/BaseHeader.vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -82,14 +82,29 @@ onMounted(async () => {
     const response = await fetch(`http://backend.vm1.test/api/topics/${subjectSlug}/${topicSlug}`, {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     })
-
+    
     if (response.status === 401) {
        localStorage.removeItem('token'); router.push('/login'); return
     }
     if (!response.ok) throw new Error('Hiba')
     
     topic.value = await response.json()
+    
     setTimeout(updateScroll, 500)
+
+    if (topic.value) {
+        
+        let subjectName = topic.value.subject?.title;
+
+        if (!subjectName && subjectSlug) {
+            subjectName = subjectSlug.charAt(0).toUpperCase() + subjectSlug.slice(1);
+        }
+
+        const finalSubjectName = subjectName || 'Lecke';
+
+        document.title = `${finalSubjectName} | ${topic.value.title} | MaturaSmart`
+    }
+
   } catch (error) {
     console.error(error)
   } finally {

@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue"
 import { useRouter } from "vue-router"
 import BaseLayout from "@/layouts/BaseLayout.vue"
-import BaseHeader from "@/components/layout/BaseHeader.vue"
+import BaseHeader from "@layouts/BaseHeader.vue"
 
 const router = useRouter()
 const subjects = ref([])

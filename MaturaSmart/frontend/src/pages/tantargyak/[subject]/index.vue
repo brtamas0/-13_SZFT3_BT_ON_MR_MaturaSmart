@@ -11,9 +11,9 @@ const isLoading = ref(true)
 
 const slug = route.params.subject
 
-// Ideiglenes mock adatok (később backendről jöhetnek)
+// Ideiglenes mock adatok
 const mockStats = {
-  progress: 35, // Százalékos haladás
+  progress: 35,
   completed: 4,
   total: 12,
   difficulty: 'Közepes',
@@ -45,6 +45,13 @@ onMounted(async () => {
     if (!response.ok) throw new Error('Nem található a tantárgy')
     
     subject.value = await response.json()
+
+    if (subject.value) {
+        const subjectName = subject.value.name || slug.charAt(0).toUpperCase() + slug.slice(1)
+        document.title = `${subjectName} | MaturaSmart`
+    }
+    // -------------------------------
+
   } catch (error) {
     console.error(error)
   } finally {
