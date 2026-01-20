@@ -1,18 +1,17 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import BaseLayout from "@/layouts/BaseLayout.vue"
-import BaseHeader from "@/components/layout/BaseHeader.vue"
+import BaseHeader from "@layouts/BaseHeader.vue"
 
 const user = ref(null)
 const isLoading = ref(true)
 const isEditing = ref(false)
 const formName = ref('')
 
-// Üzenet kezelés
 const profileMessage = ref({ text: '', type: '' })
 const passwordMessage = ref({ text: '', type: '' })
 
-// Jelszó űrlap
+// Jelszó form
 const passwordForm = ref({
     current_password: '',
     new_password: '',

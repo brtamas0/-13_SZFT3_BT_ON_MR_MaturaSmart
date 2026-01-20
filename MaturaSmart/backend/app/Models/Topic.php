@@ -22,4 +22,8 @@ class Topic extends Model
     {
         return $this->hasMany(Flashcard::class);
     }
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }

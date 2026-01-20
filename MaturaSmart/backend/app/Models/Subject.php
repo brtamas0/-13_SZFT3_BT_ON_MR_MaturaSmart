@@ -8,8 +8,13 @@ class Subject extends Model
 {
     protected $guarded = [];
 
+    public function units()
+    {
+        return $this->hasMany(Unit::class)->orderBy('order', 'asc');
+    }
+
     public function topics()
     {
-        return $this->hasMany(Topic::class)->orderBy('order');
+        return $this->hasMany(Topic::class);
     }
 }

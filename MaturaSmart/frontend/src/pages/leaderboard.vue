@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import BaseLayout from "@/layouts/BaseLayout.vue"
-import BaseHeader from "@/components/layout/BaseHeader.vue"
+import BaseHeader from "@layouts/BaseHeader.vue"
 
 const leaderboard = ref([])
 const userRank = ref(0)
