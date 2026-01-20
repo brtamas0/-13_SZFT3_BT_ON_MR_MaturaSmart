@@ -7,6 +7,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,4 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Témák lekérése tantárgyanként
     Route::get('/topics/{subject}/{topic}', [TopicController::class, 'show']);
+
+    // Profil kezelése
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile/update', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 });
