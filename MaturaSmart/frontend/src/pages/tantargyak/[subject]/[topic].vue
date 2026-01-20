@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue' 
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue' 
 import { useRoute, useRouter } from 'vue-router' 
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
@@ -9,7 +9,6 @@ const router = useRouter()
 const topic = ref(null)
 const isLoading = ref(true)
 
-// --- SCROLL & PROGRESS LOGIKA ---
 const maxScrollPercentage = ref(0) 
 
 const updateScroll = () => {
@@ -29,7 +28,6 @@ const updateScroll = () => {
 
 const selectedAnswers = ref({}) 
 
-// KOMBINÁLT PROGRESS (scroll + quiz)
 const totalProgress = computed(() => {
     if (!topic.value) return 0
     const scrollPart = maxScrollPercentage.value * 0.5 
@@ -40,7 +38,6 @@ const totalProgress = computed(() => {
     return Math.round(scrollPart + quizPart)
 })
 
-// --- KÁRTYA LOGIKA ---
 const currentCardIndex = ref(0)
 const isFlipped = ref(false)
 
@@ -64,22 +61,26 @@ const prevCard = () => {
     }, 300)
 }
 
-// --- KVÍZ LOGIKA ---
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 const resultData = ref({ xp: 0, message: '', isFirstTime: true })
 
 const subjectSlug = route.params.subject 
-const topicSlug = route.params.topic 
 
-onMounted(async () => {
-  window.addEventListener('scroll', updateScroll) 
+const fetchTopicData = async (newTopicSlug) => {
+  isLoading.value = true
+  topic.value = null
+  maxScrollPercentage.value = 0
+  selectedAnswers.value = {}
+  currentCardIndex.value = 0
+  isFlipped.value = false
+  showSuccessModal.value = false
   
   const token = localStorage.getItem('token')
   if (!token) return router.push('/login')
 
   try {
-    const response = await fetch(`http://backend.vm1.test/api/topics/${subjectSlug}/${topicSlug}`, {
+    const response = await fetch(`http://backend.vm1.test/api/topics/${subjectSlug}/${newTopicSlug}`, {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     })
     
@@ -93,15 +94,13 @@ onMounted(async () => {
     setTimeout(updateScroll, 500)
 
     if (topic.value) {
-        
-        let subjectName = topic.value.subject?.title;
+        let subjectName = topic.value.unit ? topic.value.unit.title : null; 
 
         if (!subjectName && subjectSlug) {
             subjectName = subjectSlug.charAt(0).toUpperCase() + subjectSlug.slice(1);
         }
 
         const finalSubjectName = subjectName || 'Lecke';
-
         document.title = `${finalSubjectName} | ${topic.value.title} | MaturaSmart`
     }
 
@@ -110,11 +109,27 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', updateScroll) 
+  fetchTopicData(route.params.topic)
+})
+
+watch(() => route.params.topic, (newSlug) => {
+    if (newSlug) {
+        fetchTopicData(newSlug)
+        window.scrollTo(0, 0)
+    }
 })
 
 onUnmounted(() => {
     window.removeEventListener('scroll', updateScroll) 
 })
+
+const navigateToTopic = (slug) => {
+    router.push(`/tantargyak/${subjectSlug}/${slug}`)
+}
 
 const selectAnswer = (questionId, answer) => {
   if (selectedAnswers.value[questionId]) return;
@@ -179,7 +194,7 @@ const finishLesson = async () => {
         <div class="relative z-10">
             <nav class="flex items-center gap-2 text-xs text-blue-300 font-bold uppercase tracking-widest mb-4">
                 <RouterLink to="/main" class="hover:text-white transition-colors">Vezérlőpult</RouterLink> / 
-                <span class="text-white">{{ subjectSlug }}</span>
+                <RouterLink :to="`/tantargyak/${subjectSlug}`" class="hover:text-white transition-colors">{{ subjectSlug }}</RouterLink>
             </nav>
             <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight drop-shadow-lg">
                 {{ topic.title }}
@@ -272,6 +287,25 @@ const finishLesson = async () => {
                 </div>
             </div>
 
+            <div class="flex justify-between items-center mt-12 pt-8 border-t border-white/10">
+                <button 
+                    v-if="topic.prev_slug"
+                    @click="navigateToTopic(topic.prev_slug)"
+                    class="text-gray-400 hover:text-white flex items-center gap-2 transition-colors px-4 py-2"
+                >
+                    ← Előző lecke
+                </button>
+                <div v-else></div>
+
+                <button 
+                    v-if="topic.next_slug"
+                    @click="navigateToTopic(topic.next_slug)"
+                    class="bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 border border-blue-500/30"
+                >
+                    Következő: {{ topic.next_title }} ➔
+                </button>
+            </div>
+
         </div>
 
         <div class="w-full lg:w-1/3 relative">
@@ -358,7 +392,22 @@ const finishLesson = async () => {
         </div>
         
         <div class="grid gap-3">
-          <RouterLink :to="`/tantargyak/${subjectSlug}`" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105">Vissza a témakörökhöz</RouterLink>
+          <button 
+                v-if="topic.next_slug"
+                @click="navigateToTopic(topic.next_slug)"
+                class="block w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105 shadow-lg shadow-green-900/20 flex items-center justify-center gap-2"
+          >
+                Következő: {{ topic.next_title }} ➔
+          </button>
+          
+          <RouterLink 
+            v-else
+            :to="`/tantargyak/${subjectSlug}`" 
+            class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105"
+          >
+            Vissza a témakörökhöz
+          </RouterLink>
+          
           <button @click="showSuccessModal = false" class="block w-full text-gray-500 hover:text-white py-2 transition-colors">Maradok még</button>
         </div>
       </div>
@@ -368,14 +417,12 @@ const finishLesson = async () => {
 </template>
 
 <style scoped>
-/* 3D Kártya */
 .scene { perspective: 1000px; }
 .transform-style-3d { transform-style: preserve-3d; }
 .backface-hidden { backface-visibility: hidden; }
 .rotate-y-180 { transform: rotateY(180deg); }
 .is-flipped { transform: rotateY(180deg); }
 
-/* Animációk */
 .slide-fade-enter-active { transition: all 0.3s ease-out; }
 .slide-fade-enter-from { transform: translateY(-10px); opacity: 0; }
 @keyframes popIn {
