@@ -175,8 +175,12 @@ const handleLogout = () => router.push("/login")
           </RouterLink>
 
           <!-- LOGOUT -->
-          <button @click="handleLogout" class="hidden md:block text-gray-400 hover:text-red-400 transition">
-            ⎋
+          <button
+            @click="handleLogout"
+            class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300 transition shadow-md"
+            title="Kijelentkezés"
+          >
+           🚫
           </button>
         </template>
 
