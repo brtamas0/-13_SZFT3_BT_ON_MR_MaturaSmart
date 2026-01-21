@@ -77,155 +77,134 @@ onUnmounted(() => {
   <BaseLayout>
     <BaseHeader mode="app" />
     
-    <div v-if="isLoading" class="flex justify-center items-center h-[80vh]">
-        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-
-    <div v-else class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       
-      <div class="bg-[#10194E] border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden mb-16">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+      <div class="bg-[#10194E]/80 border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-md relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-900/20 to-transparent pointer-events-none"></div>
 
-        <div class="relative z-10 grid grid-cols-1 xl:grid-cols-2 gap-12 items-center">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
           
-          <div>
-            <div class="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-blue-300 uppercase tracking-widest mb-4">
-                Vezérlőpult
-            </div>
-            <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
-              Szia, <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{{ firstName }}</span>! 👋
-            </h1>
-            <p class="text-blue-200/80 text-lg mb-8">
+          <div class="flex-1 w-full text-center md:text-left">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">
+              Szia {{ user?.full_name?.split(' ')[1] || 'Tanuló' }}! 👋
+            </h2>
+            <p class="text-blue-200 text-lg mb-8 font-light">
               Már csak ennyi időd van felkészülni az írásbelire:
             </p>
-            
-            <div class="flex gap-4">
-              <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px]">
-                <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.days }}</div>
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Nap</div>
+
+            <div class="flex flex-wrap justify-center md:justify-start gap-4">
+              
+              <div class="time-box group">
+                <div class="time-number text-blue-400 group-hover:scale-110 transition-transform">
+                  {{ remaining.days }}
+                </div>
+                <div class="time-text">NAP</div>
               </div>
-              <div class="text-2xl font-light text-slate-600 self-center">:</div>
-              <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px]">
-                <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.hours }}</div>
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Óra</div>
+
+              <div class="text-3xl font-light text-gray-600 self-center hidden sm:block">:</div>
+
+              <div class="time-box group">
+                <div class="time-number text-indigo-400 group-hover:scale-110 transition-transform">
+                  {{ remaining.hours }}
+                </div>
+                <div class="time-text">ÓRA</div>
               </div>
-              <div class="text-2xl font-light text-slate-600 self-center hidden sm:block">:</div>
-              <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px] hidden sm:block">
-                <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.minutes }}</div>
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Perc</div>
+
+              <div class="text-3xl font-light text-gray-600 self-center hidden sm:block">:</div>
+
+              <div class="time-box group">
+                <div class="time-number text-purple-400 group-hover:scale-110 transition-transform">
+                  {{ remaining.minutes }}
+                </div>
+                <div class="time-text">PERC</div>
               </div>
             </div>
           </div>
 
-          <div>
-             <div v-if="lastTopic" class="bg-[#1e293b]/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-blue-500/30 transition-all duration-300">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full animate-pulse" :class="lastTopic.progress === 100 ? 'bg-green-500' : 'bg-yellow-500'"></span>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                {{ lastTopic.progress === 100 ? 'BEFEJEZVE' : 'FOLYTATÁS' }}
-                            </span>
-                        </div>
-                        <h3 class="text-2xl font-black text-white leading-tight group-hover:text-blue-200 transition-colors">
-                            {{ lastTopic.title }}
-                        </h3>
-                        <p class="text-sm text-blue-300 font-medium mt-1">{{ lastTopic.subject.title }}</p>
-                    </div>
-                    <span class="text-4xl shadow-lg rounded-full bg-white/5 p-2">
-                        {{ lastTopic.progress === 100 ? '🏆' : '🚀' }}
-                    </span>
-                </div>
+          <div class="w-full md:w-[400px] lg:w-[450px] bg-[#0f173d] border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-colors">
+            
+            <div class="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
 
-                <div class="flex justify-between text-xs text-slate-400 mb-2 font-bold uppercase tracking-wide">
-                    <span>Lecke állapota</span>
-                    <span class="text-white">{{ lastTopic.progress }}%</span>
+            <div class="relative z-10">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Legutóbbi aktivitás</h3>
+                  <p class="text-xl font-bold text-white leading-tight">Matematika: <br/><span class="text-indigo-300">Pitagorasz-tétel</span></p>
                 </div>
-                
-                <div class="w-full h-2 bg-slate-900/50 rounded-full overflow-hidden mb-8">
-                    <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-500 relative transition-all duration-1000" 
-                         :style="{ width: lastTopic.progress + '%' }">
-                    </div>
-                </div>
+                <span class="text-2xl">🏆</span>
+              </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <RouterLink 
-                        :to="`/tantargyak/${lastTopic.subject.slug}/${lastTopic.slug}`" 
-                        class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-center transition-all hover:scale-105 shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
-                    >
-                        <span>▶️</span> {{ lastTopic.progress === 100 ? 'Gyakorlás' : 'Folytatás' }}
-                    </RouterLink>
-                    <button class="bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors border border-white/5">
-                        Részletek
-                    </button>
+              <div class="flex justify-between text-sm text-gray-300 mb-2">
+                <span>Felkészültség</span>
+                <span class="text-white font-bold">{{ user?.xp ? Math.min(Math.round(user.xp / 10), 100) : 5 }}%</span>
+              </div>
+
+              <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden mb-6 border border-white/5">
+                <div 
+                  class="h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 transition-all duration-1000 relative"
+                  :style="{ width: user?.xp ? Math.min(user.xp / 10, 100) + '%' : '5%' }"
+                >
+                  <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
                 </div>
              </div>
 
-             <div v-else class="bg-[#1e293b]/50 border border-white/10 rounded-3xl p-10 text-center flex flex-col items-center justify-center h-full min-h-[300px]">
-                <div class="text-6xl mb-4 opacity-50">🎓</div>
-                <h3 class="text-2xl font-bold text-white mb-2">Üdv a fedélzeten!</h3>
-                <p class="text-slate-400 mb-6 max-w-xs">Válassz egy tantárgyat lentebb, és kezdd el gyűjteni az XP-ket!</p>
-                <div class="animate-bounce text-blue-400 text-2xl">⬇️</div>
-             </div>
+              <div class="grid grid-cols-2 gap-3">
+                <RouterLink to="/tantargyak/matematika/pitagorasz-tetel" class="continue-btn flex justify-center items-center gap-2">
+                  <span>▶️</span> Folytatás
+                </RouterLink>
+
+                <button class="quiz-btn flex justify-center items-center gap-2" onclick="alert('Hamarosan!')">
+                  <span>📝</span> Kvíz
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>
       </div>
 
-      <div class="flex items-center gap-4 mb-8">
-        <div class="h-8 w-1.5 bg-blue-500 rounded-full"></div>
-        <h2 class="text-2xl font-bold text-white tracking-wide">Tantárgyak</h2>
-      </div>
+      <section class="mt-16 mb-20">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="h-8 w-1 bg-blue-500 rounded-full"></div>
+          <h2 class="text-2xl font-bold text-white tracking-wide">Válassz tantárgyat</h2>
+        </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-        
-        <RouterLink 
+        <div v-if="isLoading" class="flex justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <RouterLink 
             v-for="s in subjects" 
             :key="s.id" 
             :to="`/tantargyak/${s.slug}`"
-            class="group relative bg-[#1e293b] border border-white/5 rounded-[32px] p-1 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-        >
-            <div class="absolute inset-0 rounded-[32px] bg-gradient-to-br from-transparent to-transparent group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300"></div>
-
-            <div class="bg-[#131b40] rounded-[28px] p-6 h-full flex flex-col relative z-10 overflow-hidden">
-                
-                <div class="absolute -right-6 -bottom-6 text-9xl opacity-5 grayscale group-hover:grayscale-0 group-hover:opacity-10 transition-all duration-500 rotate-12">
-                    {{ s.visuals.icon }}
+            class="subject-card block group relative overflow-hidden"
+          >
+             <div class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 group-hover:from-blue-600/20 group-hover:to-purple-600/20 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col h-full justify-between">
+              <div>
+                <div class="text-5xl mb-4 transform group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300 inline-block drop-shadow-lg">
+                   {{ s.icon ? s.icon : '📚' }}
                 </div>
-
-                <div class="flex justify-between items-start mb-6">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-inner border border-white/5" :class="[s.visuals.bg, s.visuals.color]">
-                        {{ s.visuals.icon }}
-                    </div>
-                    <div class="px-3 py-1 rounded-full border border-white/5 bg-[#0f172a] text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        {{ s.total_topics }} Lecke
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <h4 class="text-2xl font-black text-white mb-1 group-hover:text-blue-200 transition-colors">{{ s.title }}</h4>
-                    <p class="text-xs text-slate-500 font-medium">Kattints a tanuláshoz</p>
-                </div>
-
-                <div class="mt-auto">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase">Haladás</span>
-                        <span class="text-xs font-bold" :class="s.visuals.color">{{ s.progress }}%</span>
-                    </div>
-                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-1000" 
-                             :class="s.visuals.bar_color" 
-                             :style="{ width: s.progress + '%' }">
-                        </div>
-                    </div>
-                </div>
-
+                <h4 class="text-2xl font-bold text-white group-hover:text-blue-300 transition-colors">
+                  {{ s.name }}
+                </h4>
+              </div>
+              
+              <div class="mt-4 flex items-center text-sm text-gray-400 group-hover:text-white transition-colors">
+                <span>Tanulás indítása</span>
+                <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+              </div>
             </div>
         </RouterLink>
 
-        <div class="border-2 border-dashed border-white/10 rounded-[32px] p-8 flex flex-col items-center justify-center text-center opacity-40 hover:opacity-100 hover:border-blue-500/30 transition-all cursor-pointer group min-h-[240px]">
-            <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-2xl text-slate-400 mb-4 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-colors">
-                +
+          <div class="add-card cursor-pointer group hover:border-blue-500/50 hover:bg-white/5">
+            <div class="text-center">
+              <div class="text-4xl text-gray-600 group-hover:text-blue-400 mb-2 transition-colors">+</div>
+              <span class="font-medium text-gray-400 group-hover:text-white transition-colors">Új tantárgy</span>
             </div>
             <span class="font-bold text-slate-500 group-hover:text-white transition-colors">Hamarosan...</span>
         </div>
@@ -235,3 +214,87 @@ onUnmounted(() => {
     </div>
   </BaseLayout>
 </template>
+
+<style scoped>
+.time-box {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  text-align: center;
+  padding: 15px 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  min-width: 100px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+.time-number {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  font-family: monospace;
+}
+.time-text {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  margin-top: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Gombok */
+.continue-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.continue-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.quiz-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.quiz-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Kártyák */
+.subject-card {
+  height: 200px;
+  background: #1e293b;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 32px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.subject-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.add-card {
+  height: 200px;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: .25s;
+}
+</style>

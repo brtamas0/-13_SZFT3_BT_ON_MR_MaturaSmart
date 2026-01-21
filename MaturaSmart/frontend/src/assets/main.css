@@ -370,3 +370,21 @@ a { text-decoration: none; color: inherit; }
     padding: 2rem 0; text-align: center; background: rgba(0,0,0,0.2);
 }
 .footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap; }
+
+/* MAIN OLDAL – ALAPSZÖVEGEK */
+.main-page,
+.main-page h1,
+.main-page h2,
+.main-page h3,
+.main-page h4,
+.main-page p,
+.main-page span,
+.main-page a {
+  color: var(--text-primary);
+}
+
+.main-page .text-secondary,
+.main-page p,
+.main-page small {
+  color: var(--text-secondary);
+}
