@@ -17,23 +17,19 @@ const mobileOpen = ref(false)
 const theme = ref("light")
 
 onMounted(() => {
-  if (props.mode === "landing") {
-    const saved = localStorage.getItem("theme") || "light"
-    theme.value = saved
-    document.documentElement.setAttribute("data-theme", saved)
-  } else {
-    // APP MODE ALWAYS DARK
-    document.documentElement.setAttribute("data-theme", "dark")
-  }
+  const saved = localStorage.getItem("theme") || "dark"
+theme.value = saved
+document.documentElement.setAttribute("data-theme", saved)
+
 })
 
 const toggleTheme = () => {
-  if (props.mode !== "landing") return
   const next = theme.value === "dark" ? "light" : "dark"
   theme.value = next
   document.documentElement.setAttribute("data-theme", next)
   localStorage.setItem("theme", next)
 }
+
 
 // Scroll (landing)
 const scrollToId = (id) => {
@@ -47,23 +43,24 @@ const handleLogout = () => router.push("/login")
 </script>
 
 <template>
-  <header
-    class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl border-b transition-all duration-300"
-    :class="props.mode === 'app' ? 'bg-[#0b102e]/80 border-white/10' : ''"
-    :style="props.mode === 'landing'
-      ? { background: 'var(--nav-bg)', borderColor: 'var(--glass-border)' }
-      : {}"
-  >
+     <header
+  class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl border-b transition-all duration-300"
+  :class="theme === 'dark'
+    ? 'bg-[#0b102e]/80 border-white/10'
+    : 'bg-white/80 border-black/10'"
+>
+
     <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
 
       <!-- LOGO -->
       <RouterLink
-        to="/"
-        class="text-2xl font-bold tracking-wide"
-        :style="{ color: props.mode === 'landing' ? 'var(--text-primary)' : 'white' }"
-      >
-        Matura<span class="accent-text">Smart</span>
-      </RouterLink>
+  to="/"
+  class="text-2xl font-bold tracking-wide"
+  :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+>
+  Matura<span class="accent-text">Smart</span>
+</RouterLink>
+
 
       <!-- DESKTOP NAV -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -82,7 +79,8 @@ const handleLogout = () => router.push("/login")
             to="/main"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/main' }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+
           >
             Vezérlőpult
           </RouterLink>
@@ -91,7 +89,8 @@ const handleLogout = () => router.push("/login")
             to="/tantargyak"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path.startsWith('/tantargyak') }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+
           >
             Tantárgyak
           </RouterLink>
@@ -100,7 +99,7 @@ const handleLogout = () => router.push("/login")
             to="/calendar"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/calendar' }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
           >
             Naptár 📅
           </RouterLink>
@@ -109,7 +108,8 @@ const handleLogout = () => router.push("/login")
             to="/results"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/results' }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+
           >
             Eredmények
           </RouterLink>
@@ -118,7 +118,7 @@ const handleLogout = () => router.push("/login")
             to="/leaderboard"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/leaderboard' }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
           >
             Ranglista 🏆
           </RouterLink>
@@ -127,7 +127,7 @@ const handleLogout = () => router.push("/login")
             to="/profile"
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/profile' }"
-            style="color: white"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
           >
             Profil
           </RouterLink>
@@ -137,14 +137,15 @@ const handleLogout = () => router.push("/login")
       <!-- RIGHT SIDE -->
       <div class="flex items-center gap-4">
 
-        <!-- THEME TOGGLE (landing only) -->
-        <button
-          v-if="props.mode === 'landing'"
-          @click="toggleTheme"
-          class="text-xl hover:opacity-80 transition theme-btn"
-        >
-          🌓
-        </button>
+        <!-- THEME TOGGLE (always visible) -->
+      <button
+        @click="toggleTheme"
+        class="text-xl hover:opacity-80 transition theme-btn"
+        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+      >
+        🌓
+      </button>
+
 
         <!-- LANDING LOGIN -->
         <template v-if="props.mode === 'landing'">
@@ -177,10 +178,13 @@ const handleLogout = () => router.push("/login")
           <!-- LOGOUT -->
           <button
             @click="handleLogout"
-            class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300 transition shadow-md"
+            class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl transition shadow-md"
+            :class="theme === 'dark'
+              ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
+              : 'bg-red-100 text-red-600 hover:bg-red-200'"
             title="Kijelentkezés"
-          >
-           🚫
+            >
+            🔓
           </button>
         </template>
 
