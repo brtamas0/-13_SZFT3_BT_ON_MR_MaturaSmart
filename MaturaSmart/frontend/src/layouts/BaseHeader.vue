@@ -1,150 +1,231 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue"
+import { useRouter, useRoute } from "vue-router"
 
 const props = defineProps({
   mode: {
     type: String,
-    default: "app", 
+    default: "landing",
   },
-});
+})
 
-const router = useRouter();
-const mobileOpen = ref(false);
-const closeMobile = () => (mobileOpen.value = false);
+const router = useRouter()
+const route = useRoute()
+const mobileOpen = ref(false)
+
+// THEME HANDLING – only for landing
+const theme = ref("light")
+
+onMounted(() => {
+  if (props.mode === "landing") {
+    const saved = localStorage.getItem("theme") || "light"
+    theme.value = saved
+    document.documentElement.setAttribute("data-theme", saved)
+  } else {
+    // APP MODE ALWAYS DARK
+    document.documentElement.setAttribute("data-theme", "dark")
+  }
+})
+
+const toggleTheme = () => {
+  if (props.mode !== "landing") return
+  const next = theme.value === "dark" ? "light" : "dark"
+  theme.value = next
+  document.documentElement.setAttribute("data-theme", next)
+  localStorage.setItem("theme", next)
+}
+
+// Scroll (landing)
+const scrollToId = (id) => {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: "smooth" })
+}
+
+// Dummy user
+const user = { full_name: "User" }
+const handleLogout = () => router.push("/login")
 </script>
 
 <template>
   <header
-    class="fixed top-0 left-0 w-full z-50
-           backdrop-blur-xl bg-[#0b1029]/70
-           border-b border-white/10"
+    class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl border-b transition-all duration-300"
+    :class="props.mode === 'app' ? 'bg-[#0b102e]/80 border-white/10' : ''"
+    :style="props.mode === 'landing'
+      ? { background: 'var(--nav-bg)', borderColor: 'var(--glass-border)' }
+      : {}"
   >
     <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
 
-      <RouterLink to="/" class="text-2xl font-bold tracking-wide">
-        Matura<span class="text-[#6CA6FF]">Smart</span>
+      <!-- LOGO -->
+      <RouterLink
+        to="/"
+        class="text-2xl font-bold tracking-wide"
+        :style="{ color: props.mode === 'landing' ? 'var(--text-primary)' : 'white' }"
+      >
+        Matura<span class="accent-text">Smart</span>
       </RouterLink>
 
-      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+      <!-- DESKTOP NAV -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+
+        <!-- LANDING NAV -->
         <template v-if="props.mode === 'landing'">
-          <a @click.prevent="scrollToId('home')" href="#home" class="nav-item">Kezdőlap</a>
-          <a @click.prevent="scrollToId('features')" href="#features" class="nav-item">Funkciók</a>
-          <a @click.prevent="scrollToId('mission')" href="#mission" class="nav-item">Célunk</a>
+          <a @click.prevent="scrollToId('home')" class="nav-item" style="color: var(--accent); font-weight: 600;">Kezdőlap</a>
+          <a @click.prevent="scrollToId('features')" class="nav-item">Funkciók</a>
+          <a @click.prevent="scrollToId('mission')" class="nav-item">Célunk</a>
+          <a @click.prevent="scrollToId('faq')" class="nav-item">GYIK</a>
         </template>
 
+        <!-- APP NAV -->
         <template v-else>
           <RouterLink
             to="/main"
-            class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow-md hover:bg-blue-500 transition"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path === '/main' }"
+            style="color: white"
           >
             Vezérlőpult
+          </RouterLink>
+
+          <RouterLink
+            to="/tantargyak"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path.startsWith('/tantargyak') }"
+            style="color: white"
+          >
+            Tantárgyak
+          </RouterLink>
+
+          <RouterLink
+            to="/calendar"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path === '/calendar' }"
+            style="color: white"
+          >
+            Naptár 📅
+          </RouterLink>
+
+          <RouterLink
+            to="/results"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path === '/results' }"
+            style="color: white"
+          >
+            Eredmények
+          </RouterLink>
+
+          <RouterLink
+            to="/leaderboard"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path === '/leaderboard' }"
+            style="color: white"
+          >
+            Ranglista 🏆
+          </RouterLink>
+
+          <RouterLink
+            to="/profile"
+            class="hover:text-blue-400 transition"
+            :class="{ 'text-blue-400 font-semibold': route.path === '/profile' }"
+            style="color: white"
+          >
+            Profil
           </RouterLink>
         </template>
       </nav>
 
+      <!-- RIGHT SIDE -->
       <div class="flex items-center gap-4">
+
+        <!-- THEME TOGGLE (landing only) -->
+        <button
+          v-if="props.mode === 'landing'"
+          @click="toggleTheme"
+          class="text-xl hover:opacity-80 transition theme-btn"
+        >
+          🌓
+        </button>
+
+        <!-- LANDING LOGIN -->
         <template v-if="props.mode === 'landing'">
-          <button class="text-xl hover:opacity-80 transition">🌓</button>
           <RouterLink
             to="/login"
-            class="bg-[#6CA6FF] text-black font-semibold px-4 py-2 rounded-xl shadow-md hover:bg-[#8bb8ff] transition text-sm"
+            class="px-4 py-2 rounded-xl font-semibold shadow-md transition text-sm"
+            style="background: var(--accent); color: black;"
           >
             Belépés
           </RouterLink>
         </template>
 
+        <!-- APP RIGHT SIDE -->
         <template v-else>
-          <div class="px-4 py-2 bg-black/40 rounded-2xl shadow-lg text-sm flex items-center gap-2">
+          <!-- STREAK -->
+          <div class="px-4 py-2 rounded-2xl shadow-lg text-sm flex items-center gap-2"
+               style="background: rgba(0,0,0,0.4); color: white;">
             🔥 <span>23</span>
           </div>
 
-          <RouterLink to="/profile" class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white border-2 border-[#0b1029] shadow-md hover:scale-105 transition-transform" title="Profil">
+          <!-- PROFILE -->
+          <RouterLink
+            to="/profile"
+            class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:scale-105 transition-transform"
+            style="background: linear-gradient(to bottom right, #2563eb, #4f46e5); border: 2px solid #0b1029;"
+          >
             {{ user.full_name?.charAt(0) || 'U' }}
           </RouterLink>
 
-          <button @click="handleLogout" class="hidden md:block text-gray-400 hover:text-red-400 transition" title="Kilépés">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
+          <!-- LOGOUT -->
+          <button @click="handleLogout" class="hidden md:block text-gray-400 hover:text-red-400 transition">
+            ⎋
           </button>
         </template>
 
-        <button class="md:hidden text-3xl" @click="mobileOpen = !mobileOpen">☰</button>
+        <!-- MOBILE MENU BUTTON -->
+        <button class="md:hidden text-3xl" @click="mobileOpen = !mobileOpen" :style="{ color: props.mode === 'landing' ? 'var(--text-primary)' : 'white' }">
+          ☰
+        </button>
       </div>
     </div>
 
+    <!-- MOBILE MENU -->
     <transition name="fade">
-  <div
-    v-if="mobileOpen"
-    class="md:hidden bg-[#0b1029]/95 border-t border-white/10 px-6 py-6 space-y-4"
-  >
-    <!-- LANDING -->
-    <template v-if="props.mode === 'landing'">
-      <RouterLink to="/#home" class="block nav-item" @click="mobileOpen = false">Kezdőlap</RouterLink>
-      <RouterLink to="/#features" class="block nav-item" @click="mobileOpen = false">Funkciók</RouterLink>
-      <RouterLink to="/#mission" class="block nav-item" @click="mobileOpen = false">Célunk</RouterLink>
-      <RouterLink to="/#faq" class="block nav-item" @click="mobileOpen = false">GYIK</RouterLink>
-    </template>
+      <div
+        v-if="mobileOpen"
+        class="md:hidden px-6 py-6 space-y-4"
+        :class="props.mode === 'app' ? 'bg-[#0b102e]/95 border-white/10' : ''"
+        :style="props.mode === 'landing'
+          ? { background: 'var(--nav-bg)', borderTop: '1px solid var(--glass-border)' }
+          : {}"
+      >
+        <!-- LANDING -->
+        <template v-if="props.mode === 'landing'">
+          <a @click="scrollToId('home'); mobileOpen=false" class="block nav-item">Kezdőlap</a>
+          <a @click="scrollToId('features'); mobileOpen=false" class="block nav-item">Funkciók</a>
+          <a @click="scrollToId('mission'); mobileOpen=false" class="block nav-item">Célunk</a>
+          <a @click="scrollToId('faq'); mobileOpen=false" class="block nav-item">GYIK</a>
+        </template>
 
-    <!-- APP -->
-    <template v-else>
-      <RouterLink to="/main" class="block nav-item" @click="mobileOpen = false">Vezérlőpult</RouterLink>
-      <RouterLink to="/subjects" class="block nav-item" @click="mobileOpen = false">Tantárgyak</RouterLink>
-      <RouterLink to="/calendar" class="block nav-item" @click="mobileOpen = false">Naptár 📅</RouterLink>
-      <RouterLink to="/results" class="block nav-item" @click="mobileOpen = false">Eredmények</RouterLink>
-      <RouterLink to="/leaderboard" class="block nav-item" @click="mobileOpen = false">Ranglista 🏆</RouterLink>
-      <RouterLink to="/profile" class="block nav-item" @click="mobileOpen = false">Profil</RouterLink>
-    </template>
-  </div>
-</transition>
-
+        <!-- APP -->
+        <template v-else>
+          <RouterLink to="/main" class="block nav-item" @click="mobileOpen = false">Vezérlőpult</RouterLink>
+          <RouterLink to="/tantargyak" class="block nav-item" @click="mobileOpen = false">Tantárgyak</RouterLink>
+          <RouterLink to="/calendar" class="block nav-item" @click="mobileOpen = false">Naptár 📅</RouterLink>
+          <RouterLink to="/results" class="block nav-item" @click="mobileOpen = false">Eredmények</RouterLink>
+          <RouterLink to="/leaderboard" class="block nav-item" @click="mobileOpen = false">Ranglista 🏆</RouterLink>
+          <RouterLink to="/profile" class="block nav-item" @click="mobileOpen = false">Profil</RouterLink>
+        </template>
+      </div>
+    </transition>
   </header>
 </template>
 
 <style scoped>
-.base-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 50;
-  backdrop-filter: blur(16px);
-  background: var(--nav-bg);
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.nav-text {
-  color: var(--text-secondary);
-}
-
 .nav-item {
-  position: relative;
-  transition: all 0.2s;
   cursor: pointer;
+  transition: 0.2s;
+  color: var(--text-secondary);
 }
 .nav-item:hover {
   color: var(--text-primary);
 }
-
-.accent-text {
-  color: var(--accent);
-}
-
-.btn-primary-sm {
-  background: var(--accent);
-  color: white;
-}
-
-.mobile-link {
-  display: block;
-  font-weight: 600;
-  color: #94a3b8;
-  transition: color 0.2s;
-}
-.mobile-link:hover {
-  color: white;
-}
-
-.slide-enter-active, .slide-leave-active { transition: all 0.3s ease; }
-.slide-enter-from, .slide-leave-to { opacity: 0; transform: translateY(-10px); }
 </style>

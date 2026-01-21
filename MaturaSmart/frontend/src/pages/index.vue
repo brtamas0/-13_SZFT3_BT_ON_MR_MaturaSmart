@@ -12,9 +12,14 @@ const toggleFaq = (index) => {
 }
 
 onMounted(() => {
-  const saved = localStorage.getItem('theme') || 'dark'
-  document.documentElement.setAttribute('data-theme', saved)
+  const saved = localStorage.getItem('darkMode')
+  if (saved === '1') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
 })
+
 
 const goToLogin = () => {
   router.push('/login')
