@@ -67,7 +67,7 @@ const handleLogout = () => {
         Matura<span class="accent-text">Smart</span>
       </RouterLink>
 
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+      <nav class="hidden lg:flex items-center gap-4 lg:gap-8">
 
         <template v-if="props.mode === 'landing'">
           <a @click.prevent="scrollToId('home')" class="nav-item" style="color: var(--accent); font-weight: 600;">Kezdőlap</a>
@@ -182,7 +182,7 @@ const handleLogout = () => {
 
         <button
           @click="handleLogout"
-          class="hidden md:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer"
+          class="hidden lg:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer"
           :class="theme === 'dark'
             ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
             : 'bg-red-100 text-red-600 hover:bg-red-200'"
@@ -194,7 +194,7 @@ const handleLogout = () => {
         </template>
 
         <button
-          class="md:hidden text-3xl"
+          class="lg:hidden text-3xl"
           @click="mobileOpen = !mobileOpen"
           :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
         >
@@ -206,7 +206,7 @@ const handleLogout = () => {
     <transition name="fade">
       <div
         v-if="mobileOpen"
-        class="md:hidden px-6 py-6 space-y-4"
+        class="lg:hidden px-6 py-6 space-y-4"
         :class="theme === 'dark'
           ? 'bg-[#0b102e]/95 border-white/10'
           : 'bg-white/95 border-black/10'"
