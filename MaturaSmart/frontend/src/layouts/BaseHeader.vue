@@ -180,16 +180,17 @@ const handleLogout = () => {
             }}
           </RouterLink>
 
-          <button
-            @click="handleLogout"
-            class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl transition shadow-md"
-            :class="theme === 'dark'
-              ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
-              : 'bg-red-100 text-red-600 hover:bg-red-200'"
-            title="Kijelentkezés"
-          >
-            🔓
-          </button>
+        <button
+          @click="handleLogout"
+          class="hidden md:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer"
+          :class="theme === 'dark'
+            ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
+            : 'bg-red-100 text-red-600 hover:bg-red-200'"
+          title="Kijelentkezés"
+        >
+          Kijelentkezés
+        </button>
+
         </template>
 
         <button
