@@ -78,9 +78,9 @@ onMounted(async () => {
 
             <div class="relative w-32 h-32 flex items-center justify-center shrink-0">
                 <svg class="w-full h-full transform -rotate-90">
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-800" />
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-white/20" />
                     <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
-                            :stroke-dasharray="365" 
+                            :stroke-dasharray="180" 
                             :stroke-dashoffset="365 - (365 * (subject.stats?.progress || 0)) / 100"
                             class="text-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
                 </svg>
