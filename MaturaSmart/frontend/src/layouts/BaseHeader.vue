@@ -13,14 +13,13 @@ const router = useRouter()
 const route = useRoute()
 const mobileOpen = ref(false)
 
-// THEME HANDLING – only for landing
-const theme = ref("light")
+// GLOBAL THEME HANDLING (landing + app)
+const theme = ref("dark")
 
 onMounted(() => {
   const saved = localStorage.getItem("theme") || "dark"
-theme.value = saved
-document.documentElement.setAttribute("data-theme", saved)
-
+  theme.value = saved
+  document.documentElement.setAttribute("data-theme", saved)
 })
 
 const toggleTheme = () => {
@@ -29,7 +28,6 @@ const toggleTheme = () => {
   document.documentElement.setAttribute("data-theme", next)
   localStorage.setItem("theme", next)
 }
-
 
 // Scroll (landing)
 const scrollToId = (id) => {
@@ -43,24 +41,22 @@ const handleLogout = () => router.push("/login")
 </script>
 
 <template>
-     <header
-  class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl border-b transition-all duration-300"
-  :class="theme === 'dark'
-    ? 'bg-[#0b102e]/80 border-white/10'
-    : 'bg-white/80 border-black/10'"
->
-
+  <header
+    class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl border-b transition-all duration-300"
+    :class="theme === 'dark'
+      ? 'bg-[#0b102e]/80 border-white/10'
+      : 'bg-white/80 border-black/10'"
+  >
     <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
 
       <!-- LOGO -->
       <RouterLink
-  to="/"
-  class="text-2xl font-bold tracking-wide"
-  :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
->
-  Matura<span class="accent-text">Smart</span>
-</RouterLink>
-
+        to="/"
+        class="text-2xl font-bold tracking-wide"
+        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+      >
+        Matura<span class="accent-text">Smart</span>
+      </RouterLink>
 
       <!-- DESKTOP NAV -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -80,7 +76,6 @@ const handleLogout = () => router.push("/login")
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/main' }"
             :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
-
           >
             Vezérlőpult
           </RouterLink>
@@ -90,7 +85,6 @@ const handleLogout = () => router.push("/login")
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path.startsWith('/tantargyak') }"
             :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
-
           >
             Tantárgyak
           </RouterLink>
@@ -109,7 +103,6 @@ const handleLogout = () => router.push("/login")
             class="hover:text-blue-400 transition"
             :class="{ 'text-blue-400 font-semibold': route.path === '/results' }"
             :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
-
           >
             Eredmények
           </RouterLink>
@@ -137,15 +130,14 @@ const handleLogout = () => router.push("/login")
       <!-- RIGHT SIDE -->
       <div class="flex items-center gap-4">
 
-        <!-- THEME TOGGLE (always visible) -->
-      <button
-        @click="toggleTheme"
-        class="text-xl hover:opacity-80 transition theme-btn"
-        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
-      >
-        🌓
-      </button>
-
+        <!-- THEME TOGGLE -->
+        <button
+          @click="toggleTheme"
+          class="text-xl hover:opacity-80 transition theme-btn"
+          :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+        >
+          🌓
+        </button>
 
         <!-- LANDING LOGIN -->
         <template v-if="props.mode === 'landing'">
@@ -161,10 +153,15 @@ const handleLogout = () => router.push("/login")
         <!-- APP RIGHT SIDE -->
         <template v-else>
           <!-- STREAK -->
-          <div class="px-4 py-2 rounded-2xl shadow-lg text-sm flex items-center gap-2"
-               style="background: rgba(0,0,0,0.4); color: white;">
-            🔥 <span>23</span>
-          </div>
+          <div
+  class="px-4 py-2 rounded-2xl shadow-lg text-sm flex items-center gap-2"
+  :style="theme === 'dark'
+    ? 'background: rgba(0,0,0,0.4); color: white;'
+    : 'background: rgba(0,0,0,0.05); color: #333;'"
+>
+  🔥 <span>23</span>
+</div>
+
 
           <!-- PROFILE -->
           <RouterLink
@@ -183,13 +180,17 @@ const handleLogout = () => router.push("/login")
               ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
               : 'bg-red-100 text-red-600 hover:bg-red-200'"
             title="Kijelentkezés"
-            >
+          >
             🔓
           </button>
         </template>
 
         <!-- MOBILE MENU BUTTON -->
-        <button class="md:hidden text-3xl" @click="mobileOpen = !mobileOpen" :style="{ color: props.mode === 'landing' ? 'var(--text-primary)' : 'white' }">
+        <button
+          class="md:hidden text-3xl"
+          @click="mobileOpen = !mobileOpen"
+          :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+        >
           ☰
         </button>
       </div>
@@ -200,10 +201,9 @@ const handleLogout = () => router.push("/login")
       <div
         v-if="mobileOpen"
         class="md:hidden px-6 py-6 space-y-4"
-        :class="props.mode === 'app' ? 'bg-[#0b102e]/95 border-white/10' : ''"
-        :style="props.mode === 'landing'
-          ? { background: 'var(--nav-bg)', borderTop: '1px solid var(--glass-border)' }
-          : {}"
+        :class="theme === 'dark'
+          ? 'bg-[#0b102e]/95 border-white/10'
+          : 'bg-white/95 border-black/10'"
       >
         <!-- LANDING -->
         <template v-if="props.mode === 'landing'">

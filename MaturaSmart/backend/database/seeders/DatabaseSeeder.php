@@ -349,7 +349,7 @@ EOT,
                 <p>A magyar nyelv szavait jelentésük és mondatbeli szerepük alapján három fő kategóriába soroljuk.</p>
             '
         ]);
-
+        
         // Kérdés Nyelvtanhoz
         $q4 = Question::create(['topic_id' => $partsOfSpeech->id, 'type' => 'multiple_choice', 'content' => 'Milyen szófaj a "fut" szó?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Ige', 'is_correct' => true]);
