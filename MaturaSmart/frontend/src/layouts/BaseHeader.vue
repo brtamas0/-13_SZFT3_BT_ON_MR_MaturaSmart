@@ -226,6 +226,14 @@ const handleLogout = () => {
           <RouterLink to="/leaderboard" class="block nav-item" @click="mobileOpen = false">Ranglista 🏆</RouterLink>
           <RouterLink to="/profile" class="block nav-item" @click="mobileOpen = false">Profil</RouterLink>
         </template>
+        <button
+          @click="handleLogout"
+          class="w-full text-left px-4 py-3 rounded-xl font-medium cursor-pointer transition
+          bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300"
+        >
+          Kijelentkezés
+        </button>
+
       </div>
     </transition>
   </header>
