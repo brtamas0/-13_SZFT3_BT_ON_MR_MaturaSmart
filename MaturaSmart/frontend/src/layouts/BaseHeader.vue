@@ -13,13 +13,22 @@ const router = useRouter()
 const route = useRoute()
 const mobileOpen = ref(false)
 
-// GLOBAL THEME HANDLING (landing + app)
 const theme = ref("dark")
+const user = ref({ full_name: "" })
 
 onMounted(() => {
-  const saved = localStorage.getItem("theme") || "dark"
-  theme.value = saved
-  document.documentElement.setAttribute("data-theme", saved)
+  const savedTheme = localStorage.getItem("theme") || "dark"
+  theme.value = savedTheme
+  document.documentElement.setAttribute("data-theme", savedTheme)
+
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    try {
+      user.value = JSON.parse(storedUser)
+    } catch (e) {
+      console.error("Hiba a felhasználói adatok betöltésekor:", e)
+    }
+  }
 })
 
 const toggleTheme = () => {
@@ -29,15 +38,16 @@ const toggleTheme = () => {
   localStorage.setItem("theme", next)
 }
 
-// Scroll (landing)
 const scrollToId = (id) => {
   const el = document.getElementById(id)
   if (el) el.scrollIntoView({ behavior: "smooth" })
 }
 
-// Dummy user
-const user = { full_name: "User" }
-const handleLogout = () => router.push("/login")
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  router.push("/login")
+}
 </script>
 
 <template>
@@ -49,7 +59,6 @@ const handleLogout = () => router.push("/login")
   >
     <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
 
-      <!-- LOGO -->
       <RouterLink
         to="/"
         class="text-2xl font-bold tracking-wide"
@@ -58,10 +67,8 @@ const handleLogout = () => router.push("/login")
         Matura<span class="accent-text">Smart</span>
       </RouterLink>
 
-      <!-- DESKTOP NAV -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
 
-        <!-- LANDING NAV -->
         <template v-if="props.mode === 'landing'">
           <a @click.prevent="scrollToId('home')" class="nav-item" style="color: var(--accent); font-weight: 600;">Kezdőlap</a>
           <a @click.prevent="scrollToId('features')" class="nav-item">Funkciók</a>
@@ -69,7 +76,6 @@ const handleLogout = () => router.push("/login")
           <a @click.prevent="scrollToId('faq')" class="nav-item">GYIK</a>
         </template>
 
-        <!-- APP NAV -->
         <template v-else>
           <RouterLink
             to="/main"
@@ -127,10 +133,8 @@ const handleLogout = () => router.push("/login")
         </template>
       </nav>
 
-      <!-- RIGHT SIDE -->
       <div class="flex items-center gap-4">
 
-        <!-- THEME TOGGLE -->
         <button
           @click="toggleTheme"
           class="text-xl hover:opacity-80 transition theme-btn"
@@ -139,7 +143,6 @@ const handleLogout = () => router.push("/login")
           🌓
         </button>
 
-        <!-- LANDING LOGIN -->
         <template v-if="props.mode === 'landing'">
           <RouterLink
             to="/login"
@@ -150,29 +153,33 @@ const handleLogout = () => router.push("/login")
           </RouterLink>
         </template>
 
-        <!-- APP RIGHT SIDE -->
         <template v-else>
-          <!-- STREAK -->
           <div
-  class="px-4 py-2 rounded-2xl shadow-lg text-sm flex items-center gap-2"
-  :style="theme === 'dark'
-    ? 'background: rgba(0,0,0,0.4); color: white;'
-    : 'background: rgba(0,0,0,0.05); color: #333;'"
->
-  🔥 <span>23</span>
-</div>
+            class="px-4 py-2 rounded-2xl shadow-lg text-sm flex items-center gap-2"
+            :style="theme === 'dark'
+              ? 'background: rgba(0,0,0,0.4); color: white;'
+              : 'background: rgba(0,0,0,0.05); color: #333;'"
+          >
+            🔥 <span>23</span>
+          </div>
 
-
-          <!-- PROFILE -->
           <RouterLink
             to="/profile"
             class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:scale-105 transition-transform"
             style="background: linear-gradient(to bottom right, #2563eb, #4f46e5); border: 2px solid #0b1029;"
           >
-            {{ user.full_name?.charAt(0) || 'U' }}
+            {{ 
+               user.full_name 
+                 ? user.full_name
+                     .split(' ')
+                     .map(n => n[0])
+                     .join('')
+                     .toUpperCase()
+                     .substring(0, 2)
+                 : 'U' 
+            }}
           </RouterLink>
 
-          <!-- LOGOUT -->
           <button
             @click="handleLogout"
             class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl transition shadow-md"
@@ -185,7 +192,6 @@ const handleLogout = () => router.push("/login")
           </button>
         </template>
 
-        <!-- MOBILE MENU BUTTON -->
         <button
           class="md:hidden text-3xl"
           @click="mobileOpen = !mobileOpen"
@@ -196,7 +202,6 @@ const handleLogout = () => router.push("/login")
       </div>
     </div>
 
-    <!-- MOBILE MENU -->
     <transition name="fade">
       <div
         v-if="mobileOpen"
@@ -205,7 +210,6 @@ const handleLogout = () => router.push("/login")
           ? 'bg-[#0b102e]/95 border-white/10'
           : 'bg-white/95 border-black/10'"
       >
-        <!-- LANDING -->
         <template v-if="props.mode === 'landing'">
           <a @click="scrollToId('home'); mobileOpen=false" class="block nav-item">Kezdőlap</a>
           <a @click="scrollToId('features'); mobileOpen=false" class="block nav-item">Funkciók</a>
@@ -213,7 +217,6 @@ const handleLogout = () => router.push("/login")
           <a @click="scrollToId('faq'); mobileOpen=false" class="block nav-item">GYIK</a>
         </template>
 
-        <!-- APP -->
         <template v-else>
           <RouterLink to="/main" class="block nav-item" @click="mobileOpen = false">Vezérlőpult</RouterLink>
           <RouterLink to="/tantargyak" class="block nav-item" @click="mobileOpen = false">Tantárgyak</RouterLink>
