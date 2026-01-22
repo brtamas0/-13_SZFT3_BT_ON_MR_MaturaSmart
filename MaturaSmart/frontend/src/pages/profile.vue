@@ -223,8 +223,8 @@ const updatePassword = async () => {
                     </div>
 
                     <div class="flex flex-wrap justify-center gap-2">
-                        <span class="px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
-                            Diák
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border" :class="user.role === 'admin' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'">
+                            {{ user.role === 'student' ? 'diák' : user.role }}
                         </span>
                         <span v-if="user.graduation_year" class="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider">
                             🎓 {{ user.graduation_year }}
