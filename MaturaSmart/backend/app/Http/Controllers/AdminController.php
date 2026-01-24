@@ -156,5 +156,24 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
+     // FLASHCARDOK KEZELÉSE
+
+    public function getFlashcards(Topic $topic) {
+        return $topic->flashcards()->get();
+    }
+
+    public function storeFlashcard(Request $request, Topic $topic) {
+        $validated = $request->validate([
+            'front' => 'required|string',
+            'back' => 'required|string'
+        ]);
+
+        return $topic->flashcards()->create($validated);
+    }
+
+    public function destroyFlashcard(\App\Models\Flashcard $flashcard) {
+        $flashcard->delete();
+        return response()->noContent();
+    }
 
 }
