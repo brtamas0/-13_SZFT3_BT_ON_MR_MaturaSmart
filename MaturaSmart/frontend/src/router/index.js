@@ -3,7 +3,7 @@ import { setTitle } from '@/router/guards/SetTitleGuard.mjs'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
 
 const customRoutes = [
-  // --- PUBLIKUS OLDALAK ---
+  // PUBLIKUS OLDALAK
   {
     path: '/',
     name: 'Landing',
@@ -23,7 +23,7 @@ const customRoutes = [
     meta: { title: 'Regisztráció' }
   },
 
-  // --- VÉDETT OLDALAK ---
+  // VÉDETT OLDALAK (Diák nézet)
   {
     path: '/main',
     name: 'Main',
@@ -50,12 +50,46 @@ const customRoutes = [
         requiresAuth: true,
         title: 'Ranglista' 
     }
+  },
+
+  // ADMIN
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'), 
+    meta: { 
+        requiresAuth: true, 
+        requiresAdmin: true, // Csak admin léphet be
+        title: 'Adminisztráció'
+    },
+    children: [
+      {
+        path: '',
+        name: 'AdminDashboard',
+        component: () => import('@/pages/admin/dashboard.vue')
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('@/pages/admin/users.vue')
+      },
+      {
+        path: 'subjects',
+        name: 'AdminSubjects',
+        component: () => import('@/pages/admin/subjects.vue')
+      },
+      {
+        path: 'subjects/:id/builder', // URL: /admin/subjects/5/builder
+        name: 'CourseBuilder',
+        component: () => import('@/pages/admin/course-builder.vue'),
+        props: true
+      }
+    ]
   }
 ]
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [...autoRoutes, ...customRoutes],
+  routes: [...customRoutes, ...autoRoutes], 
 
   scrollBehavior(to) {
     if (to.hash) {
@@ -65,13 +99,30 @@ export const router = createRouter({
   }
 })
 
+// Cím beállítása
 router.beforeEach(setTitle)
 
+// AUTH guard
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else {
-    next()
+  
+  let user = {}
+  try {
+    user = JSON.parse(localStorage.getItem('user') || '{}')
+  } catch (e) {
+    console.error("Hibás user adat a tárolóban")
+    user = {}
   }
+
+  // 1. Ha be kell jelentkezni, de nincs token -> Login
+  if (to.meta.requiresAuth && !token) {
+    return next('/login')
+  }
+  
+  // 2. Ha ADMIN jog kell, de a user NEM admin -> Vissza a főoldalra
+  if (to.meta.requiresAdmin && user.role !== 'admin') {
+    return next('/main') 
+  }
+
+  next()
 })
