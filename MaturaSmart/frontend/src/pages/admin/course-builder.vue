@@ -237,6 +237,47 @@ const executeDelete = async () => {
                 <div class="flex-1 p-8 prose prose-invert max-w-none overflow-y-auto text-gray-200" v-html="editorContent"></div>
             </div>
         </div>
+
+        <div v-if="activeTab === 'quiz'" class="flex-1 overflow-y-auto p-8 bg-[#0b102e]">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold text-white mb-6">Kérdések kezelése</h3>
+                
+                <div class="bg-[#131b3d] p-6 rounded-xl border border-gray-700 mb-8">
+                    <h4 class="font-bold text-blue-400 mb-4">Új kérdés hozzáadása</h4>
+                    <input v-model="newQuestion.content" placeholder="Mi a kérdés?" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white mb-4 focus:border-blue-500 outline-none" />
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div v-for="(ans, i) in newQuestion.answers" :key="i" class="flex items-center gap-2 bg-[#0b102e] p-2 rounded border border-gray-700">
+                            <input type="radio" name="correct" :checked="ans.is_correct" @change="setCorrectAnswer(i)" class="cursor-pointer accent-green-500 w-4 h-4" />
+                            <input v-model="ans.text" :placeholder="(i+1) + '. válaszlehetőség'" class="bg-transparent text-white w-full outline-none text-sm" />
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2 text-gray-400 text-sm">
+                            <span>XP Jutalom:</span>
+                            <input v-model="newQuestion.xp" type="number" class="bg-[#0b102e] border border-gray-700 w-16 p-1 rounded text-center text-white" />
+                        </div>
+                        <button @click="addQuestion" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold">Kérdés Hozzáadása</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div v-for="q in questions" :key="q.id" class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-white text-lg mb-2">{{ q.content }} <span class="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-400">{{ q.xp }} XP</span></p>
+                            <ul class="space-y-1">
+                                <li v-for="a in q.answers" :key="a.id" :class="a.is_correct ? 'text-green-400 font-bold' : 'text-gray-400'" class="text-sm flex items-center gap-2">
+                                    <span v-if="a.is_correct">✅</span>
+                                    <span v-else>⚪</span>
+                                    {{ a.text }}
+                                </li>
+                            </ul>
+                        </div>
+                        <button @click="deleteQuestion(q.id)" class="text-red-400 hover:bg-red-900/20 p-2 rounded">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </template>
