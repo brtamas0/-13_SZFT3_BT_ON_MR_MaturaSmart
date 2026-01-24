@@ -73,4 +73,36 @@ const openEditor = async (topic) => {
     await loadQuestions(topic.id)
     await loadFlashcards(topic.id)
 }
+
+// KVÍZ LOGIKA
+const loadQuestions = async (topicId) => {
+    const token = localStorage.getItem('token')
+    const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/questions`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
+    if(res.ok) questions.value = await res.json()
+}
+
+const addQuestion = async () => {
+    if(!newQuestion.value.content) return alert("Írd be a kérdést!")
+    const token = localStorage.getItem('token')
+    
+    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}/questions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        body: JSON.stringify(newQuestion.value)
+    })
+    
+    // Reset form
+    newQuestion.value = { content: '', xp: 10, answers: [{ text: '', is_correct: true }, { text: '', is_correct: false }, { text: '', is_correct: false }, { text: '', is_correct: false }] }
+    loadQuestions(editingTopic.value.id)
+}
+
+const deleteQuestion = async (id) => {
+    const token = localStorage.getItem('token')
+    await fetch(`http://backend.vm1.test/api/admin/questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
+    loadQuestions(editingTopic.value.id)
+}
+
+const setCorrectAnswer = (index) => {
+    newQuestion.value.answers.forEach((a, i) => a.is_correct = (i === index))
+}
 </script>
