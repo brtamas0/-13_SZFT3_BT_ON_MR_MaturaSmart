@@ -193,6 +193,17 @@ const executeDelete = async () => {
                             <button @click="reqDelete('topic', topic.id)" class="text-gray-500 hover:text-red-400 px-2">×</button>
                         </div>
                     </div>
+                    <div class="mt-4 flex gap-2 pl-4 border-l-2 border-gray-700 ml-2">
+                        <input v-model="unit.newTopicTitle" placeholder="+ Új lecke címe..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex-1 focus:border-blue-500 outline-none" @keyup.enter="addTopic(unit)" />
+                        <button @click="addTopic(unit)" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Hozzáadás</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-2 border-dashed border-gray-700 rounded-xl p-6 text-center hover:border-gray-500 transition bg-[#131b3d]/30">
+                <div class="flex max-w-md mx-auto gap-2">
+                    <input v-model="newUnitTitle" placeholder="Új mappa neve..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-4 py-2 text-white flex-1 outline-none focus:border-blue-500" />
+                    <button @click="addUnit" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold">Létrehozás</button>
                 </div>
             </div>
         </div>
