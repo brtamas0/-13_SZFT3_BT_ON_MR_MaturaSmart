@@ -112,4 +112,10 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
+    public function showSubject(Subject $subject)
+    {
+        return $subject;
+    }
+
+
 }
