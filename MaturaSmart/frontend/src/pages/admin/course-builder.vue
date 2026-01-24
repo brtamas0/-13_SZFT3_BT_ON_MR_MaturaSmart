@@ -208,5 +208,35 @@ const executeDelete = async () => {
             </div>
         </div>
     </div>
+
+    <div v-else class="fixed inset-0 z-50 bg-[#0b102e] flex flex-col animate-fade-in">
+        <div class="h-16 border-b border-gray-700 flex items-center justify-between px-6 bg-[#06091a]">
+            <div class="flex items-center gap-4">
+                <button @click="isEditing = false" class="text-gray-400 hover:text-white font-bold text-sm">← Vissza</button>
+                <div class="h-6 w-px bg-gray-700"></div>
+                <h2 class="font-bold text-white text-lg">{{ editingTopic.title }}</h2>
+            </div>
+            
+            <div class="flex bg-gray-800 rounded-lg p-1 gap-1">
+                <button @click="activeTab = 'content'" :class="activeTab === 'content' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">📄 Tartalom</button>
+                <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">❓ Kvíz</button>
+                <button @click="activeTab = 'flashcards'" :class="activeTab === 'flashcards' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">🃏 Kártyák</button>
+                <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">⚙️ Beállítások</button>
+            </div>
+
+            <button @click="saveTopicSettings" class="bg-green-600 hover:bg-green-500 px-6 py-2 rounded-lg text-white font-bold shadow-lg shadow-green-900/40">
+                💾 MENTÉS
+            </button>
+        </div>
+        
+        <div v-if="activeTab === 'content'" class="flex-1 flex overflow-hidden">
+            <div class="w-1/2 flex flex-col border-r border-gray-700 bg-[#0d1117]">
+                <textarea v-model="editorContent" class="flex-1 bg-[#0d1117] text-blue-300 font-mono p-4 outline-none resize-none text-sm leading-relaxed scrollbar-thin"></textarea>
+            </div>
+            <div class="w-1/2 flex flex-col bg-[#0b102e] border-l border-gray-700">
+                <div class="flex-1 p-8 prose prose-invert max-w-none overflow-y-auto text-gray-200" v-html="editorContent"></div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
