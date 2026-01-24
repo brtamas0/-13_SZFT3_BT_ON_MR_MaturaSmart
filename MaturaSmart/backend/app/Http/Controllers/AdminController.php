@@ -21,4 +21,11 @@ class AdminController extends Controller
             'topics' => Topic::count(),
         ]);
     }
+
+    // FELHASZNÁLÓK LISTÁZÁSA
+    public function indexUsers()
+    {
+        return User::orderBy('role', 'asc')->orderBy('full_name', 'asc')->get();
+    }
+
 }
