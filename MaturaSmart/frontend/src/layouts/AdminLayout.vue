@@ -5,7 +5,7 @@ const isActive = (path) => route.path === path
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#0b102e] text-white flex font-sans">
+  <div class="min-h-screen bg-[#0b102e] text-white flex font-sans"> 
     <aside class="w-64 bg-[#06091a] border-r border-white/5 flex flex-col fixed h-full z-40">
       <div class="p-6 border-b border-white/5">
         <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
@@ -37,3 +37,25 @@ const isActive = (path) => route.path === path
     </main>
   </div>
 </template>
+
+<style scoped>
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    color: #94a3b8;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+    color: #60a5fa;
+    border-left: 3px solid #3b82f6;
+}
+</style>
