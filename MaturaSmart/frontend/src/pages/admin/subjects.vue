@@ -45,4 +45,31 @@ const fetchSubjects = async () => {
     }
 }
 
+// Új létrehozása
+const createSubject = async () => {
+    if (!newSubject.value.name) return alert("A név kötelező!")
+
+    const token = localStorage.getItem('token')
+    try {
+        const res = await fetch('http://backend.vm1.test/api/admin/subjects', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(newSubject.value)
+        })
+        
+        if (!res.ok) throw new Error('Hiba a mentéskor')
+
+        // Sikeres mentés után
+        isCreating.value = false
+        newSubject.value = { name: '', description: '', icon: '📘' }
+        fetchSubjects()
+    } catch (e) {
+        alert("Hiba történt a tantárgy létrehozásakor!")
+    }
+}
+
 </script>
