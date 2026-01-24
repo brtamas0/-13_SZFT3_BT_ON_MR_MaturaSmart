@@ -2,72 +2,87 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AxelController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\GamificationController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AxelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIKUS ROUTE-OK (Bejelentkezés nélkül elérhető)
+| PUBLIKUS ROUTE-OK
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('throttle:5,1')->group(function () { // Limitáljuk a kéréseket 10 per perc
-    // Bejelentkezés
-    Route::post('/login', [AuthController::class, 'login']);
-    //Regisztráció
+Route::middleware('throttle:60,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register']);
-    
-
 });
+
 /*
 |--------------------------------------------------------------------------
-| VÉDETT ROUTE-OK (Csak Tokennel érhető el)
+| VÉDETT ROUTE-OK
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    //Felhasználói adatok
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
-    //Kijelentkezés
+    // --- User ---
+    Route::get('/user', function (Request $request) { return $request->user(); });
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    //Tartalom (Tantárgyak és Témák)
+    // --- Student App ---
+    Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/tantargyak', [SubjectController::class, 'index']);
     Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
     Route::get('/topics/{slug}', [TopicController::class, 'show']);
-
-    //Gamifikáció (XP szerzés)
-    Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
-
-    //Axel AI
-    Route::post('/ask-axel', [AxelController::class, 'ask']);
-
-    //Felhasználói profil frissítése
-    Route::get('/user/profile', function (Request $request) {
-        return $request->user();
-    });
-    Route::put('/user/profile', [AuthController::class, 'updateProfile']);
-    
-    //Leaderboard
-    Route::get('/leaderboard', [GamificationController::class, 'leaderboard']);
-
-    //Témák lekérése tantárgyanként
     Route::get('/topics/{subject}/{topic}', [TopicController::class, 'show']);
-
-    // Profil kezelése
+    Route::post('/ask-axel', [AxelController::class, 'ask']);
+    Route::post('/gamification/complete-topic', [GamificationController::class, 'completeTopic']);
+    Route::get('/leaderboard', [GamificationController::class, 'leaderboard']);
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile/update', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+/*
+|--------------------------------------------------------------------------
+| ADMIN ROUTE-OK
+|--------------------------------------------------------------------------
+*/
+    
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        
+        // 1. Dashboard & User lista
+        Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/users', [AdminController::class, 'indexUsers']);
+        Route::post('/verify-password', [AdminController::class, 'verifyPassword']);
 
-    // Dashboard adatok lekérése
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+        // 2. Tantárgyak
+        Route::get('/subjects', [AdminController::class, 'indexSubjects']);
+        Route::get('/subjects/{subject}', [AdminController::class, 'showSubject']);
+        Route::post('/subjects', [AdminController::class, 'storeSubject']);
+        Route::delete('/subjects/{subject}', [AdminController::class, 'destroySubject']);
+
+        // 3. Unitok (Mappák)
+        Route::get('/subjects/{subject}/units', [AdminController::class, 'getUnits']);
+        Route::post('/subjects/{subject}/units', [AdminController::class, 'storeUnit']);
+        Route::delete('/units/{unit}', [AdminController::class, 'destroyUnit']);
+
+        // 4. Topics (Leckék)
+        Route::get('/units/{unit}/topics', [AdminController::class, 'getTopics']);
+        Route::post('/units/{unit}/topics', [AdminController::class, 'storeTopic']);
+        Route::put('/topics/{topic}', [AdminController::class, 'updateTopic']);
+        Route::delete('/topics/{topic}', [AdminController::class, 'destroyTopic']);
+        // 5. Kvíz & Flashcard (Course Builderhez)
+        Route::get('/topics/{topic}/questions', [AdminController::class, 'getQuestions']);
+        Route::post('/topics/{topic}/questions', [AdminController::class, 'storeQuestion']);
+        Route::delete('/questions/{question}', [AdminController::class, 'destroyQuestion']);
+
+        Route::get('/topics/{topic}/flashcards', [AdminController::class, 'getFlashcards']);
+        Route::post('/topics/{topic}/flashcards', [AdminController::class, 'storeFlashcard']);
+        Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
+    });
+
 });
