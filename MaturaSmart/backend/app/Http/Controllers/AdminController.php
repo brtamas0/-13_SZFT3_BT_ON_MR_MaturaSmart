@@ -65,5 +65,23 @@ class AdminController extends Controller
         return response()->json(['message' => 'Törölve']);
     }
 
+    // UNITOK (Mappák)
+    public function getUnits(Subject $subject) {
+        return $subject->units()->orderBy('order')->get();
+    }
+
+    public function storeUnit(Request $request, Subject $subject) {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'order' => 'integer'
+        ]);
+        return $subject->units()->create($validated);
+    }
+    
+    public function destroyUnit(Unit $unit) {
+        $unit->delete();
+        return response()->noContent();
+    }
+
 
 }
