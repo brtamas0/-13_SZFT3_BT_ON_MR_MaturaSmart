@@ -28,4 +28,16 @@ class AdminController extends Controller
         return User::orderBy('role', 'asc')->orderBy('full_name', 'asc')->get();
     }
 
+    // JELSZÓ ELLENŐRZÉS
+    public function verifyPassword(Request $request)
+    {
+        $request->validate(['password' => 'required']);
+
+        if (Hash::check($request->password, $request->user()->password)) {
+            return response()->json(['message' => 'OK']);
+        }
+
+        return response()->json(['message' => 'Hibás jelszó'], 403);
+    }
+
 }
