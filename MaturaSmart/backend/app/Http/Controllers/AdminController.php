@@ -83,5 +83,33 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
+    // TOPICS (Leckék)
+    public function getTopics(Unit $unit) {
+        return $unit->topics()->orderBy('order')->get();
+    }
+
+    public function storeTopic(Request $request, Unit $unit) {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'xp' => 'integer', 
+            'order' => 'integer'
+        ]);
+        
+        $validated['slug'] = Str::slug($validated['title']) . '-' . rand(1000,9999);
+        $validated['subject_id'] = $unit->subject_id;
+
+        return $unit->topics()->create($validated);
+    }
+
+    public function updateTopic(Request $request, Topic $topic)
+    {
+        $topic->update($request->all());
+        return $topic;
+    }
+    
+    public function destroyTopic(Topic $topic) {
+        $topic->delete();
+        return response()->noContent();
+    }
 
 }
