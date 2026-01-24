@@ -117,5 +117,44 @@ class AdminController extends Controller
         return $subject;
     }
 
+    // KVÍZ (Kérdések) KEZELÉSE
+
+    public function getQuestions(Topic $topic) {
+        return $topic->questions()->with('answers')->get();
+    }
+
+    public function storeQuestion(Request $request, Topic $topic) {
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'xp' => 'integer',
+            'answers' => 'required|array|min:2',
+            'answers.*.text' => 'required|string',
+            'answers.*.is_correct' => 'boolean'
+        ]);
+
+        // 1. Kérdés mentése
+        $question = $topic->questions()->create([
+            'content' => $validated['content'],
+            'type' => 'multiple_choice',
+            'xp' => $validated['xp'] ?? 10,
+            'difficulty' => 1
+        ]);
+
+        // 2. Válaszok mentése
+        foreach ($validated['answers'] as $ans) {
+            $question->answers()->create([
+                'text' => $ans['text'],
+                'is_correct' => $ans['is_correct']
+            ]);
+        }
+
+        return $question->load('answers');
+    }
+
+    public function destroyQuestion(\App\Models\Question $question) {
+        $question->delete();
+        return response()->noContent();
+    }
+
 
 }
