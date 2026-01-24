@@ -105,4 +105,31 @@ const deleteQuestion = async (id) => {
 const setCorrectAnswer = (index) => {
     newQuestion.value.answers.forEach((a, i) => a.is_correct = (i === index))
 }
+
+// FLASHCARD LOGIKA
+const loadFlashcards = async (topicId) => {
+    const token = localStorage.getItem('token')
+    const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/flashcards`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
+    if(res.ok) flashcards.value = await res.json()
+}
+
+const addFlashcard = async () => {
+    if(!newFlashcard.value.front || !newFlashcard.value.back) return
+    const token = localStorage.getItem('token')
+    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}/flashcards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        body: JSON.stringify(newFlashcard.value)
+    })
+    newFlashcard.value = { front: '', back: '' }
+    loadFlashcards(editingTopic.value.id)
+}
+
+const deleteFlashcard = async (id) => {
+    const token = localStorage.getItem('token')
+    await fetch(`http://backend.vm1.test/api/admin/flashcards/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
+    loadFlashcards(editingTopic.value.id)
+}
+
+
 </script>
