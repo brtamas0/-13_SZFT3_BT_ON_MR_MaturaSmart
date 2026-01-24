@@ -40,4 +40,30 @@ class AdminController extends Controller
         return response()->json(['message' => 'Hibás jelszó'], 403);
     }
 
+    // TANTÁRGYAK
+    public function indexSubjects()
+    {
+        return Subject::withCount('units')->get();
+    }
+
+    public function storeSubject(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+
+        return Subject::create($validated);
+    }
+
+    public function destroySubject(Subject $subject)
+    {
+        $subject->delete();
+        return response()->json(['message' => 'Törölve']);
+    }
+
+
 }
