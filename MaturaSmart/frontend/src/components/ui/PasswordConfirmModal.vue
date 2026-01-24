@@ -7,6 +7,37 @@ const emit = defineEmits(['confirm', 'cancel'])
 const password = ref('')
 const error = ref('')
 const isLoading = ref(false)
+
+const handleConfirm = async () => {
+  error.value = ''
+  isLoading.value = true
+  
+  const token = localStorage.getItem('token')
+  
+  try {
+    const res = await fetch('http://backend.vm1.test/api/admin/verify-password', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ password: password.value })
+    })
+
+    if (res.ok) {
+        emit('confirm')
+        password.value = ''
+    } else {
+        error.value = 'Hibás jelszó!'
+    }
+  } catch (e) {
+    error.value = 'Hálózati hiba'
+  } finally {
+    isLoading.value = false
+  }
+}
+
 </script>
 
 <template>
