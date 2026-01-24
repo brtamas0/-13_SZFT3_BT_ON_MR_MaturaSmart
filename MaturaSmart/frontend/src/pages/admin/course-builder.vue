@@ -160,3 +160,42 @@ const executeDelete = async () => {
 }
 
 </script>
+
+<template>
+  <div class="h-full flex flex-col">
+    
+    <div v-if="!isEditing" class="flex-1 overflow-y-auto">
+        <div class="flex items-center gap-4 mb-8 border-b border-gray-800 pb-4">
+            <RouterLink to="/admin/subjects" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm font-bold text-gray-300 transition">← Vissza</RouterLink>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Kurzusépítő</h1>
+                <p class="text-gray-400 text-sm">{{ subjectName }} tananyagának szerkesztése</p>
+            </div>
+        </div>
+
+        <div v-if="loading" class="text-center py-10 text-blue-400 animate-pulse">Betöltés...</div>
+
+        <div v-else class="space-y-8 max-w-5xl mx-auto pb-20">
+            <div v-for="unit in units" :key="unit.id" class="bg-[#131b3d] border border-gray-700 rounded-xl overflow-hidden shadow-md animate-fade-in">
+                <div class="bg-[#0b102e]/50 p-4 flex justify-between items-center border-b border-gray-700/50">
+                    <h3 class="font-bold text-lg text-blue-200">📂 {{ unit.title }}</h3>
+                    <button @click="reqDelete('unit', unit.id)" class="text-red-400 text-xs font-bold px-2 py-1 border border-red-900/30 rounded">TÖRLÉS</button>
+                </div>
+                <div class="p-4 space-y-2">
+                    <div v-for="topic in unit.topics" :key="topic.id" class="flex items-center justify-between bg-[#0b102e] p-3 rounded-lg border border-gray-700/50 hover:border-blue-500/30 group transition">
+                        <div class="flex items-center gap-3">
+                            <span class="text-gray-500 text-lg">📄</span>
+                            <span class="font-medium text-gray-200">{{ topic.title }}</span>
+                            <span class="text-xs text-gray-500 bg-gray-800 px-2 rounded">{{ topic.xp }} XP</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="openEditor(topic)" class="bg-blue-600 text-white hover:bg-blue-500 px-3 py-1.5 rounded text-xs font-bold shadow-lg shadow-blue-900/20">✏️ SZERKESZTÉS</button>
+                            <button @click="reqDelete('topic', topic.id)" class="text-gray-500 hover:text-red-400 px-2">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</template>
