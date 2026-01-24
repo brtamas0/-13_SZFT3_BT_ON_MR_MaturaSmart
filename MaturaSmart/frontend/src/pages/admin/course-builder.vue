@@ -131,5 +131,32 @@ const deleteFlashcard = async (id) => {
     loadFlashcards(editingTopic.value.id)
 }
 
+// FŐ MENTÉS (HTML + BEÁLLÍTÁSOK)
+const saveTopicSettings = async () => {
+    const token = localStorage.getItem('token')
+    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        body: JSON.stringify({ 
+            title: editingTopic.value.title,
+            content: editorContent.value,
+            xp: editingTopic.value.xp // XP mentése
+        })
+    })
+    alert("Sikeres mentés!")
+    fetchStructure() // Lista frissítése
+}
+
+// --- STRUKTÚRA MŰVELETEK ---
+const addUnit = async () => {
+    const token = localStorage.getItem('token'); await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); newUnitTitle.value = ''; fetchStructure(); 
+}
+const addTopic = async (unit) => { 
+    const token = localStorage.getItem('token'); await fetch(`http://backend.vm1.test/api/admin/units/${unit.id}/topics`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: unit.newTopicTitle, xp: 100, order: unit.topics.length + 1 }) }); fetchStructure(); 
+}
+const reqDelete = (type, id) => { actionToDelete.value = { type, id }; showModal.value = true }
+const executeDelete = async () => { 
+    showModal.value = false; const token = localStorage.getItem('token'); const endpoint = actionToDelete.value.type === 'unit' ? `units/${actionToDelete.value.id}` : `topics/${actionToDelete.value.id}`; await fetch(`http://backend.vm1.test/api/admin/${endpoint}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } }); fetchStructure(); 
+}
 
 </script>
