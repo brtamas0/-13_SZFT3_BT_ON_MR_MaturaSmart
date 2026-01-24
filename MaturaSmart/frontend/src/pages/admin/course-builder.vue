@@ -278,6 +278,52 @@ const executeDelete = async () => {
                 </div>
             </div>
         </div>
+
+        <div v-if="activeTab === 'flashcards'" class="flex-1 overflow-y-auto p-8 bg-[#0b102e]">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold text-white mb-6">Tanulókártyák</h3>
+                
+                <div class="bg-[#131b3d] p-6 rounded-xl border border-gray-700 mb-8 flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label class="text-gray-400 text-xs uppercase font-bold mb-1 block">Kártya eleje (Kérdés)</label>
+                        <input v-model="newFlashcard.front" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white focus:border-blue-500 outline-none" />
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-gray-400 text-xs uppercase font-bold mb-1 block">Kártya hátulja (Válasz)</label>
+                        <input v-model="newFlashcard.back" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white focus:border-blue-500 outline-none" />
+                    </div>
+                    <button @click="addFlashcard" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold">Hozzáadás</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div v-for="card in flashcards" :key="card.id" class="bg-gray-800 p-4 rounded-xl border border-gray-700 relative group">
+                        <button @click="deleteFlashcard(card.id)" class="absolute top-2 right-2 text-gray-500 hover:text-red-500">×</button>
+                        <div class="text-white font-bold mb-2 pb-2 border-b border-gray-700">{{ card.front }}</div>
+                        <div class="text-blue-400">{{ card.back }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="activeTab === 'settings'" class="flex-1 p-8 bg-[#0b102e]">
+            <div class="max-w-xl mx-auto bg-[#131b3d] p-8 rounded-xl border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-6">Lecke beállításai</h3>
+                
+                <div class="mb-4">
+                    <label class="text-gray-400 block mb-2">Lecke címe</label>
+                    <input v-model="editingTopic.title" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-gray-400 block mb-2">XP Jutalom (Elolvasásért)</label>
+                    <input v-model="editingTopic.xp" type="number" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white" />
+                    <p class="text-xs text-gray-500 mt-1">Ezt kapja meg a diák, ha végigolvasta a leckét.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
+
+    <PasswordConfirmModal :visible="showModal" @confirm="executeDelete" @cancel="showModal = false" />
+  </div>
 </template>
