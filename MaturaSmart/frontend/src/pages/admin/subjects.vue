@@ -72,4 +72,35 @@ const createSubject = async () => {
     }
 }
 
+// Törlés előkészítése
+const confirmDelete = (id) => {
+    itemToDelete.value = id
+    showModal.value = true
+}
+
+// Törlés végrehajtása
+const executeDelete = async () => {
+    showModal.value = false
+    const token = localStorage.getItem('token')
+    
+    try {
+        const res = await fetch(`http://backend.vm1.test/api/admin/subjects/${itemToDelete.value}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        })
+
+        if(res.ok) {
+            fetchSubjects()
+        } else {
+            alert("Nem sikerült a törlés.")
+        }
+    } catch (e) {
+        alert("Hálózati hiba a törléskor!")
+    }
+}
+
+
 </script>
