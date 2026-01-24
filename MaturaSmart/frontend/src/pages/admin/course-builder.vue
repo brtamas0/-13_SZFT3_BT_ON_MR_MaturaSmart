@@ -327,3 +327,14 @@ const executeDelete = async () => {
     <PasswordConfirmModal :visible="showModal" @confirm="executeDelete" @cancel="showModal = false" />
   </div>
 </template>
+
+<style scoped>
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.scrollbar-thin::-webkit-scrollbar { width: 8px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: #0d1117; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+.prose-invert h1, .prose-invert h2, .prose-invert h3 { color: white; font-weight: bold; }
+.prose-invert p { color: #cbd5e1; }
+.prose-invert strong { color: white; }
+</style>
