@@ -62,4 +62,15 @@ const fetchStructure = async () => {
         units.value = data
     } catch (e) { console.error(e) } finally { loading.value = false }
 }
+
+// EDITOR MEGNYITÁSA & ADATOK BETÖLTÉSE
+const openEditor = async (topic) => {
+    editingTopic.value = { ...topic }
+    editorContent.value = topic.content || '<h3>👋 Üdv a szerkesztőben!</h3>\n<p>Kezdd el írni a tananyagot...</p>'
+    activeTab.value = 'content'
+    isEditing.value = true
+    
+    await loadQuestions(topic.id)
+    await loadFlashcards(topic.id)
+}
 </script>
