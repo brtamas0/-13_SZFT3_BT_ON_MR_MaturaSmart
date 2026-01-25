@@ -18,31 +18,36 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Unitok (Mappák / Korszakok) - ÚJ TÁBLA!
+        // 2. Unitok (Mappák / Korszakok)
         Schema::create('units', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->string('title'); // Pl. "Az Ókor"
+            $table->string('title');
             $table->text('description')->nullable();
             $table->integer('order')->default(0); 
             $table->timestamps();
         });
 
-        // 3. Témák (Leckék)
+        // 3. Témák (Leckék ÉS Tesztek)
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained()->onDelete('set null');
+            
+            $table->string('type')->default('lesson'); // 'lesson' (Tananyag) vagy 'test' (Témazáró)
+            $table->integer('time_limit_minutes')->nullable(); // Tesztnél: időkorlát (ha null, nincs)
+            $table->integer('passing_percentage')->default(50); // Tesztnél: hány % kell a sikerhez
+
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->longText('content')->nullable(); 
+            $table->longText('content')->nullable(); // Leckénél: HTML tartalom
             $table->integer('xp')->default(0);             
             $table->integer('order')->default(0);
             
             // Idővonal
-            $table->integer('year')->nullable(); // Pl. -500, 0, 1500
-            $table->string('year_label')->nullable(); // Pl. "i.e. 500"
+            $table->integer('year')->nullable();
+            $table->string('year_label')->nullable();
 
             $table->timestamps();
         });
@@ -87,7 +92,6 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->timestamps();
         });
-        
     }
 
     public function down(): void

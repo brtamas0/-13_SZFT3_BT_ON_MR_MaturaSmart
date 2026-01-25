@@ -66,37 +66,49 @@ class AdminController extends Controller
     }
 
     // UNITOK (Mappák)
-    public function getUnits(Subject $subject) {
+    public function getUnits(Subject $subject)
+    {
         return $subject->units()->orderBy('order')->get();
     }
 
-    public function storeUnit(Request $request, Subject $subject) {
+    public function storeUnit(Request $request, Subject $subject)
+    {
         $validated = $request->validate([
             'title' => 'required|string',
             'order' => 'integer'
         ]);
         return $subject->units()->create($validated);
     }
-    
-    public function destroyUnit(Unit $unit) {
+
+    public function destroyUnit(Unit $unit)
+    {
         $unit->delete();
         return response()->noContent();
     }
 
-    // TOPICS (Leckék)
-    public function getTopics(Unit $unit) {
+    // TOPICS (Leckék és Tesztek) KEZELÉSE
+    public function getTopics(Unit $unit)
+    {
         return $unit->topics()->orderBy('order')->get();
     }
 
-    public function storeTopic(Request $request, Unit $unit) {
+    public function storeTopic(Request $request, Unit $unit)
+    {
         $validated = $request->validate([
             'title' => 'required|string',
-            'xp' => 'integer', 
-            'order' => 'integer'
+            'type' => 'nullable|in:lesson,test',
+            'xp' => 'integer',
+            'order' => 'integer',
+            'time_limit_minutes' => 'nullable|integer',
+            'passing_percentage' => 'nullable|integer|min:1|max:100'
         ]);
-        
-        $validated['slug'] = Str::slug($validated['title']) . '-' . rand(1000,9999);
+
+        $validated['slug'] = Str::slug($validated['title']) . '-' . rand(1000, 9999);
         $validated['subject_id'] = $unit->subject_id;
+
+        if (!isset($validated['type'])) {
+            $validated['type'] = 'lesson';
+        }
 
         return $unit->topics()->create($validated);
     }
@@ -106,11 +118,13 @@ class AdminController extends Controller
         $topic->update($request->all());
         return $topic;
     }
-    
-    public function destroyTopic(Topic $topic) {
+
+    public function destroyTopic(Topic $topic)
+    {
         $topic->delete();
         return response()->noContent();
     }
+
 
     public function showSubject(Subject $subject)
     {
@@ -119,11 +133,13 @@ class AdminController extends Controller
 
     // KVÍZ (Kérdések) KEZELÉSE
 
-    public function getQuestions(Topic $topic) {
+    public function getQuestions(Topic $topic)
+    {
         return $topic->questions()->with('answers')->get();
     }
 
-    public function storeQuestion(Request $request, Topic $topic) {
+    public function storeQuestion(Request $request, Topic $topic)
+    {
         $validated = $request->validate([
             'content' => 'required|string',
             'xp' => 'integer',
@@ -151,18 +167,21 @@ class AdminController extends Controller
         return $question->load('answers');
     }
 
-    public function destroyQuestion(\App\Models\Question $question) {
+    public function destroyQuestion(\App\Models\Question $question)
+    {
         $question->delete();
         return response()->noContent();
     }
 
-     // FLASHCARDOK KEZELÉSE
+    // FLASHCARDOK KEZELÉSE
 
-    public function getFlashcards(Topic $topic) {
+    public function getFlashcards(Topic $topic)
+    {
         return $topic->flashcards()->get();
     }
 
-    public function storeFlashcard(Request $request, Topic $topic) {
+    public function storeFlashcard(Request $request, Topic $topic)
+    {
         $validated = $request->validate([
             'front' => 'required|string',
             'back' => 'required|string'
@@ -171,9 +190,9 @@ class AdminController extends Controller
         return $topic->flashcards()->create($validated);
     }
 
-    public function destroyFlashcard(\App\Models\Flashcard $flashcard) {
+    public function destroyFlashcard(\App\Models\Flashcard $flashcard)
+    {
         $flashcard->delete();
         return response()->noContent();
     }
-
 }
