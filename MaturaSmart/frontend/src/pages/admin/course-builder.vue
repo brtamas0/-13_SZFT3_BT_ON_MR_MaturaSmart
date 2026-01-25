@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import PasswordConfirmModal from '@/components/PasswordConfirmModal.vue'
 
@@ -9,19 +9,21 @@ const units = ref([])
 const subjectName = ref('')
 const loading = ref(true)
 
-// Struktúra változók
 const newUnitTitle = ref('')
 const showModal = ref(false)
 const actionToDelete = ref(null)
 
 // SZERKESZTŐ ÁLLAPOTOK
 const isEditing = ref(false)
-const activeTab = ref('content') // 'content', 'quiz', 'flashcards', 'settings'
+const activeTab = ref('content') 
 const editingTopic = ref(null) 
 const editorContent = ref('') 
 
 // KVÍZ VÁLTOZÓK
 const questions = ref([])
+// Összpontszám számítása valós időben
+const totalXp = computed(() => questions.value.reduce((sum, q) => sum + q.xp, 0))
+
 const newQuestion = ref({
     content: '',
     xp: 10,
@@ -39,7 +41,7 @@ const newFlashcard = ref({ front: '', back: '' })
 
 onMounted(async () => { await fetchStructure() })
 
-// STRUKTÚRA BETÖLTÉSE
+// 1. STRUKTÚRA BETÖLTÉSE
 const fetchStructure = async () => {
     loading.value = true
     const token = localStorage.getItem('token')
@@ -58,23 +60,27 @@ const fetchStructure = async () => {
             })
             unit.topics = await tRes.json()
             unit.newTopicTitle = ''
+            unit.newTopicType = 'lesson'
         }
         units.value = data
     } catch (e) { console.error(e) } finally { loading.value = false }
 }
 
-// EDITOR MEGNYITÁSA & ADATOK BETÖLTÉSE
+// 2. EDITOR MEGNYITÁSA
 const openEditor = async (topic) => {
     editingTopic.value = { ...topic }
     editorContent.value = topic.content || '<h3>👋 Üdv a szerkesztőben!</h3>\n<p>Kezdd el írni a tananyagot...</p>'
-    activeTab.value = 'content'
+    
+    // Ha teszt, akkor alapból a Kvíz fülre vigyen, ne a tartalomra
+    activeTab.value = topic.type === 'test' ? 'quiz' : 'content'
+    
     isEditing.value = true
     
     await loadQuestions(topic.id)
     await loadFlashcards(topic.id)
 }
 
-// KVÍZ LOGIKA
+// 3. KVÍZ MŰVELETEK
 const loadQuestions = async (topicId) => {
     const token = localStorage.getItem('token')
     const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/questions`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
@@ -91,7 +97,6 @@ const addQuestion = async () => {
         body: JSON.stringify(newQuestion.value)
     })
     
-    // Reset form
     newQuestion.value = { content: '', xp: 10, answers: [{ text: '', is_correct: true }, { text: '', is_correct: false }, { text: '', is_correct: false }, { text: '', is_correct: false }] }
     loadQuestions(editingTopic.value.id)
 }
@@ -106,7 +111,7 @@ const setCorrectAnswer = (index) => {
     newQuestion.value.answers.forEach((a, i) => a.is_correct = (i === index))
 }
 
-// FLASHCARD LOGIKA
+// 4. FLASHCARD MŰVELETEK
 const loadFlashcards = async (topicId) => {
     const token = localStorage.getItem('token')
     const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/flashcards`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
@@ -131,29 +136,54 @@ const deleteFlashcard = async (id) => {
     loadFlashcards(editingTopic.value.id)
 }
 
-// FŐ MENTÉS (HTML + BEÁLLÍTÁSOK)
+// 5. MENTÉS
 const saveTopicSettings = async () => {
     const token = localStorage.getItem('token')
+    
+    let finalXp = editingTopic.value.xp
+    if (editingTopic.value.type === 'test') {
+        finalXp = totalXp.value
+    }
+
     await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
         body: JSON.stringify({ 
             title: editingTopic.value.title,
             content: editorContent.value,
-            xp: editingTopic.value.xp // XP mentése
+            xp: finalXp,
+            time_limit_minutes: editingTopic.value.time_limit_minutes,
+            passing_percentage: editingTopic.value.passing_percentage
         })
     })
     alert("Sikeres mentés!")
-    fetchStructure() // Lista frissítése
+    fetchStructure() 
 }
 
 // --- STRUKTÚRA MŰVELETEK ---
 const addUnit = async () => {
-    const token = localStorage.getItem('token'); await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); newUnitTitle.value = ''; fetchStructure(); 
+    const token = localStorage.getItem('token'); 
+    await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); 
+    newUnitTitle.value = ''; fetchStructure(); 
 }
+
 const addTopic = async (unit) => { 
-    const token = localStorage.getItem('token'); await fetch(`http://backend.vm1.test/api/admin/units/${unit.id}/topics`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: unit.newTopicTitle, xp: 100, order: unit.topics.length + 1 }) }); fetchStructure(); 
+    if(!unit.newTopicTitle) return;
+    const token = localStorage.getItem('token'); 
+    await fetch(`http://backend.vm1.test/api/admin/units/${unit.id}/topics`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, 
+        body: JSON.stringify({ 
+            title: unit.newTopicTitle, 
+            type: unit.newTopicType || 'lesson',
+            xp: unit.newTopicType === 'test' ? 0 : 50,
+            order: unit.topics.length + 1 
+        }) 
+    }); 
+    unit.newTopicTitle = ''; 
+    fetchStructure(); 
 }
+
 const reqDelete = (type, id) => { actionToDelete.value = { type, id }; showModal.value = true }
 const executeDelete = async () => { 
     showModal.value = false; const token = localStorage.getItem('token'); const endpoint = actionToDelete.value.type === 'unit' ? `units/${actionToDelete.value.id}` : `topics/${actionToDelete.value.id}`; await fetch(`http://backend.vm1.test/api/admin/${endpoint}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } }); fetchStructure(); 
@@ -184,8 +214,13 @@ const executeDelete = async () => {
                 <div class="p-4 space-y-2">
                     <div v-for="topic in unit.topics" :key="topic.id" class="flex items-center justify-between bg-[#0b102e] p-3 rounded-lg border border-gray-700/50 hover:border-blue-500/30 group transition">
                         <div class="flex items-center gap-3">
-                            <span class="text-gray-500 text-lg">📄</span>
-                            <span class="font-medium text-gray-200">{{ topic.title }}</span>
+                            <span class="text-gray-500 text-lg" v-if="topic.type === 'test'">📝</span>
+                            <span class="text-gray-500 text-lg" v-else>📄</span>
+                            
+                            <span class="font-medium" :class="topic.type === 'test' ? 'text-yellow-400' : 'text-gray-200'">
+                                {{ topic.title }}
+                                <span v-if="topic.type === 'test'" class="text-[10px] uppercase bg-yellow-900/40 text-yellow-500 px-2 rounded ml-2 border border-yellow-700/50">Témazáró</span>
+                            </span>
                             <span class="text-xs text-gray-500 bg-gray-800 px-2 rounded">{{ topic.xp }} XP</span>
                         </div>
                         <div class="flex gap-2">
@@ -193,13 +228,18 @@ const executeDelete = async () => {
                             <button @click="reqDelete('topic', topic.id)" class="text-gray-500 hover:text-red-400 px-2">×</button>
                         </div>
                     </div>
+                    
                     <div class="mt-4 flex gap-2 pl-4 border-l-2 border-gray-700 ml-2">
-                        <input v-model="unit.newTopicTitle" placeholder="+ Új lecke címe..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex-1 focus:border-blue-500 outline-none" @keyup.enter="addTopic(unit)" />
+                        <select v-model="unit.newTopicType" class="bg-[#0b102e] border border-gray-700 rounded-lg px-2 py-2 text-sm text-white focus:border-blue-500 outline-none">
+                            <option value="lesson">📄 Lecke</option>
+                            <option value="test">📝 Témazáró</option>
+                        </select>
+                        <input v-model="unit.newTopicTitle" placeholder="Cím..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex-1 focus:border-blue-500 outline-none" @keyup.enter="addTopic(unit)" />
                         <button @click="addTopic(unit)" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Hozzáadás</button>
                     </div>
                 </div>
             </div>
-
+            
             <div class="border-2 border-dashed border-gray-700 rounded-xl p-6 text-center hover:border-gray-500 transition bg-[#131b3d]/30">
                 <div class="flex max-w-md mx-auto gap-2">
                     <input v-model="newUnitTitle" placeholder="Új mappa neve..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-4 py-2 text-white flex-1 outline-none focus:border-blue-500" />
@@ -210,17 +250,23 @@ const executeDelete = async () => {
     </div>
 
     <div v-else class="fixed inset-0 z-50 bg-[#0b102e] flex flex-col animate-fade-in">
+        
         <div class="h-16 border-b border-gray-700 flex items-center justify-between px-6 bg-[#06091a]">
             <div class="flex items-center gap-4">
                 <button @click="isEditing = false" class="text-gray-400 hover:text-white font-bold text-sm">← Vissza</button>
                 <div class="h-6 w-px bg-gray-700"></div>
-                <h2 class="font-bold text-white text-lg">{{ editingTopic.title }}</h2>
+                <h2 class="font-bold text-lg flex items-center gap-2" :class="editingTopic.type === 'test' ? 'text-yellow-500' : 'text-white'">
+                    <span v-if="editingTopic.type === 'test'">📝</span> 
+                    {{ editingTopic.title }}
+                </h2>
             </div>
             
             <div class="flex bg-gray-800 rounded-lg p-1 gap-1">
-                <button @click="activeTab = 'content'" :class="activeTab === 'content' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">📄 Tartalom</button>
-                <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">❓ Kvíz</button>
-                <button @click="activeTab = 'flashcards'" :class="activeTab === 'flashcards' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">🃏 Kártyák</button>
+                <button v-if="editingTopic.type !== 'test'" @click="activeTab = 'content'" :class="activeTab === 'content' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">📄 Tartalom</button>
+                <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? (editingTopic.type === 'test' ? 'bg-yellow-600 text-white' : 'bg-blue-600 text-white') : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">
+                    {{ editingTopic.type === 'test' ? '📝 Vizsgafeladatok' : '❓ Kvíz' }}
+                </button>
+                <button v-if="editingTopic.type !== 'test'" @click="activeTab = 'flashcards'" :class="activeTab === 'flashcards' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">🃏 Kártyák</button>
                 <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-md text-sm font-bold transition">⚙️ Beállítások</button>
             </div>
 
@@ -238,42 +284,124 @@ const executeDelete = async () => {
             </div>
         </div>
 
-        <div v-if="activeTab === 'quiz'" class="flex-1 overflow-y-auto p-8 bg-[#0b102e]">
-            <div class="max-w-4xl mx-auto">
-                <h3 class="text-2xl font-bold text-white mb-6">Kérdések kezelése</h3>
-                
-                <div class="bg-[#131b3d] p-6 rounded-xl border border-gray-700 mb-8">
-                    <h4 class="font-bold text-blue-400 mb-4">Új kérdés hozzáadása</h4>
-                    <input v-model="newQuestion.content" placeholder="Mi a kérdés?" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white mb-4 focus:border-blue-500 outline-none" />
-                    
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div v-for="(ans, i) in newQuestion.answers" :key="i" class="flex items-center gap-2 bg-[#0b102e] p-2 rounded border border-gray-700">
-                            <input type="radio" name="correct" :checked="ans.is_correct" @change="setCorrectAnswer(i)" class="cursor-pointer accent-green-500 w-4 h-4" />
-                            <input v-model="ans.text" :placeholder="(i+1) + '. válaszlehetőség'" class="bg-transparent text-white w-full outline-none text-sm" />
+        <div v-if="activeTab === 'quiz'" class="flex-1 flex flex-col bg-[#0b102e] overflow-hidden">
+            
+            <div v-if="editingTopic.type === 'test'" class="bg-[#161b22] border-b border-gray-700 p-6 shadow-lg z-10">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-yellow-900/10 border border-yellow-700/30 p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center text-xl text-yellow-500">🏆</div>
+                        <div>
+                            <div class="text-xs font-bold text-yellow-500/80 uppercase">Összpontszám</div>
+                            <div class="text-2xl font-bold text-white">{{ totalXp }} XP</div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2 text-gray-400 text-sm">
-                            <span>XP Jutalom:</span>
-                            <input v-model="newQuestion.xp" type="number" class="bg-[#0b102e] border border-gray-700 w-16 p-1 rounded text-center text-white" />
+                    
+                    <div class="bg-blue-900/10 border border-blue-700/30 p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-xl text-blue-500">📊</div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-400/80 uppercase">Feladatok</div>
+                            <div class="text-2xl font-bold text-white">{{ questions.length }} db</div>
                         </div>
-                        <button @click="addQuestion" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold">Kérdés Hozzáadása</button>
+                    </div>
+
+                    <div class="bg-gray-800/50 border border-gray-700 p-4 rounded-xl flex items-center justify-between">
+                        <span class="text-sm text-gray-400 font-bold">⏱️ Időkorlát:</span>
+                        <div class="flex items-center gap-2">
+                            <input v-model="editingTopic.time_limit_minutes" type="number" class="bg-gray-900 border border-gray-600 w-16 text-center rounded-lg text-white font-bold py-1 focus:border-yellow-500 outline-none" />
+                            <span class="text-gray-500 text-xs uppercase font-bold">perc</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800/50 border border-gray-700 p-4 rounded-xl flex items-center justify-between">
+                        <span class="text-sm text-gray-400 font-bold">🎯 Küszöb:</span>
+                        <div class="flex items-center gap-2">
+                            <input v-model="editingTopic.passing_percentage" type="number" class="bg-gray-900 border border-gray-600 w-16 text-center rounded-lg text-white font-bold py-1 focus:border-yellow-500 outline-none" />
+                            <span class="text-gray-500 text-xs uppercase font-bold">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden">
+                
+                <div class="flex-1 overflow-y-auto p-8 border-r border-gray-700 bg-[#0d1117] scrollbar-thin">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-[#161b22] p-8 rounded-2xl border border-gray-700 shadow-2xl relative">
+                            
+                            <div class="absolute -top-3 left-6 bg-blue-600 text-white text-xs font-bold uppercase px-3 py-1 rounded-full shadow-lg">
+                                Új feladat szerkesztése
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-xs uppercase font-bold text-gray-500 mb-2">Feladat szövege / Kérdés</label>
+                                <textarea v-model="newQuestion.content" placeholder="Írd ide a kérdést..." class="w-full bg-[#0b102e] border border-gray-700 p-4 rounded-xl text-white text-lg focus:border-blue-500 outline-none h-32 resize-none leading-relaxed shadow-inner transition focus:ring-2 focus:ring-blue-900"></textarea>
+                            </div>
+                            
+                            <div class="space-y-3 mb-8">
+                                <label class="block text-xs uppercase font-bold text-gray-500 mb-2">Válaszlehetőségek</label>
+                                <div v-for="(ans, i) in newQuestion.answers" :key="i" 
+                                    class="flex items-center gap-4 bg-[#0b102e] p-4 rounded-xl border border-gray-700 hover:border-gray-500 transition group focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/50">
+                                    
+                                    <div class="relative flex items-center justify-center w-8 h-8 shrink-0">
+                                        <input type="radio" name="correct" :checked="ans.is_correct" @change="setCorrectAnswer(i)" class="peer cursor-pointer appearance-none w-6 h-6 border-2 border-gray-600 rounded-full checked:border-green-500 checked:bg-green-500" />
+                                        <div class="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none transform scale-50 peer-checked:scale-100 transition">✓</div>
+                                    </div>
+                                    
+                                    <div class="flex-1">
+                                        <span class="text-xs text-gray-500 font-mono font-bold uppercase mb-1 block">{{ String.fromCharCode(65+i) }}. opció</span>
+                                        <input v-model="ans.text" :placeholder="`Válaszlehetőség szövege...`" class="bg-transparent text-white w-full outline-none text-base font-medium placeholder-gray-700" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-6 border-t border-gray-700">
+                                <div class="flex items-center gap-3 bg-[#0b102e] px-4 py-2 rounded-lg border border-gray-700 shadow-inner">
+                                    <span class="text-gray-400 text-xs font-bold uppercase">Pontérték:</span>
+                                    <input v-model="newQuestion.xp" type="number" class="bg-transparent w-12 text-center text-white font-bold outline-none text-lg" />
+                                    <span class="text-yellow-500 font-bold">XP</span>
+                                </div>
+                                <button @click="addQuestion" class="px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2 transform active:scale-95" :class="editingTopic.type === 'test' ? 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-yellow-900/20' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20'">
+                                    <span>+ Feladat rögzítése</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div v-for="q in questions" :key="q.id" class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-start">
-                        <div>
-                            <p class="font-bold text-white text-lg mb-2">{{ q.content }} <span class="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-400">{{ q.xp }} XP</span></p>
-                            <ul class="space-y-1">
-                                <li v-for="a in q.answers" :key="a.id" :class="a.is_correct ? 'text-green-400 font-bold' : 'text-gray-400'" class="text-sm flex items-center gap-2">
-                                    <span v-if="a.is_correct">✅</span>
-                                    <span v-else>⚪</span>
-                                    {{ a.text }}
-                                </li>
-                            </ul>
+                <div class="w-1/3 min-w-[350px] bg-[#0b102e] overflow-y-auto border-l border-gray-800 p-6 scrollbar-thin">
+                    <h4 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <span>Rögzített feladatok</span>
+                        <span class="bg-gray-800 text-gray-300 px-2 rounded-full text-[10px]">{{ questions.length }}</span>
+                    </h4>
+                    
+                    <div v-if="questions.length === 0" class="text-center py-20 text-gray-600 border-2 border-dashed border-gray-800 rounded-2xl">
+                        <div class="text-4xl mb-2 opacity-20">📝</div>
+                        <p class="text-sm">Nincs még feladat rögzítve.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div v-for="(q, index) in questions" :key="q.id" class="bg-[#161b22] p-5 rounded-2xl border border-gray-800 hover:border-gray-600 transition group relative shadow-md">
+                            
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 h-6 flex items-center justify-center bg-gray-800 rounded text-xs font-mono font-bold text-gray-400">#{{ index + 1 }}</span>
+                                    <span class="text-xs bg-gray-900/50 text-yellow-500 font-bold px-2 py-0.5 rounded border border-yellow-900/20">{{ q.xp }} XP</span>
+                                </div>
+                                <button @click="deleteQuestion(q.id)" class="text-gray-600 hover:text-red-400 hover:bg-red-900/20 p-1.5 rounded-lg transition">
+                                    🗑️
+                                </button>
+                            </div>
+
+                            <p class="font-bold text-white text-sm mb-4 leading-relaxed">{{ q.content }}</p>
+                            
+                            <div class="space-y-2">
+                                <div v-for="a in q.answers" :key="a.id" class="text-xs flex items-start gap-3 p-2 rounded-lg" :class="a.is_correct ? 'bg-green-900/10 border border-green-900/30' : 'bg-gray-900/30 border border-transparent'">
+                                    <span v-if="a.is_correct" class="text-green-500 font-bold">✔</span>
+                                    <span v-else class="text-gray-600">⚪</span>
+                                    <span :class="a.is_correct ? 'text-green-100 font-medium' : 'text-gray-500'">{{ a.text }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <button @click="deleteQuestion(q.id)" class="text-red-400 hover:bg-red-900/20 p-2 rounded">🗑️</button>
                     </div>
                 </div>
             </div>
@@ -282,7 +410,6 @@ const executeDelete = async () => {
         <div v-if="activeTab === 'flashcards'" class="flex-1 overflow-y-auto p-8 bg-[#0b102e]">
             <div class="max-w-4xl mx-auto">
                 <h3 class="text-2xl font-bold text-white mb-6">Tanulókártyák</h3>
-                
                 <div class="bg-[#131b3d] p-6 rounded-xl border border-gray-700 mb-8 flex gap-4 items-end">
                     <div class="flex-1">
                         <label class="text-gray-400 text-xs uppercase font-bold mb-1 block">Kártya eleje (Kérdés)</label>
@@ -294,7 +421,6 @@ const executeDelete = async () => {
                     </div>
                     <button @click="addFlashcard" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold">Hozzáadás</button>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div v-for="card in flashcards" :key="card.id" class="bg-gray-800 p-4 rounded-xl border border-gray-700 relative group">
                         <button @click="deleteFlashcard(card.id)" class="absolute top-2 right-2 text-gray-500 hover:text-red-500">×</button>
@@ -307,17 +433,21 @@ const executeDelete = async () => {
 
         <div v-if="activeTab === 'settings'" class="flex-1 p-8 bg-[#0b102e]">
             <div class="max-w-xl mx-auto bg-[#131b3d] p-8 rounded-xl border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-6">Lecke beállításai</h3>
+                <h3 class="text-xl font-bold text-white mb-6">Általános beállítások</h3>
                 
                 <div class="mb-4">
                     <label class="text-gray-400 block mb-2">Lecke címe</label>
                     <input v-model="editingTopic.title" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white" />
                 </div>
 
-                <div class="mb-4">
-                    <label class="text-gray-400 block mb-2">XP Jutalom (Elolvasásért)</label>
+                <div v-if="editingTopic.type !== 'test'" class="mb-4">
+                    <label class="text-gray-400 block mb-2">XP Jutalom</label>
                     <input v-model="editingTopic.xp" type="number" class="w-full bg-[#0b102e] border border-gray-700 p-3 rounded-lg text-white" />
-                    <p class="text-xs text-gray-500 mt-1">Ezt kapja meg a diák, ha végigolvasta a leckét.</p>
+                </div>
+                
+                <div v-else class="p-4 bg-yellow-900/10 border border-yellow-700/30 rounded-lg text-yellow-500 text-sm flex gap-3">
+                    <span class="text-xl">ℹ️</span>
+                    <p>Témazáró esetén az XP-t a feladatok pontszámai határozzák meg automatikusan. Az időkorlátot és a küszöböt a <strong>📝 Vizsgafeladatok</strong> fülön, a felső sávban állíthatod be!</p>
                 </div>
             </div>
         </div>
