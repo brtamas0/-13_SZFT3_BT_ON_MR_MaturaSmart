@@ -92,20 +92,28 @@ class AdminController extends Controller
         return $unit->topics()->orderBy('order')->get();
     }
 
-    public function storeTopic(Request $request, Unit $unit)
-    {
+    public function storeTopic(Request $request, Unit $unit) {
         $validated = $request->validate([
             'title' => 'required|string',
             'type' => 'nullable|in:lesson,test',
-            'xp' => 'integer',
+            'xp' => 'integer', 
             'order' => 'integer',
             'time_limit_minutes' => 'nullable|integer',
-            'passing_percentage' => 'nullable|integer|min:1|max:100'
+            'passing_percentage' => 'nullable|integer'
         ]);
+        
+        $baseSlug = Str::slug($validated['title']);
+        $slug = $baseSlug;
+        $counter = 1;
 
-        $validated['slug'] = Str::slug($validated['title']) . '-' . rand(1000, 9999);
+        while (Topic::where('slug', $slug)->exists()) {
+            $counter++;
+            $slug = $baseSlug . '-' . $counter;
+        }
+        $validated['slug'] = $slug;
+
         $validated['subject_id'] = $unit->subject_id;
-
+        
         if (!isset($validated['type'])) {
             $validated['type'] = 'lesson';
         }
