@@ -82,7 +82,7 @@ class GamificationController extends Controller
                 $isCorrectNow = true;
                 $correctCount++;
 
-                // Megnézzük, hogy EZT A KONKRÉT kérdést megoldotta-e már régen
+                // Megnézzük, hogy megoldotta e már korábban helyesen
                 $alreadySolved = DB::table('question_user')
                     ->where('user_id', $user->id)
                     ->where('question_id', $question->id)
@@ -94,7 +94,6 @@ class GamificationController extends Controller
                 }
             }
 
-            // Eredmény mentése (csak ha nem bukott meg)
             DB::table('question_user')->updateOrInsert(
                 ['user_id' => $user->id, 'question_id' => $question->id],
                 ['is_correct' => $isCorrectNow, 'updated_at' => now()]
