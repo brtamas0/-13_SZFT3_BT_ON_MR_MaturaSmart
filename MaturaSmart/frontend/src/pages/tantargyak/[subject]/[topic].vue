@@ -3,41 +3,42 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router' 
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
+import TestModule from "@/components/TestModule.vue" 
 
 const route = useRoute()
 const router = useRouter()
 const topic = ref(null)
 const isLoading = ref(true)
 
+const testModuleRef = ref(null)
+
+// --- SCROLL & PROGRESS ---
 const maxScrollPercentage = ref(0) 
 
 const updateScroll = () => {
+  if (!topic.value || topic.value.type === 'test') return 
   const scrollTop = window.scrollY
   const docHeight = document.documentElement.scrollHeight
   const winHeight = window.innerHeight
   const scrollTotal = docHeight - winHeight
-  
   if (scrollTotal <= 0) return
-
   const currentPct = Math.min(scrollTop / scrollTotal, 1) * 100
-  
-  if (currentPct > maxScrollPercentage.value) {
-      maxScrollPercentage.value = currentPct
-  }
+  if (currentPct > maxScrollPercentage.value) maxScrollPercentage.value = currentPct
 }
 
 const selectedAnswers = ref({}) 
 
 const totalProgress = computed(() => {
-    if (!topic.value) return 0
+    if (!topic.value || topic.value.type === 'test') return 0
     const scrollPart = maxScrollPercentage.value * 0.5 
-    const totalQuestions = topic.value.questions.length
+    const totalQuestions = topic.value.questions ? topic.value.questions.length : 0
     const answeredCount = Object.keys(selectedAnswers.value).length
     const quizPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0
     const quizPart = quizPercent * 0.5
     return Math.round(scrollPart + quizPart)
 })
 
+// --- FLASHCARD LOGIKA ---
 const currentCardIndex = ref(0)
 const isFlipped = ref(false)
 
@@ -54,17 +55,13 @@ const nextCard = () => {
 
 const prevCard = () => {
     isFlipped.value = false
-    setTimeout(() => {
-        if (currentCardIndex.value > 0) {
-            currentCardIndex.value--
-        }
-    }, 300)
+    setTimeout(() => { if (currentCardIndex.value > 0) currentCardIndex.value-- }, 300)
 }
 
+// --- ÁLTALÁNOS ---
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 const resultData = ref({ xp: 0, message: '', isFirstTime: true })
-
 const subjectSlug = route.params.subject 
 
 const fetchTopicData = async (newTopicSlug) => {
@@ -84,53 +81,57 @@ const fetchTopicData = async (newTopicSlug) => {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     })
     
-    if (response.status === 401) {
-       localStorage.removeItem('token'); router.push('/login'); return
-    }
+    if (response.status === 401) { localStorage.removeItem('token'); router.push('/login'); return }
     if (!response.ok) throw new Error('Hiba')
     
     topic.value = await response.json()
     
-    setTimeout(updateScroll, 500)
+    if(topic.value.type !== 'test') setTimeout(updateScroll, 500)
 
     if (topic.value) {
         let subjectName = topic.value.unit ? topic.value.unit.title : null; 
-
-        if (!subjectName && subjectSlug) {
-            subjectName = subjectSlug.charAt(0).toUpperCase() + subjectSlug.slice(1);
-        }
-
+        if (!subjectName && subjectSlug) subjectName = subjectSlug.charAt(0).toUpperCase() + subjectSlug.slice(1);
         const finalSubjectName = subjectName || 'Lecke';
         document.title = `${finalSubjectName} | ${topic.value.title} | MaturaSmart`
     }
-
-  } catch (error) {
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
+  } catch (error) { console.error(error) } 
+  finally { isLoading.value = false }
 }
 
-onMounted(() => {
-  window.addEventListener('scroll', updateScroll) 
-  fetchTopicData(route.params.topic)
-})
+onMounted(() => { window.addEventListener('scroll', updateScroll); fetchTopicData(route.params.topic) })
+watch(() => route.params.topic, (newSlug) => { if (newSlug) { fetchTopicData(newSlug); window.scrollTo(0, 0) } })
+onUnmounted(() => { window.removeEventListener('scroll', updateScroll) })
 
-watch(() => route.params.topic, (newSlug) => {
-    if (newSlug) {
-        fetchTopicData(newSlug)
-        window.scrollTo(0, 0)
-    }
-})
+const navigateToTopic = (slug) => { router.push(`/tantargyak/${subjectSlug}/${slug}`) }
 
-onUnmounted(() => {
-    window.removeEventListener('scroll', updateScroll) 
-})
-
-const navigateToTopic = (slug) => {
-    router.push(`/tantargyak/${subjectSlug}/${slug}`)
+// --- TESZT KEZELÉSE ---
+const handleTestCompletion = async (payload) => {
+    const token = localStorage.getItem('token') 
+    isSubmitting.value = true
+    
+    try {
+        const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ 
+                topic_id: topic.value.id, 
+                answers: payload.answers
+            })
+        })
+        
+        const data = await response.json()
+        
+        if (testModuleRef.value) {
+            testModuleRef.value.showResult(data.xp_gained, data.passed)
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        
+    } catch (e) { console.error(e) } 
+    finally { isSubmitting.value = false }
 }
 
+// --- LECKE KEZELÉSE ---
 const selectAnswer = (questionId, answer) => {
   if (selectedAnswers.value[questionId]) return;
   selectedAnswers.value[questionId] = { id: answer.id, isCorrect: answer.is_correct }
@@ -139,9 +140,7 @@ const selectAnswer = (questionId, answer) => {
 const getAnswerClass = (questionId, answer) => {
   const selection = selectedAnswers.value[questionId]
   if (!selection) return 'bg-[#0f172a] border-white/5 text-gray-400 hover:border-blue-500/50 hover:bg-blue-900/10'
-  if (selection.id === answer.id) return answer.is_correct 
-    ? 'bg-green-500/20 border-green-500 text-green-400 font-bold shadow-[0_0_15px_rgba(34,197,94,0.3)]' 
-    : 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+  if (selection.id === answer.id) return answer.is_correct ? 'bg-green-500/20 border-green-500 text-green-400 font-bold shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
   if (answer.is_correct && selection.id !== answer.id) return 'bg-green-500/5 border-green-500/30 text-green-500/50 border-dashed' 
   return 'opacity-30 cursor-not-allowed border-transparent grayscale'
 }
@@ -149,28 +148,22 @@ const getAnswerClass = (questionId, answer) => {
 const finishLesson = async () => {
   const token = localStorage.getItem('token') 
   if (!token) return router.push('/login')
-
   isSubmitting.value = true
   const answersPayload = {}
   Object.keys(selectedAnswers.value).forEach(qId => answersPayload[qId] = selectedAnswers.value[qId].id)
-
   try {
     const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ topic_id: topic.value.id, answers: answersPayload })
     })
-
     const data = await response.json()
     if (!response.ok) throw new Error(data.message)
-
+    
     resultData.value = { xp: data.xp_gained, totalXp: data.total_xp, message: data.message }
     showSuccessModal.value = true
-  } catch (error) {
-    alert(error.message)
-  } finally {
-    isSubmitting.value = false
-  }
+  } catch (error) { alert(error.message) } 
+  finally { isSubmitting.value = false }
 }
 </script>
 
@@ -183,6 +176,33 @@ const finishLesson = async () => {
          <div class="absolute inset-0 border-4 border-blue-500/30 rounded-full animate-ping"></div>
          <div class="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin"></div>
       </div>
+    </div>
+
+    <div v-else-if="topic && topic.type === 'test'" class="fixed inset-0 z-[100] bg-[#0b1029] overflow-y-auto">
+        <div class="w-full min-h-screen flex flex-col">
+            <div class="w-full bg-[#1e293b] border-b border-gray-800 px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-lg">
+                <div class="flex items-center gap-4">
+                    <RouterLink :to="`/tantargyak/${subjectSlug}`" class="text-gray-400 hover:text-white transition font-bold flex items-center gap-2">
+                        <span>←</span> Kilépés
+                    </RouterLink>
+                    <div class="h-6 w-px bg-gray-700 hidden md:block"></div>
+                    <h1 class="text-white font-bold text-lg hidden md:block">{{ topic.title }}</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <div class="text-xs text-blue-400 font-bold uppercase tracking-widest">VIZSGA MÓD</div>
+                </div>
+            </div>
+
+            <div class="flex-1 flex justify-center p-4 md:p-8">
+                <TestModule 
+                    ref="testModuleRef"
+                    :topic="topic" 
+                    :questions="topic.questions" 
+                    @complete="handleTestCompletion" 
+                />
+            </div>
+        </div>
     </div>
 
     <div v-else-if="topic" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
