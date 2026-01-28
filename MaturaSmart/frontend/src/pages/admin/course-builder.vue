@@ -176,7 +176,7 @@ const addTopic = async (unit) => {
         body: JSON.stringify({ 
             title: unit.newTopicTitle, 
             type: unit.newTopicType || 'lesson',
-            xp: unit.newTopicType === 'test' ? 0 : 50,
+            xp: unit.newTopicType === 'test' ? 0 : 50, // Tesztnél 0-ról indul, majd a kérdések adják össze
             order: unit.topics.length + 1 
         }) 
     }); 
