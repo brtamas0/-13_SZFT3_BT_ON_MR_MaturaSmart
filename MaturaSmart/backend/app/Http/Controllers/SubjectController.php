@@ -28,17 +28,42 @@ class SubjectController extends Controller
             }])
             ->orderBy('order', 'asc')
             ->get();
+
         $units->transform(function ($unit) use ($user) {
             
             $unit->topics->transform(function ($topic) use ($user) {
-                $isCompleted = DB::table('question_user')
-                    ->join('questions', 'questions.id', '=', 'question_user.question_id')
-                    ->where('questions.topic_id', $topic->id)
-                    ->where('question_user.user_id', $user->id)
-                    ->where('question_user.is_correct', true)
-                    ->exists();
+                
+                // --- JAVÍTOTT LOGIKA KEZDETE ---
+                if ($topic->type === 'test') {
+                    // TESZT ESETÉN: Százalékos ellenőrzés
+                    
+                    // Összes kérdés száma a témában
+                    $totalQuestions = DB::table('questions')->where('topic_id', $topic->id)->count();
+                    
+                    // User helyes válaszainak száma ebben a témában
+                    $correctAnswers = DB::table('question_user')
+                        ->join('questions', 'questions.id', '=', 'question_user.question_id')
+                        ->where('questions.topic_id', $topic->id)
+                        ->where('question_user.user_id', $user->id)
+                        ->where('question_user.is_correct', true)
+                        ->count();
 
-                $topic->is_completed = $isCompleted;
+                    // Százalék számítás
+                    $percent = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
+                    $passing = $topic->passing_percentage ?? 50;
+
+                    $topic->is_completed = $percent >= $passing;
+
+                } else {
+                    $isCompleted = DB::table('question_user')
+                        ->join('questions', 'questions.id', '=', 'question_user.question_id')
+                        ->where('questions.topic_id', $topic->id)
+                        ->where('question_user.user_id', $user->id)
+                        ->where('question_user.is_correct', true)
+                        ->exists();
+
+                    $topic->is_completed = $isCompleted;
+                }
                 
                 if ($topic->year) {
                     $topic->year_label = $topic->year < 0 
@@ -51,6 +76,7 @@ class SubjectController extends Controller
 
             return $unit;
         });
+
         // 4. Statisztikák számítása
         $allTopics = $units->flatMap->topics;
         
