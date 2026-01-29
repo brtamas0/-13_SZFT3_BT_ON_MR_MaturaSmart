@@ -6,7 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Topic extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'subject_id',
+        'unit_id',
+        'title',
+        'slug',
+        'description',
+        'content',
+        'type',
+        'xp',
+        'time_limit_minutes',
+        'passing_percentage',
+        'year',
+        'year_label',
+        'order',
+        'reading_weight'
+    ];
 
     public function subject()
     {
@@ -22,6 +37,7 @@ class Topic extends Model
     {
         return $this->hasMany(Flashcard::class);
     }
+    
     public function unit()
     {
         return $this->belongsTo(Unit::class);

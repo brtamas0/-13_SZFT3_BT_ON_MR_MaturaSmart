@@ -35,13 +35,19 @@ return new class extends Migration
             $table->foreignId('unit_id')->nullable()->constrained()->onDelete('set null');
             
             $table->string('type')->default('lesson'); // 'lesson' (Tananyag) vagy 'test' (Témazáró)
-            $table->integer('time_limit_minutes')->nullable(); // Tesztnél: időkorlát (ha null, nincs)
-            $table->integer('passing_percentage')->default(50); // Tesztnél: hány % kell a sikerhez
+            
+            // Teszt specifikus mezők
+            $table->integer('time_limit_minutes')->nullable(); 
+            $table->integer('passing_percentage')->default(50); 
+
+            // Olvasás vs Kvíz arány (0-100)
+            // 75: 75%ban az olvasás számít a progressnél
+            $table->integer('reading_weight')->default(50); 
 
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->longText('content')->nullable(); // Leckénél: HTML tartalom
+            $table->longText('content')->nullable(); 
             $table->integer('xp')->default(0);             
             $table->integer('order')->default(0);
             
