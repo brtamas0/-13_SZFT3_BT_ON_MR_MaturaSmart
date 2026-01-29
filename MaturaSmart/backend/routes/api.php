@@ -46,14 +46,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile/update', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
-/*
-|--------------------------------------------------------------------------
-| ADMIN ROUTE-OK
-|--------------------------------------------------------------------------
-*/
-    
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ROUTE-OK
+    |--------------------------------------------------------------------------
+    */
     Route::middleware('admin')->prefix('admin')->group(function () {
         
+        Route::post('/topics/reorder', [AdminController::class, 'reorderTopics']);
+
         // 1. Dashboard & User lista
         Route::get('/stats', [AdminController::class, 'stats']);
         Route::get('/users', [AdminController::class, 'indexUsers']);
@@ -73,8 +75,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // 4. Topics (Leckék)
         Route::get('/units/{unit}/topics', [AdminController::class, 'getTopics']);
         Route::post('/units/{unit}/topics', [AdminController::class, 'storeTopic']);
-        Route::put('/topics/{topic}', [AdminController::class, 'updateTopic']);
+        
+        // Ez a dinamikus ID-s route most már nem zavarja a reorder-t
+        Route::put('/topics/{topic}', [AdminController::class, 'updateTopic']); 
         Route::delete('/topics/{topic}', [AdminController::class, 'destroyTopic']);
+
         // 5. Kvíz & Flashcard (Course Builderhez)
         Route::get('/topics/{topic}/questions', [AdminController::class, 'getQuestions']);
         Route::post('/topics/{topic}/questions', [AdminController::class, 'storeQuestion']);
@@ -83,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/topics/{topic}/flashcards', [AdminController::class, 'getFlashcards']);
         Route::post('/topics/{topic}/flashcards', [AdminController::class, 'storeFlashcard']);
         Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
+
     });
 
 });
