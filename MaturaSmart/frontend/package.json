@@ -31,7 +31,8 @@
     "vite-plugin-vue-devtools": "8.0.0",
     "vue": "3.5.18",
     "vue-i18n": "11.1.11",
-    "vue-router": "4.5.1"
+    "vue-router": "4.5.1",
+    "vue-draggable-plus": "^0.6.0"
   },
   "description": "> Az alap tartalmaz minden olyan csomagot amely az órai feladatok elkészítéséhez szükséges.",
   "main": "vite.config.js",
