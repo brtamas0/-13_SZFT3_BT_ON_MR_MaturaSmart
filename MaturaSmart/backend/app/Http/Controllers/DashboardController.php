@@ -13,6 +13,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        // --- UTOLSÓ LECKE LEKÉRDEZÉSE ---
         $lastTopicData = null;
         if ($user->last_topic_id) {
             $topic = Topic::with('subject', 'questions')->find($user->last_topic_id);
@@ -30,20 +31,21 @@ class DashboardController extends Controller
                 $lastTopicData = [
                     'title' => $topic->title,
                     'slug' => $topic->slug,
+                    'progress' => $topicProgress,
                     'subject' => [
-                        'title' => $topic->subject->title,
+                        'title' => $topic->subject->name, 
                         'slug' => $topic->subject->slug
-                    ],
-                    'progress' => $topicProgress
+                    ]
                 ];
             }
         }
 
+        // --- TANTÁRGYAK LEKÉRDEZÉSE ---
         $subjects = Subject::with('topics.questions')->get()->map(function ($subject) use ($user) {
             
             $totalQuestionsInSubject = $subject->topics->flatMap->questions->count();
-            
             $questionIds = $subject->topics->flatMap->questions->pluck('id');
+            
             $solvedCount = DB::table('question_user')
                 ->where('user_id', $user->id)
                 ->whereIn('question_id', $questionIds)
@@ -53,49 +55,18 @@ class DashboardController extends Controller
             $progress = $totalQuestionsInSubject > 0 
                 ? round(($solvedCount / $totalQuestionsInSubject) * 100) 
                 : 0;
+            $colors = $this->getSubjectColors($subject->id);
 
-            $visuals = match($subject->slug) {
-                'matematika' => [
-                    'icon' => '🧮', 
-                    'color' => 'text-blue-400', 
-                    'bg' => 'bg-blue-500/20', 
-                    'bar_color' => 'bg-blue-600'
-                ],
-                'tortenelem' => [
-                    'icon' => '⚔️', 
-                    'color' => 'text-orange-400', 
-                    'bg' => 'bg-orange-500/20',
-                    'bar_color' => 'bg-orange-500' 
-                ],
-                'irodalom'   => [
-                    'icon' => '📖', 
-                    'color' => 'text-emerald-400', 
-                    'bg' => 'bg-emerald-500/20',
-                    'bar_color' => 'bg-emerald-500'
-                ],
-                'angol'      => [
-                    'icon' => '🇬🇧', 
-                    'color' => 'text-red-400', 
-                    'bg' => 'bg-red-500/20',
-                    'bar_color' => 'bg-red-500'
-                ],
-                'informatika'=> [
-                    'icon' => '💻', 
-                    'color' => 'text-cyan-400', 
-                    'bg' => 'bg-cyan-500/20',
-                    'bar_color' => 'bg-cyan-500'
-                ],
-                default      => [
-                    'icon' => '📚', 
-                    'color' => 'text-slate-400', 
-                    'bg' => 'bg-slate-500/20',
-                    'bar_color' => 'bg-slate-500'
-                ],
-            };
+            $visuals = [
+                'icon' => $subject->icon ?? '📘', 
+                'color' => $colors['color'],
+                'bg' => $colors['bg'],
+                'bar_color' => $colors['bar_color']
+            ];
 
             return [
                 'id' => $subject->id,
-                'title' => $subject->title, 
+                'title' => $subject->name, 
                 'slug' => $subject->slug,
                 'progress' => $progress, 
                 'total_topics' => $subject->topics->count(),
@@ -109,5 +80,21 @@ class DashboardController extends Controller
             'subjects' => $subjects,
             'quote' => "A tudás hatalom."
         ]);
+    }
+
+    private function getSubjectColors($id)
+    {
+        $palettes = [
+            ['bg' => 'bg-blue-500/20', 'color' => 'text-blue-400', 'bar_color' => 'bg-blue-500'],
+            ['bg' => 'bg-purple-500/20', 'color' => 'text-purple-400', 'bar_color' => 'bg-purple-500'],
+            ['bg' => 'bg-green-500/20', 'color' => 'text-green-400', 'bar_color' => 'bg-green-500'],
+            ['bg' => 'bg-yellow-500/20', 'color' => 'text-yellow-400', 'bar_color' => 'bg-yellow-500'],
+            ['bg' => 'bg-red-500/20', 'color' => 'text-red-400', 'bar_color' => 'bg-red-500'],
+            ['bg' => 'bg-pink-500/20', 'color' => 'text-pink-400', 'bar_color' => 'bg-pink-500'],
+            ['bg' => 'bg-cyan-500/20', 'color' => 'text-cyan-400', 'bar_color' => 'bg-cyan-500'],
+            ['bg' => 'bg-indigo-500/20', 'color' => 'text-indigo-400', 'bar_color' => 'bg-indigo-500'],
+        ];
+
+        return $palettes[$id % count($palettes)];
     }
 }
