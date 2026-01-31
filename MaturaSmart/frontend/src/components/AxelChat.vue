@@ -4,7 +4,52 @@ import { nextTick, computed } from 'vue'
 
 const isThinking = ref(false)
 const chatContainer = ref(null)
+const stripHtml = (html) => {
+   let tmp = document.createElement("DIV")
+   tmp.innerHTML = html
+   return tmp.textContent || tmp.innerText || ""
+}
 
+const sendMessage = async () => {
+  if (!messageInput.value.trim() || isThinking.value) return
+
+  const userMsg = messageInput.value
+  messages.value.push({ role: 'user', content: userMsg })
+  messageInput.value = ''
+  isThinking.value = true
+  await scrollToBottom()
+
+  try {
+    const token = localStorage.getItem('token')
+    const cleanContent = stripHtml(props.topicContent || "")
+
+    const response = await fetch('http://backend.vm1.test/api/ask-axel', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        message: userMsg,
+        subject: props.subject,
+        topic: props.topicTitle,
+        notes: cleanContent,
+        history: messages.value.slice(-6)
+      })
+    })
+
+    const data = await response.json()
+    if (response.ok) {
+      messages.value.push({ role: 'assistant', content: data.answer })
+    }
+  } catch (error) {
+    messages.value.push({ role: 'assistant', content: 'Hálózati hiba történt. 🔌' })
+  } finally {
+    isThinking.value = false
+    await scrollToBottom()
+  }
+}
 const axelAvatar = computed(() => {
     return isThinking.value ? '/axel.png' : '/axel.png'
 })
