@@ -7,41 +7,48 @@ use Illuminate\Support\Facades\Http;
 
 class AxelController extends Controller
 {
-    
     public function ask(Request $request)
     {
         try {
             // 1. Adatok fogadása
             $message = $request->input('message');
             $history = $request->input('history', []);
-            $subject = $request->input('subject', 'Általános');
-            $topic = $request->input('topic', 'Általános');
-            $notes = $request->input('notes') ?: "Nincs megadva konkrét tananyag.";
+            $subject = $request->input('subject', 'Ismeretlen tárgy');
+            $topic = $request->input('topic', 'Ismeretlen témakör');
+            
+            // HTML tagek törlése a token spóroláshoz + limitálás
+            $rawNotes = $request->input('notes') ?: "";
+            $cleanNotes = strip_tags($rawNotes);
+            // Ha nagyon hosszú a lecke, levágjuk az első 8000 karakterre (kb 2-3k token), ai kiegészíti saját tudásból, ha valami lemaradt
+            $cleanNotes = mb_substr($cleanNotes, 0, 8000); 
 
-            // 2. Alap prompt, Ai tanítás
+            // Szigorított System Prompt
             $systemPrompt = <<<EOT
-            SZEREP:
-Te Axel vagy, a MaturaSmart érettségi felkészítő oldal intelligens, fiatalos és türelmes kabalája, aki segít a tanulónak, ha kérdése lenne, segítségre lenne szüksége. 🤖🎓
+SZEREP:
+Te Axel vagy, a MaturaSmart oktatási platform AI mentora. 
+Célod: Kizárólag a megadott tananyag megértésében segíteni a diákot.
+Stílusod: Fiatalos, tegező, bátorító, emojikat használó (de nem túlzásba vive).
 
-KONTEXTUS:
-Tantárgy: $subject
-Témakör: $topic
+KONTEXTUS ADATOK:
+- Tantárgy: $subject
+- Témakör: $topic
 
-Az alábbi tananyagra / tananyag alapján válaszolj!
-
-""" MaturaSmart Tananyag leírás:
-$notes
+JELENLEGI TANANYAG TARTALMA (Forrás):
+"""
+$cleanNotes
 """
 
-INSTRUKCIÓK:
-1. Stílus: Tegeződj, légy közvetlen, használj emojikat.
-2. Pedagógia: Ne csak a megoldást mondd meg! Magyarázd el úgy, mintha a fenti jegyzetet értelmeznéd a diáknak.
-3. Matek esetén: Vezesd le lépésről lépésre.
-4. Nyelvtan esetén: Adj példákat a szabályokra.
-5. Történelem esetén: Helyezd el a kontextusban az eseményeket.
-6. Ha a kérdés nem kapcsolódik a fenti tantárgyhoz vagy témakörhöz, udvariasan jelezd, hogy ebben nem tudsz segíteni.
-7. Formázás: Használj Markdown-t (félkövér, listák, stb.) a válaszodban.
+SZIGORÚ SZABÁLYOK (GUARDRAILS):
+1. KIZÁRÓLAG a fenti "Jelenlegi Tananyag Tartalma" és a "$subject" tárgykörében válaszolj.
+2. HA a kérdés NEM kapcsolódik a tananyaghoz vagy a tantárgyhoz (pl. "Mi a kedvenc színed?", "Írj egy receptet", "Ki nyerte a meccset?"):
+   - VÁLASZOD: "Bocsi, de én csak a(z) $subject tantárggyal és a(z) $topic leckével kapcsolatban tudok segíteni! 📚 Térjünk vissza a tanuláshoz!"
+   - NE válaszolj a kérdésre, még akkor sem, ha tudod a választ.
+3. Ne oldd meg a házifeladatot helyette, hanem vezesd rá a megoldásra.
+4. Ha a tananyagban nincs benne a válasz, de szorosan kapcsolódik a témához (pl. történelemnél egy évszám), akkor válaszolhatsz általános tudásodból, de jelezd, hogy ez kiegészítés.
 
+VÁLASZ FORMÁTUM:
+- Használj Markdown formázást (félkövér kiemelések).
+- Légy tömör és lényegretörő.
 EOT;
 
             // API Kulcs ellenőrzés
@@ -51,15 +58,16 @@ EOT;
             }
             
             $messagesPayload = [];
-
             $messagesPayload[] = ['role' => 'system', 'content' => $systemPrompt];
 
+            // Előzmények hozzáadása (Max 6 üzenet)
             if (!empty($history) && is_array($history)) {
-                foreach ($history as $msg) {
+                $historySubset = array_slice($history, -6);
+                foreach ($historySubset as $msg) {
                     if (isset($msg['role'], $msg['content'])) {
                         $messagesPayload[] = [
                             'role' => $msg['role'], 
-                            'content' => $msg['content']
+                            'content' => mb_substr($msg['content'], 0, 500) // User input limitálása
                         ];
                     }
                 }
@@ -67,30 +75,29 @@ EOT;
 
             $messagesPayload[] = ['role' => 'user', 'content' => $message];
 
-
-            //Küldés a GROQ API-nak
+            // Küldés a GROQ API-nak
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'llama-3.3-70b-versatile',
+                'model' => 'llama-3.3-70b-versatile', // 'mixtral-8x7b-32768' gyorsabb lehet, ha később AI-val validálnánk a felhasználó kérdését, hogy a topichoz tartozik e
                 'messages' => $messagesPayload,
-                'temperature' => 0.7,
-                'max_tokens' => 1024
+                'temperature' => 0.6,
+                'max_tokens' => 800,
+                'top_p' => 0.9
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
-                $answer = $data['choices'][0]['message']['content'] ?? 'Nem kaptam választ.';
+                $answer = $data['choices'][0]['message']['content'] ?? 'Ezt most nem tudtam feldolgozni.';
                 return response()->json(['answer' => $answer]);
             } else {
                 return response()->json([
-                    'error' => 'Groq API Hiba',
-                    'details' => $response->json()
+                    'error' => 'Hiba az AI szolgáltatásban.',
                 ], 500);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Szerver Hiba', 'msg' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Szerver Hiba'], 500);
         }
     }
 }
