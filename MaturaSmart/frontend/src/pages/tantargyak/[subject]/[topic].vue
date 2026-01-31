@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import BaseLayout from "@/layouts/BaseLayout.vue"
 import BaseHeader from "@layouts/BaseHeader.vue"
 import TestModule from "@/components/TestModule.vue" 
+import AxelChat from "@/components/AxelChat.vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -432,10 +433,14 @@ const finishLesson = async () => {
         </div>
       </div>
     </div>
-
+<AxelChat 
+        v-if="topic && topic.type !== 'test'" 
+        :subject="subjectSlug" 
+        :topic-title="topic.title" 
+        :topic-content="topic.content"
+     />
   </BaseLayout>
 </template>
-
 <style scoped>
 .scene { perspective: 1000px; }
 .transform-style-3d { transform-style: preserve-3d; }
