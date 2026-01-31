@@ -1,6 +1,20 @@
 <script setup>
 import { ref } from 'vue'
+import { nextTick, computed } from 'vue'
 
+const isThinking = ref(false)
+const chatContainer = ref(null)
+
+const axelAvatar = computed(() => {
+    return isThinking.value ? '/axel.png' : '/axel.png'
+})
+
+const scrollToBottom = async () => {
+  await nextTick()
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  }
+}
 const props = defineProps({
   subject: String,
   topicTitle: String,
