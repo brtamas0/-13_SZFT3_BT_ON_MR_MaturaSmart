@@ -10,6 +10,7 @@ use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\AxelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile/update', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+    Route::get('/search', [SearchController::class, 'search']);
 
     /*
     |--------------------------------------------------------------------------
