@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick, watch, computed } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 
 const props = defineProps({
   subject: String,
@@ -13,7 +13,7 @@ const messageInput = ref('')
 const messages = ref([
   { 
     role: 'assistant', 
-    content: `Szia! Axel vagyok. 👋\nLátom a(z) **${props.topicTitle}** témakört tanulod. Miben segíthetek ezzel kapcsolatban?` 
+    content: `Szia! Axel vagyok. 👋\nLátom a(z) **${props.topicTitle}** témakört tanulod. Miben segíthetek?` 
   }
 ])
 
@@ -21,10 +21,9 @@ const chatContainer = ref(null)
 
 // Kép váltogatása gondolkodás közben
 const axelAvatar = computed(() => {
-    return isThinking.value ? '/axel.png' : '/axel.png' //első axel_thinking.png lesz később
+    return isThinking.value ? '/axel.png' : '/axel.png' //Az első később axel_thinking.png lesz
 })
 
-// Görgetés az aljára
 const scrollToBottom = async () => {
   await nextTick()
   if (chatContainer.value) {
@@ -32,7 +31,6 @@ const scrollToBottom = async () => {
   }
 }
 
-// HTML tagek eltávolítása a kontextusból (token spórolás)
 const stripHtml = (html) => {
    let tmp = document.createElement("DIV")
    tmp.innerHTML = html
@@ -50,7 +48,7 @@ const sendMessage = async () => {
 
   try {
     const token = localStorage.getItem('token')
-    const cleanContent = stripHtml(props.topicContent || "") // Szöveg tisztítása HTML tagektől
+    const cleanContent = stripHtml(props.topicContent || "")
 
     const response = await fetch('http://backend.vm1.test/api/ask-axel', {
       method: 'POST',
@@ -64,7 +62,7 @@ const sendMessage = async () => {
         subject: props.subject,
         topic: props.topicTitle,
         notes: cleanContent,
-        history: messages.value.slice(-6) // Csak az utolsó 6 üzenetet küldjük
+        history: messages.value.slice(-6)
       })
     })
 
@@ -92,21 +90,26 @@ const isSubmitting = computed(() => isThinking.value)
   <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans">
     
     <transition name="slide-up">
-      <div v-if="isOpen" class="bg-[#1e293b] border border-blue-500/30 w-[350px] md:w-[400px] h-[500px] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div v-if="isOpen" class="relative bg-[#1e293b] border border-blue-500/30 w-[350px] md:w-[400px] h-[500px] rounded-2xl shadow-2xl flex flex-col overflow-visible ring-1 ring-white/10">
         
-        <div class="bg-blue-600/20 p-4 border-b border-white/5 flex items-center justify-between backdrop-blur-md">
-          <div class="flex items-center gap-3">
-            <div class="relative">
-                <img :src="axelAvatar" class="w-10 h-10 rounded-full border-2 border-blue-400 bg-[#0b1029] object-cover transition-all duration-300" alt="Axel">
-                <span v-if="isThinking" class="absolute bottom-0 right-0 w-3 h-3 bg-yellow-400 rounded-full animate-bounce"></span>
-                <span v-else class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full"></span>
+        <div class="absolute -top-24 -left-6 z-50 pointer-events-none drop-shadow-2xl filter animate-float">
+            <img 
+                :src="axelAvatar" 
+                class="w-32 h-32 object-contain transition-transform duration-300"
+                :class="{ 'scale-110': isThinking }" 
+                alt="Axel"
+            >
+            <div v-if="isThinking" class="absolute top-8 right-0 bg-white text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse shadow-lg">
+                🤔 Hmm...
             </div>
-            <div>
-              <h3 class="text-white font-bold text-sm">Axel</h3>
-              <p class="text-blue-300 text-[10px] uppercase font-bold tracking-widest">AI Mentor</p>
-            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-blue-900/50 to-blue-600/20 p-4 border-b border-white/5 flex items-center justify-end rounded-t-2xl">
+          <div class="text-right mr-3">
+            <h3 class="text-white font-bold text-sm">Szia, itt Axel!</h3>
+            <p class="text-blue-300 text-[10px] uppercase font-bold tracking-widest">A te AI Mentorod</p>
           </div>
-          <button @click="isOpen = false" class="text-gray-400 hover:text-white transition">
+          <button @click="isOpen = false" class="text-gray-400 hover:text-white hover:bg-white/10 p-1 rounded-lg transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
           </button>
         </div>
@@ -126,9 +129,7 @@ const isSubmitting = computed(() => isThinking.value)
           
           <div v-if="isThinking" class="flex gap-3">
              <div class="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/30">
-                <!-- <img src="/axel_thinking.png" class="w-full h-full object-cover rounded-full"> -->
-                <img src="/axel.png" class="w-full h-full object-cover rounded-full">
-
+                <img src="/axel.png" class="w-full h-full object-cover rounded-full opacity-50">
              </div>
              <div class="bg-[#0f172a] p-3 rounded-2xl rounded-bl-none border border-white/10 flex gap-1 items-center">
                 <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
@@ -138,12 +139,12 @@ const isSubmitting = computed(() => isThinking.value)
           </div>
         </div>
 
-        <div class="p-4 bg-[#0f172a] border-t border-white/5">
+        <div class="p-4 bg-[#0f172a] border-t border-white/5 rounded-b-2xl">
           <form @submit.prevent="sendMessage" class="relative">
             <input 
               v-model="messageInput" 
               type="text" 
-              placeholder="Kérdezz a leckéről..." 
+              placeholder="Segíthetek valamiben?" 
               class="w-full bg-[#1e293b] text-white rounded-xl pl-4 pr-12 py-3 border border-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm placeholder-gray-500 transition-all"
               :disabled="isThinking"
             >
@@ -158,7 +159,7 @@ const isSubmitting = computed(() => isThinking.value)
             </button>
           </form>
           <div class="text-[10px] text-gray-600 text-center mt-2">
-            Axel is tévedhet. Ellenőrizd a fontos információkat.
+            Axel is tévedhet.
           </div>
         </div>
 
@@ -167,10 +168,10 @@ const isSubmitting = computed(() => isThinking.value)
 
     <button 
       @click="isOpen = !isOpen" 
-      class="group relative w-16 h-16 rounded-full shadow-2xl transition-transform hover:scale-105 active:scale-95 flex items-center justify-center border-4 border-[#1e293b]"
-      :class="isOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-500'"
+      class="group relative w-16 h-16 rounded-full shadow-2xl transition-transform hover:scale-110 active:scale-95 flex items-center justify-center border-4 border-[#1e293b]"
+      :class="isOpen ? 'bg-red-500 hover:bg-red-600 rotate-90' : 'bg-blue-600 hover:bg-blue-500'"
     >
-      <div v-if="!isOpen" class="absolute inset-0 rounded-full border-2 border-white/20 animate-ping"></div>
+      <div v-if="!isOpen" class="absolute inset-0 rounded-full border-2 border-white/20 animate-ping opacity-50"></div>
       
       <img v-if="!isOpen" src="/axel.png" class="w-full h-full rounded-full object-cover">
       
@@ -179,7 +180,7 @@ const isSubmitting = computed(() => isThinking.value)
       </svg>
       
       <div v-if="!isOpen" class="absolute right-full mr-4 bg-white text-blue-900 px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-        Segíthetek a tanulásban?
+        Elakadtál? Kérdezz!
         <div class="absolute top-1/2 -right-1 w-2 h-2 bg-white rotate-45 -translate-y-1/2"></div>
       </div>
     </button>
@@ -188,8 +189,17 @@ const isSubmitting = computed(() => isThinking.value)
 </template>
 
 <style scoped>
-.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(20px) scale(0.95); }
+/* Lebegő animáció Axelnek */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(40px) scale(0.9); }
 .scrollbar-thin::-webkit-scrollbar { width: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #3b82f6; border-radius: 20px; }
 .scrollbar-thin::-webkit-scrollbar-track { background-color: transparent; }
