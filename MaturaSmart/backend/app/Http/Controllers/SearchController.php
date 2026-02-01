@@ -28,7 +28,7 @@ class SearchController extends Controller
             });
 
         // 2. Keresés a Leckék között
-        $topics = Topic::with('subject') // Kell a subject, hogy tudjuk a slugját
+        $topics = Topic::with('subject')
             ->where('title', 'LIKE', "%{$query}%")
             ->select('id', 'title', 'slug', 'subject_id', 'type')
             ->take(5)

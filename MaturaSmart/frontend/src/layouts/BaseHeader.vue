@@ -38,7 +38,7 @@ onMounted(() => {
     }
   }
 
-  // Klikk figyelése a kereső bezárásához
+  // Kattintás figyelése a kereső bezárásához
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-container')) {
       showResults.value = false
