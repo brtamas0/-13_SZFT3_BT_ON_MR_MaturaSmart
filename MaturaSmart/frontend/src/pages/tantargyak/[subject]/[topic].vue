@@ -29,13 +29,23 @@ const updateScroll = () => {
 
 const selectedAnswers = ref({}) 
 
+// Javított progress számítás (Súlyozott)
 const totalProgress = computed(() => {
     if (!topic.value || topic.value.type === 'test') return 0
-    const scrollPart = maxScrollPercentage.value * 0.5 
-    const totalQuestions = topic.value.questions ? topic.value.questions.length : 0
+    
+    // 1. Súlyok lekérése (Ha null, alapértelmezett 50%)
+    const readWeight = topic.value.reading_weight ?? 50 
+    const quizWeight = 100 - readWeight
+
+    // 2. Olvasás része (Görgetés % * Súly %)
+    const scrollPart = maxScrollPercentage.value * (readWeight / 100) 
+
+    // 3. Kvíz része
+    const totalQuestions = topic.value.questions ? topic.value.questions.length : 0 
     const answeredCount = Object.keys(selectedAnswers.value).length
-    const quizPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0
-    const quizPart = quizPercent * 0.5
+    const quizPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0 
+    const quizPart = quizPercent * (quizWeight / 100)
+
     return Math.round(scrollPart + quizPart)
 })
 
@@ -340,13 +350,29 @@ const finishLesson = async () => {
                     </div>
                     
                     <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden relative">
-                        <div class="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-500 ease-out" :style="{ width: (maxScrollPercentage * 0.5) + '%' }"></div>
-                        <div class="absolute top-0 h-full bg-green-500 transition-all duration-500 ease-out" :style="{ left: (maxScrollPercentage * 0.5) + '%', width: ((Object.keys(selectedAnswers).length / topic.questions.length) * 50) + '%' }"></div>
+                        <div 
+                            class="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-500 ease-out" 
+                            :style="{ width: (maxScrollPercentage * ((topic.reading_weight ?? 50) / 100)) + '%' }"
+                        ></div>
+
+                        <div 
+                            class="absolute top-0 h-full bg-green-500 transition-all duration-500 ease-out" 
+                            :style="{ 
+                                left: (maxScrollPercentage * ((topic.reading_weight ?? 50) / 100)) + '%', 
+                                width: ((Object.keys(selectedAnswers).length / (topic.questions.length || 1)) * ((100 - (topic.reading_weight ?? 50)))) + '%' 
+                            }"
+                        ></div>
                     </div>
                     
                     <div class="flex justify-between text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-wider">
-                        <span class="flex items-center gap-1"><span class="text-lg">👀</span></span>
-                        <span class="flex items-center gap-1"><span class="text-lg">✅</span></span>
+                        <span class="flex items-center gap-1" title="Olvasás súlya">
+                            <span class="text-lg">👀</span> 
+                            {{ topic.reading_weight ?? 50 }}%
+                        </span>
+                        <span class="flex items-center gap-1" title="Feladatok súlya">
+                            <span class="text-lg">✅</span> 
+                            {{ 100 - (topic.reading_weight ?? 50) }}%
+                        </span>
                     </div>
                 </div>
                 
@@ -433,14 +459,17 @@ const finishLesson = async () => {
         </div>
       </div>
     </div>
-<AxelChat 
+
+    <AxelChat 
         v-if="topic && topic.type !== 'test'" 
         :subject="subjectSlug" 
         :topic-title="topic.title" 
         :topic-content="topic.content"
-     />
+    />
+
   </BaseLayout>
 </template>
+
 <style scoped>
 .scene { perspective: 1000px; }
 .transform-style-3d { transform-style: preserve-3d; }

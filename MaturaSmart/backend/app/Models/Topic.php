@@ -22,7 +22,12 @@ class Topic extends Model
         'order',
         'reading_weight'
     ];
-
+    protected $casts = [
+        'is_active' => 'boolean',
+        'order' => 'integer',
+        'xp' => 'integer',
+        'reading_weight' => 'integer',
+    ];
     public function subject()
     {
         return $this->belongsTo(Subject::class);
@@ -42,4 +47,5 @@ class Topic extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    
 }

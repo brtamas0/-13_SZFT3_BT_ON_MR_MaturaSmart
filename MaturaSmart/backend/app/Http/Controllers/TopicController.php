@@ -42,12 +42,10 @@ class TopicController extends Controller
         return response()->json([
             'id' => $topic->id,
             'title' => $topic->title,
-            
-            // --- EZEK HIÁNYOZTAK: ---
-            'type' => $topic->type, // FONTOS! Ez mondja meg, hogy Teszt-e
+            'type' => $topic->type,
             'time_limit_minutes' => $topic->time_limit_minutes,
             'passing_percentage' => $topic->passing_percentage,
-            // ------------------------
+            'reading_weight' => $topic->reading_weight,
 
             'description' => $topic->description,
             'content' => $topic->content,
