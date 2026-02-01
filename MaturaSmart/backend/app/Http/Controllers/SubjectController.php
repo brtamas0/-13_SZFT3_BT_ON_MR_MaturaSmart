@@ -33,7 +33,6 @@ class SubjectController extends Controller
             
             $unit->topics->transform(function ($topic) use ($user) {
                 
-                // --- JAVÍTOTT LOGIKA KEZDETE ---
                 if ($topic->type === 'test') {
                     // TESZT ESETÉN: Százalékos ellenőrzés
                     

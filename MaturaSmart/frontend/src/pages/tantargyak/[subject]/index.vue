@@ -8,6 +8,7 @@ const route = useRoute()
 const router = useRouter()
 const subject = ref(null)
 const isLoading = ref(true)
+const errorMessage = ref(null)
 const slug = route.params.subject
 
 onMounted(async () => {
@@ -34,6 +35,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Hiba történt:", error)
+    errorMessage.value = "Nem sikerült betölteni a tantárgy adatait."
   } finally {
     isLoading.value = false
   }
@@ -72,20 +74,29 @@ onMounted(async () => {
                         <span class="flex items-center gap-2">
                             <span>⏱️</span> {{ subject.stats?.estimated_hours || 0 }} óra tanulás
                         </span>
+                        <span class="flex items-center gap-2 text-green-400">
+                            <span>✅</span> {{ subject.stats?.completed || 0 }} Befejezve
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="relative w-32 h-32 flex items-center justify-center shrink-0">
-                <svg class="w-full h-full transform -rotate-90">
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-white/20" />
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
-                            :stroke-dasharray="180" 
-                            :stroke-dashoffset="365 - (365 * (subject.stats?.progress || 0)) / 100"
-                            class="text-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-white/10" />
+                    
+                    <circle 
+                        cx="64" cy="64" r="58" 
+                        stroke="currentColor" stroke-width="8" 
+                        fill="transparent" 
+                        stroke-linecap="round"
+                        stroke-dasharray="364.4" 
+                        :stroke-dashoffset="364.4 - (364.4 * (subject.stats?.progress || 0)) / 100"
+                        class="text-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]" 
+                    />
                 </svg>
-                <div class="absolute text-center">
-                    <span class="text-2xl font-bold text-white">{{ subject.stats?.progress || 0 }}%</span>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-2xl font-black text-white">{{ subject.stats?.progress || 0 }}%</span>
                 </div>
             </div>
         </div>
@@ -145,9 +156,9 @@ onMounted(async () => {
                                     </p>
                                     
                                     <div class="mt-3 flex items-center gap-4 text-xs font-medium text-gray-500">
-                                        <span class="flex items-center gap-1">⏱️ 45 perc</span>
-                                        <span class="flex items-center gap-1">📝 12 kérdés</span>
-                                        <span class="text-yellow-500/80 flex items-center gap-1">⭐ {{ topic.xp || 150 }} XP</span>
+                                        <span class="flex items-center gap-1">⏱️ {{ topic.time_limit_minutes || 45 }} perc</span>
+                                        <span class="text-yellow-500/80 flex items-center gap-1">⭐ {{ topic.xp || 10 }} XP</span>
+                                        <span v-if="topic.type === 'test'" class="text-red-400/80 uppercase font-bold border border-red-500/20 px-1 rounded">Teszt</span>
                                     </div>
                                 </div>
 
@@ -179,7 +190,7 @@ onMounted(async () => {
     <div v-else class="text-center py-20">
       <div class="text-6xl mb-4">😕</div>
       <h1 class="text-3xl font-bold text-white mb-4">Hoppá!</h1>
-      <p class="text-gray-400 mb-6">Nem sikerült betölteni az adatokat.</p>
+      <p class="text-gray-400 mb-6">{{ errorMessage || 'Nem sikerült betölteni az adatokat.' }}</p>
       <RouterLink to="/main" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-colors">
         Vissza a vezérlőpultra
       </RouterLink>

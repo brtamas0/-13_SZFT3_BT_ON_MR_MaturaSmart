@@ -259,7 +259,7 @@ const executeDelete = async () => {
                                 
                                 <span class="font-medium" :class="topic.type === 'test' ? 'text-yellow-400' : 'text-gray-200'">
                                     {{ topic.title }}
-                                    <span v-if="topic.type === 'test'" class="text-[10px] uppercase bg-yellow-900/40 text-yellow-500 px-2 rounded ml-2 border border-yellow-700/50">Témazáró</span>
+                                    <span v-if="topic.type === 'test'" class="text-[10px] uppercase bg-yellow-900/40 text-yellow-500 px-2 rounded ml-2 border border-yellow-700/50">Teszt</span>
                                 </span>
                                 <span class="text-xs text-gray-500 bg-gray-800 px-2 rounded">{{ topic.xp }} XP</span>
                             </div>
@@ -273,7 +273,7 @@ const executeDelete = async () => {
                     <div class="mt-4 flex gap-2 pl-4 border-l-2 border-gray-700 ml-2">
                         <select v-model="unit.newTopicType" class="bg-[#0b102e] border border-gray-700 rounded-lg px-2 py-2 text-sm text-white focus:border-blue-500 outline-none">
                             <option value="lesson">📄 Lecke</option>
-                            <option value="test">📝 Témazáró</option>
+                            <option value="test">📝 Teszt</option>
                         </select>
                         <input v-model="unit.newTopicTitle" placeholder="Cím..." class="bg-[#0b102e] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex-1 focus:border-blue-500 outline-none" @keyup.enter="addTopic(unit)" />
                         <button @click="addTopic(unit)" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Hozzáadás</button>
@@ -407,7 +407,7 @@ const executeDelete = async () => {
                 
                 <div v-else class="p-4 bg-yellow-900/10 border border-yellow-700/30 rounded-lg text-yellow-500 text-sm flex gap-3">
                     <span class="text-xl">ℹ️</span>
-                    <p>Témazáró esetén az XP-t a feladatok pontszámai határozzák meg automatikusan. Az időkorlátot és a küszöböt a <strong>📝 Vizsgafeladatok</strong> fülön, a felső sávban állíthatod be!</p>
+                    <p>Teszt esetén az XP-t a feladatok pontszámai határozzák meg automatikusan. Az időkorlátot és a küszöböt a <strong>📝 Vizsgafeladatok</strong> fülön, a felső sávban állíthatod be!</p>
                 </div>
             </div>
         </div>
