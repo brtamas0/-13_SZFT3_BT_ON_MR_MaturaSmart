@@ -139,17 +139,17 @@ onMounted(() => {
                 </div>
 
                 <div class="space-y-1">
-                    <div class="flex justify-between ml-1">
-                        <label class="text-xs font-bold uppercase text-slate-500">Jelszó</label>
-                        <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300">Elfelejtetted?</a>
-                    </div>
-                    <input 
-                        v-model="password"
-                        type="password" 
-                        placeholder="••••••••"
-                        class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
-                        required
-                    >
+                  <input 
+                  v-model="password"
+                  type="password" 
+                  placeholder="••••••••"
+                  class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                  required
+                  >
+                  <div class="flex justify-between ml-1">
+                      <label class="text-xs font-bold uppercase text-slate-500">Jelszó</label>
+                      <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300">Elfelejtetted?</a>
+                </div>
                 </div>
 
                 <button 
