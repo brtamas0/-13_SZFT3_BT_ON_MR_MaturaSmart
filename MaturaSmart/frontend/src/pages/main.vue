@@ -99,7 +99,7 @@ onUnmounted(() => {
               Már csak ennyi időd van felkészülni az írásbelire:
             </p>
             
-            <div class="flex gap-4">
+            <div class="flex gap-4 md:justify-start sm:justify-center">
               <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px]">
                 <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.days }}</div>
                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Nap</div>
