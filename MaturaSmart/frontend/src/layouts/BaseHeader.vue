@@ -193,7 +193,6 @@ watch(() => route.path, () => {
 
         <template v-else>
           <RouterLink to="/main" class="nav-link" :class="{ 'active': route.path === '/main' }">Vezérlőpult</RouterLink>
-          <RouterLink to="/calendar" class="nav-link" :class="{ 'active': route.path === '/calendar' }">Naptár 📅</RouterLink>
           <RouterLink to="/leaderboard" class="nav-link" :class="{ 'active': route.path === '/leaderboard' }">Ranglista 🏆</RouterLink>
         </template>
       </nav>
