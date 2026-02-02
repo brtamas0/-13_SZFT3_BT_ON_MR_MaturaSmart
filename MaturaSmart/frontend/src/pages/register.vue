@@ -20,7 +20,7 @@ const handleRegister = async () => {
   errorMessage.value = ''
 
   try {
-    const response = await fetch('http://backend.vm1.test/api/register', {
+    const response = await fetch('http://backend.maturasmart.hu/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ const handleConfirm = async () => {
   const token = localStorage.getItem('token')
   
   try {
-    const res = await fetch('http://backend.vm1.test/api/admin/verify-password', {
+    const res = await fetch('http://backend.maturasmart.hu/api/admin/verify-password', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',

@@ -8,9 +8,63 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'full_name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'password' => null,
+                    'avatar_url' => $googleUser->getAvatar(),
+                    'role' => 'student',
+                    'xp' => 0,
+                    'level' => 1,
+                ]);
+            } else {
+                // LÉTEZŐ FELHASZNÁLÓ FRISSÍTÉSE
+                // Ha eddig simán regisztrált, most összekötjük a Google fiókkal
+                $updateData = [];
+                if (!$user->google_id) {
+                    $updateData['google_id'] = $googleUser->getId();
+                }
+                if (!$user->avatar_url) {
+                    $updateData['avatar_url'] = $googleUser->getAvatar();
+                }
+                
+                if (!empty($updateData)) {
+                    $user->update($updateData);
+                }
+            }
+
+            // Token generálás a belépéshez
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Visszairányítás a Frontend oldalra a tokennel az URL-ben
+            $frontendUrl = env('FRONTEND_URL', 'http://maturasmart.hu') . "/google-callback";
+
+            // A user objektumot JSON stringgé alakítjuk és kódoljuk
+            $userData = urlencode(json_encode($user));
+            
+            return redirect("{$frontendUrl}?token={$token}&user={$userData}");
+
+        } catch (\Exception $e) {
+            // Hiba esetén visszaküldjük a login oldalra
+            return redirect("http://maturasmart.hu/login?error=google_login_failed");
+        }
+    }
     public function login(Request $request)
     {
         $request->validate([

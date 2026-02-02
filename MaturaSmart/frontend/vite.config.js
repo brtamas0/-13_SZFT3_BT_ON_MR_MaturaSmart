@@ -20,7 +20,8 @@ export default ({ mode }) => {
     ],
     server: {
       host: true,
-      allowedHosts: [process.env.VITE_FRONTEND_URL ?? 'localhost']
+      // allowedHosts: [process.env.VITE_FRONTEND_URL ?? 'localhost']
+      allowedHosts: ['maturasmart.hu', 'www.maturasmart.hu']
     },
     resolve: {
       alias: {

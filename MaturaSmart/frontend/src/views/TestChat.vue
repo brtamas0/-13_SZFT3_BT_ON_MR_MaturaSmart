@@ -56,7 +56,7 @@ const sendMessage = async () => {
   }))
 
   try {
-    const res = await fetch('http://backend.vm1.test/api/ask-axel', {
+    const res = await fetch('http://backend.maturasmart.hu/api/ask-axel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

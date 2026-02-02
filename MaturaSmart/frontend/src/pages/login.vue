@@ -10,7 +10,7 @@ const isDark = ref(true)
 const errorMessage = ref('')
 
 const handleGoogleLogin = () => {
-  window.location.href = 'http://backend.vm1.test/auth/google/redirect'
+  window.location.href = 'http://backend.maturasmart.hu/auth/google/redirect'
 }
 
 const handleEmailLogin = async () => {
@@ -18,7 +18,7 @@ const handleEmailLogin = async () => {
   errorMessage.value = ''
 
   try {
-    const response = await fetch('http://backend.vm1.test/api/login', {
+    const response = await fetch('http://backend.maturasmart.hu/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

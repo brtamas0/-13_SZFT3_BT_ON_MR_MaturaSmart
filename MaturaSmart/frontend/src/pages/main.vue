@@ -47,7 +47,7 @@ onMounted(async () => {
   timerInterval = setInterval(updateCountdown, 60000)
 
   try {
-    const response = await fetch('http://backend.vm1.test/api/dashboard', {
+    const response = await fetch('http://backend.maturasmart.hu/api/dashboard', {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     })
     

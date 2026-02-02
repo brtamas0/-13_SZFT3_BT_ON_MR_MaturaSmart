@@ -20,7 +20,7 @@ onMounted(async () => {
   const token = localStorage.getItem('token')
   
   try {
-    const response = await fetch('http://backend.vm1.test/api/leaderboard', {
+    const response = await fetch('http://backend.maturasmart.hu/api/leaderboard', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     const data = await response.json()

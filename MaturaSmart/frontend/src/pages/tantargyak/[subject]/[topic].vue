@@ -121,7 +121,7 @@ const handleTestCompletion = async (payload) => {
     isSubmitting.value = true
     
     try {
-        const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
+        const response = await fetch('http://backend.maturasmart.hu/api/gamification/complete-topic', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ 
@@ -163,7 +163,7 @@ const finishLesson = async () => {
   const answersPayload = {}
   Object.keys(selectedAnswers.value).forEach(qId => answersPayload[qId] = selectedAnswers.value[qId].id)
   try {
-    const response = await fetch('http://backend.vm1.test/api/gamification/complete-topic', {
+    const response = await fetch('http://backend.maturasmart.hu/api/gamification/complete-topic', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ topic_id: topic.value.id, answers: answersPayload })

@@ -15,7 +15,7 @@ const fetchUsers = async () => {
     const token = localStorage.getItem('token')
 
     try {
-        const res = await fetch('http://backend.vm1.test/api/admin/users', {
+        const res = await fetch('http://backend.maturasmart.hu/api/admin/users', {
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'

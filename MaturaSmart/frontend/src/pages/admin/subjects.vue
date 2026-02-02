@@ -27,7 +27,7 @@ const fetchSubjects = async () => {
     const token = localStorage.getItem('token')
     
     try {
-        const res = await fetch('http://backend.vm1.test/api/admin/subjects', {
+        const res = await fetch('http://backend.maturasmart.hu/api/admin/subjects', {
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -51,7 +51,7 @@ const createSubject = async () => {
 
     const token = localStorage.getItem('token')
     try {
-        const res = await fetch('http://backend.vm1.test/api/admin/subjects', {
+        const res = await fetch('http://backend.maturasmart.hu/api/admin/subjects', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json', 

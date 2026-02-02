@@ -62,7 +62,7 @@ const fetchProfile = async () => {
           formName.value = user.value.full_name
       }
 
-      const res = await fetch('http://backend.vm1.test/api/profile', {
+      const res = await fetch('http://backend.maturasmart.hu/api/profile', {
          headers: { 'Authorization': `Bearer ${token}` }
       })
       if (res.ok) {
@@ -83,16 +83,19 @@ const updateProfile = async () => {
   profileMessage.value = { text: '', type: '' }
 
   try {
-    const response = await fetch('http://backend.vm1.test/api/profile/update', {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({ full_name: formName.value })
-    })
-
+    // ...
+const response = await fetch('http://backend.maturasmart.hu/api/profile/update', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  body: JSON.stringify({ 
+      full_name: formName.value,
+      email: user.value.email 
+  })
+})
     const data = await response.json()
 
     if (!response.ok) throw new Error(data.message || 'Hiba történt.')
@@ -123,7 +126,7 @@ const updatePassword = async () => {
     }
 
     try {
-        const response = await fetch('http://backend.vm1.test/api/profile/password', {
+        const response = await fetch('http://backend.maturasmart.hu/api/profile/password', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { setTitle } from '@/router/guards/SetTitleGuard.mjs'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
+import GoogleCallback from '@/pages/GoogleCallback.vue'
 
 const customRoutes = [
   // PUBLIKUS OLDALAK
@@ -21,6 +22,10 @@ const customRoutes = [
     name: 'Register',
     component: () => import('@/pages/register.vue'),
     meta: { title: 'Regisztráció' }
+  },
+  {
+    path: '/google-callback',
+    component: GoogleCallback
   },
 
   // VÉDETT OLDALAK (Diák nézet)

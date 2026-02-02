@@ -60,6 +60,11 @@ services:
     image: nginx:1.29.0-alpine3.22
     depends_on:
      - backend
+    
+    extra_hosts:
+      - "maturasmart.hu:host-gateway"
+      - "backend.maturasmart.hu:host-gateway"
+      
     networks:
      - fullstack
     volumes:

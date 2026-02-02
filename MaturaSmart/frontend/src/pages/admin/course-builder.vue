@@ -195,7 +195,7 @@ const onDragEnd = async (unit) => {
     
     const token = localStorage.getItem('token')
     try {
-        await fetch('http://backend.vm1.test/api/admin/topics/reorder', {
+        await fetch('http://backend.maturasmart.hu/api/admin/topics/reorder', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json', 

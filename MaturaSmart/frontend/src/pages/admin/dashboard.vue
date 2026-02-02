@@ -7,7 +7,7 @@ const loading = ref(true)
 onMounted(async () => {
     const token = localStorage.getItem('token')
     try {
-        const res = await fetch('http://backend.vm1.test/api/admin/stats', {
+        const res = await fetch('http://backend.maturasmart.hu/api/admin/stats', {
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
