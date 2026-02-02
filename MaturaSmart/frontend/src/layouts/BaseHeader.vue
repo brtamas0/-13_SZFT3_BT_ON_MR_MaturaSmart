@@ -124,7 +124,7 @@ watch(() => route.path, () => {
     <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between gap-4">
 
       <RouterLink
-        to="/"
+        to="/main"
         class="text-2xl font-bold tracking-wide shrink-0"
         :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
       >
