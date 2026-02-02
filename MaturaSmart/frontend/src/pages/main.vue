@@ -109,8 +109,8 @@ onUnmounted(() => {
                 <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.hours }}</div>
                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Óra</div>
               </div>
-              <div class="text-2xl font-light text-slate-600 self-center hidden sm:block">:</div>
-              <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px] hidden sm:block">
+              <div class="text-2xl font-light text-slate-600 self-center">:</div>
+              <div class="bg-[#0b102e]/60 backdrop-blur border border-white/10 rounded-2xl p-4 text-center min-w-[80px]">
                 <div class="text-2xl md:text-3xl font-black text-white">{{ remaining.minutes }}</div>
                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Perc</div>
               </div>
