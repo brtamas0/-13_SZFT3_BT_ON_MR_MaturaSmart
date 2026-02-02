@@ -247,6 +247,16 @@ watch(() => route.path, () => {
           >
             Kilépés
           </button>
+
+          <button 
+          v-if="user.role === 'admin'" @click="$router.push('/admin')" class="hidden lg:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer text-sm" 
+          :class="theme === 'dark'
+              ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
+              : 'bg-red-100 text-red-600 hover:bg-red-200'"
+          title="Admin felület"
+          >
+            Admin
+          </button>
         </template>
 
         <button
