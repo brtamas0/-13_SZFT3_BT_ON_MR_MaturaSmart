@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { setTitle } from '@/router/guards/SetTitleGuard.mjs'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
 import GoogleCallback from '@/pages/GoogleCallback.vue'
+import ForgotPassword from '../pages/forgotpassword.vue'
 
 const customRoutes = [
   // PUBLIKUS OLDALAK
@@ -27,44 +28,49 @@ const customRoutes = [
     path: '/google-callback',
     component: GoogleCallback
   },
+  {
+    path: '/forgot-password',
+    name: 'forgotpassword',
+    component: ForgotPassword
+  },
 
   // VÉDETT OLDALAK (Diák nézet)
   {
     path: '/main',
     name: 'Main',
     component: () => import('@/pages/main.vue'),
-    meta: { 
-        requiresAuth: true,
-        title: 'Vezérlőpult'
+    meta: {
+      requiresAuth: true,
+      title: 'Vezérlőpult'
     }
   },
   {
     path: '/profile',
     name: 'Profile',
     component: () => import('@/pages/profile.vue'),
-    meta: { 
-        requiresAuth: true,
-        title: 'Profilom' 
+    meta: {
+      requiresAuth: true,
+      title: 'Profilom'
     }
   },
   {
-    path: '/ranglista', 
+    path: '/ranglista',
     name: 'Leaderboard',
     component: () => import('@/pages/leaderboard.vue'),
-    meta: { 
-        requiresAuth: true,
-        title: 'Ranglista' 
+    meta: {
+      requiresAuth: true,
+      title: 'Ranglista'
     }
   },
 
   // ADMIN
   {
     path: '/admin',
-    component: () => import('@/layouts/AdminLayout.vue'), 
-    meta: { 
-        requiresAuth: true, 
-        requiresAdmin: true, // Csak admin léphet be
-        title: 'Adminisztráció'
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true, // Csak admin léphet be
+      title: 'Adminisztráció'
     },
     children: [
       {
@@ -94,7 +100,7 @@ const customRoutes = [
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [...customRoutes, ...autoRoutes], 
+  routes: [...customRoutes, ...autoRoutes],
 
   scrollBehavior(to) {
     if (to.hash) {
@@ -110,7 +116,7 @@ router.beforeEach(setTitle)
 // AUTH guard
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  
+
   let user = {}
   try {
     user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -123,10 +129,10 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !token) {
     return next('/login')
   }
-  
+
   // 2. Ha ADMIN jog kell, de a user NEM admin -> Vissza a főoldalra
   if (to.meta.requiresAdmin && user.role !== 'admin') {
-    return next('/main') 
+    return next('/main')
   }
 
   next()
