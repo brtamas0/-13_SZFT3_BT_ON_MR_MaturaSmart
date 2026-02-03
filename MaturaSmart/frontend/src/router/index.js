@@ -3,6 +3,7 @@ import { setTitle } from '@/router/guards/SetTitleGuard.mjs'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
 import GoogleCallback from '@/pages/GoogleCallback.vue'
 import ForgotPassword from '../pages/forgotpassword.vue'
+import ResetPassword from '../pages/resetpassword.vue'
 
 const customRoutes = [
   // PUBLIKUS OLDALAK
@@ -33,6 +34,13 @@ const customRoutes = [
     name: 'forgotpassword',
     component: ForgotPassword
   },
+
+{
+    // A :token --> URL-ben ott egy változó lesz
+    path: '/reset-password/:token',
+    name: 'ResetPassword',
+    component: ResetPassword
+},
 
   // VÉDETT OLDALAK (Diák nézet)
   {

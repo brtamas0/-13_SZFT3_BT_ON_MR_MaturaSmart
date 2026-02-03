@@ -233,4 +233,39 @@ class AuthController extends Controller
             'message' => 'Nem sikerült elküldeni az emailt. Próbáld újra később.'
         ], 500);
     }
+
+    public function resetPassword(Request $request)
+    {
+        // Validálás
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+                //kiléptetjük az összes eszközről
+                $user->tokens()->delete(); 
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'A jelszavad sikeresen megváltozott! Most már beléphetsz.'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Hiba történt. Lehet, hogy a link lejárt vagy érvénytelen.'
+        ], 400);
+    }
 }

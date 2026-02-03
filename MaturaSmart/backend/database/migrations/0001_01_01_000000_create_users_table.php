@@ -14,6 +14,7 @@ return new class extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->string('password')->nullable(); // Nullable a Google login miatt
+            $table->rememberToken(); 
             $table->string('full_name');
             $table->string('google_id')->nullable()->unique();
             $table->string('avatar_url')->nullable();
