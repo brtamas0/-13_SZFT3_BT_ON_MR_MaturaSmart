@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'streak_start' => 'datetime',
         'last_activity' => 'datetime',
+        
     ];
 
     public function settings()
@@ -46,5 +47,41 @@ class User extends Authenticatable
         return $this->belongsToMany(Achievement::class, 'user_achievements')
             ->withPivot('earned_at');
     }
-    
+
+    public function updateStreak()
+    {
+        $now = now();
+        $lastActivity = $this->last_activity;
+
+        if (!$lastActivity) {
+            $this->update([
+                'current_streak' => 1,
+                'streak_start' => $now,
+                'last_activity' => $now,
+            ]);
+            return;
+        }
+
+        if ($lastActivity->isSameDay($now)) {
+            $this->update(['last_activity' => $now]);
+            return;
+        }
+
+        if ($lastActivity->isYesterday()) {
+            $this->update([
+                'current_streak' => $this->current_streak + 1,
+                'last_activity' => $now,
+            ]);
+            return;
+        }
+
+        if ($lastActivity->lt($now->subDay())) {
+            $this->update([
+                'lost_streak' => $this->lost_streak + 1,
+                'current_streak' => 1,
+                'streak_start' => $now,
+                'last_activity' => $now,
+            ]);
+        }
+    }
 }
