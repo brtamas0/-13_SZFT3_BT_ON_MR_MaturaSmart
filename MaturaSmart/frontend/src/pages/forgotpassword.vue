@@ -1,13 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const email = ref('')
 const isLoading = ref(false)
+const isDark = ref(true) 
+
+const toggleTheme = () => {
+  const html = document.documentElement
+  const currentTheme = html.getAttribute('data-theme')
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+  
+  html.setAttribute('data-theme', newTheme)
+  localStorage.setItem('theme', newTheme)
+  isDark.value = newTheme === 'dark'
+}
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme') || 'dark'
+  document.documentElement.setAttribute('data-theme', saved)
+  isDark.value = saved === 'dark'
+})
 </script>
 
 <template>
+    <div class="...">
+    <button 
+      @click="toggleTheme" 
+      class="absolute top-5 right-5 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all cursor-pointer border border-white/5 shadow-lg"
+      title="Téma váltása"
+    >
+      <span v-if="isDark">🌓</span> <span v-else>☀️</span>
+    </button>
+    
+    </div>
   <div class="min-h-screen bg-[#020617] flex items-center justify-center text-white relative overflow-hidden p-4 font-sans">
     <div class="relative w-full max-w-5xl z-10">
       <div class="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-[#020617]">
