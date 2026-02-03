@@ -9,20 +9,28 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    // 1. Google Login indítása
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
+
+    // 2. Google Visszatérés kezelése
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+            
+            // Van ilyen email címmel user?
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
+                // Nincs: Létrehozzuk
                 $user = User::create([
                     'full_name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -34,9 +42,9 @@ class AuthController extends Controller
                     'level' => 1,
                 ]);
             } else {
-                // LÉTEZŐ FELHASZNÁLÓ FRISSÍTÉSE
-                // Ha eddig simán regisztrált, most összekötjük a Google fiókkal
+                // HA VAN: Frissítjük az adatokat (Összekötés)
                 $updateData = [];
+                
                 if (!$user->google_id) {
                     $updateData['google_id'] = $googleUser->getId();
                 }
@@ -49,13 +57,13 @@ class AuthController extends Controller
                 }
             }
 
-            // Token generálás a belépéshez
+            // Token generálás a belépéshez (Sanctum)
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // Visszairányítás a Frontend oldalra a tokennel az URL-ben
+            // Visszairányítás a Frontend oldalra (Vue)
             $frontendUrl = env('FRONTEND_URL', 'http://maturasmart.hu') . "/google-callback";
 
-            // A user objektumot JSON stringgé alakítjuk és kódoljuk
+            // A user adatokat átadjuk az URL-ben --> frontend tudja ki lépett be
             $userData = urlencode(json_encode($user));
             
             return redirect("{$frontendUrl}?token={$token}&user={$userData}");
@@ -65,6 +73,8 @@ class AuthController extends Controller
             return redirect("http://maturasmart.hu/login?error=google_login_failed");
         }
     }
+
+    // 3. Sima Login
     public function login(Request $request)
     {
         $request->validate([
@@ -80,6 +90,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->firstOrFail();
         
+        // Régi tokenek törlése
         $user->tokens()->delete();
         
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -91,12 +102,14 @@ class AuthController extends Controller
         ]);
     }
     
+    // 4. Kijelentkezés
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
 
+    // 5. Sima Regisztráció
     public function register(Request $request)
     {
         $fields = $request->validate([
@@ -107,10 +120,12 @@ class AuthController extends Controller
                 function ($attribute, $value, $fail) {
                     $cleanName = Str::squish($value);
                     
+                    // Csak betűk és pont (pl. Dr. Kiss)
                     if (!preg_match('/^[\p{L}\s\.]+$/u', $cleanName)) {
                         $fail('A név csak betűket tartalmazhat!');
                     }
 
+                    // Legalább két szó legyen (Vezetéknév Keresztnév)
                     if (!str_contains($cleanName, ' ')) {
                         $fail('Kérlek add meg a teljes nevedet (legalább 2 szó)!');
                     }
@@ -138,12 +153,15 @@ class AuthController extends Controller
         ], 201);
     }
 
+    // 6. Profil Frissítés (Név)
     public function updateProfile(Request $request)
     {
         $user = $request->user();
         
+        // Rate Limiting: userenként külön kulcs
         $key = 'profile-update:' . $user->id;
 
+        // Ha túl sokat próbálkozott (pl. 1 percen belül többször)
         if (RateLimiter::tooManyAttempts($key, 1)) {
             $seconds = RateLimiter::availableIn($key);
             $minutes = ceil($seconds / 60);
@@ -175,12 +193,44 @@ class AuthController extends Controller
         $user->update([
             'full_name' => Str::squish($request->full_name)
         ]);
-        // Limitáljuk a profil frissítést 5 percenként egy alkalomra
+        
+        // Sikeres frissítés után beállítjuk az időkorlátot (5 perc)
         RateLimiter::hit($key, 5 * 60);
 
         return response()->json([
             'message' => 'Profil sikeresen frissítve!',
             'user' => $user
         ]);
+    }
+    // 7. Jelszó Emlékeztető Küldése
+    public function sendResetLink(Request $request)
+    {
+        // Validálás: kötelező az email, és léteznie kell a users táblában
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'email', 'exists:users,email'],
+        ], [
+            'email.exists' => 'Ezzel az email címmel nincs regisztrált felhasználó.',
+            'email.required' => 'Az email mező kötelező.',
+            'email.email' => 'Helytelen email formátum.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        // A Laravel beépített jelszókezelőjét használjuk
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Az emlékeztető emailt elküldtük!'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Nem sikerült elküldeni az emailt. Próbáld újra később.'
+        ], 500);
     }
 }
