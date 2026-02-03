@@ -43,10 +43,7 @@ class User extends Authenticatable
     public function achievements()
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')
-                    ->withPivot('earned_at');
+            ->withPivot('earned_at');
     }
-    public function sendPasswordResetNotification($token)
-{
-    $this->notify(new ResetPasswordNotification($token));
-}
+    
 }

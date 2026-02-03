@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,10 +20,15 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
-        return env('FRONTEND_URL', 'http://maturasmart.hu') . "/reset-password/{$token}?email={$notifiable->getEmailForPasswordReset()}";
-    });
-}
+    {
+        ResetPassword::toMailUsing(function ($notifiable, $token) {
+            
+            $frontendUrl = env('FRONTEND_URL', 'http://maturasmart.hu');
+            $url = "{$frontendUrl}/reset-password/{$token}?email={$notifiable->getEmailForPasswordReset()}";
+            return (new MailMessage)
+                ->subject('Jelszó visszaállítása - MaturaSmart')
+                ->view('emails.reset-password', ['url' => $url]);
+        });
+    }
 }
 
