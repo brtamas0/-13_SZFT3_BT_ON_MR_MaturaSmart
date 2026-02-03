@@ -87,12 +87,12 @@ const isSubmitting = computed(() => isThinking.value)
 </script>
 
 <template>
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans">
+  <div class="fixed bottom-6 right-6 flex flex-col items-end gap-4 font-sans z-50">
     
     <transition name="slide-up">
       <div v-if="isOpen" class="relative bg-[#1e293b] border border-blue-500/30 w-[350px] md:w-[400px] h-[500px] rounded-2xl shadow-2xl flex flex-col overflow-visible ring-1 ring-white/10">
         
-        <div class="absolute -top-24 -left-6 z-50 pointer-events-none drop-shadow-2xl filter animate-float">
+        <div class="absolute -top-24 -left-6 pointer-events-none drop-shadow-2xl filter animate-float">
             <img 
                 :src="axelAvatar" 
                 class="w-32 h-32 object-contain transition-transform duration-300"
@@ -159,7 +159,7 @@ const isSubmitting = computed(() => isThinking.value)
             </button>
           </form>
           <div class="text-[10px] text-gray-600 text-center mt-2">
-            Axel is tévedhet.
+            Néha Axel is tévedhet. Használd saját felelősségre.
           </div>
         </div>
 

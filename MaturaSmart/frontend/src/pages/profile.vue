@@ -170,16 +170,22 @@ const updatePassword = async () => {
         </div>
     </div>
 
-    <div v-else-if="user" class="min-h-screen bg-[#020617] pb-20 overflow-hidden relative">
+    <div v-else-if="user" class="min-h-screen pb-20 overflow-hidden relative bg-gradient-to-b from-[#0b1029] to-[#031625]">
       
-      <div class="fixed inset-0 z-0 pointer-events-none opacity-20" style="background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 50px 50px;"></div>
+      <div class="absolute inset-0 bg-[#020617]" 
+           style="mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%); pointer-events: none;">
+      </div>
 
-      <div class="relative h-64 w-full bg-gradient-to-r from-blue-900 to-[#0b1029] overflow-hidden border-b border-white/5">
+      <div class="fixed inset-0 z-0 pointer-events-none opacity-20" 
+           style="background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(circle, black 30%, transparent 80%);">
+      </div>
+
+      <div class="relative h-64 w-full bg-gradient-to-r from-blue-900/80 to-[#0b1029]/80 overflow-hidden border-b border-white/5 z-10">
           <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
           <div class="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-[100px]"></div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-24">
           
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
@@ -190,7 +196,9 @@ const updatePassword = async () => {
                     <div class="relative inline-block mb-6">
                         <div class="w-40 h-40 rounded-full p-1 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 shadow-[0_0_40px_rgba(59,130,246,0.3)] group-hover:shadow-[0_0_60px_rgba(59,130,246,0.5)] transition-all duration-500">
                             <div class="w-full h-full rounded-full bg-[#0f172a] flex items-center justify-center text-6xl font-black text-white overflow-hidden relative">
-                                {{ user.full_name?.charAt(0).toUpperCase() }}
+                                <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" alt="Avatar">
+                                <span v-else>{{ user.full_name?.charAt(0).toUpperCase() }}</span>
+                                
                                 <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </div>
                         </div>
