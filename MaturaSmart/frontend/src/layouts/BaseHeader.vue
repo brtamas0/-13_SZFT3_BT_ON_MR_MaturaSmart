@@ -1,5 +1,4 @@
 <script setup>
-import Users from "@pages/admin/users.vue"
 import { ref, onMounted, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 
@@ -24,7 +23,6 @@ const showResults = ref(false)
 const isSearching = ref(false)
 let searchTimeout = null
 
-// --- ÉLETCIKLUS ---
 onMounted(() => {
   const savedTheme = localStorage.getItem("theme") || "dark"
   theme.value = savedTheme
@@ -47,8 +45,6 @@ onMounted(() => {
   })
 })
 
-// --- METÓDUSOK ---
-
 const toggleTheme = () => {
   const next = theme.value === "dark" ? "light" : "dark"
   theme.value = next
@@ -67,9 +63,8 @@ const handleLogout = () => {
   router.push("/login")
 }
 
-// --- KERESŐ LOGIKA (Clean Code) ---
+// --- KERESŐ ---
 
-// 1. Debounce (Késleltetés): Csak akkor indít keresést, ha abbahagytad a gépelést
 const handleSearchInput = () => {
   if (searchTimeout) clearTimeout(searchTimeout)
 
@@ -81,11 +76,9 @@ const handleSearchInput = () => {
 
   isSearching.value = true
   
-  // 300ms várakozás
   searchTimeout = setTimeout(async () => {
     try {
       const token = localStorage.getItem('token')
-      // API Hívás
       const response = await fetch(`http://backend.vm1.test/api/search?q=${searchQuery.value}`, {
          headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -100,7 +93,6 @@ const handleSearchInput = () => {
   }, 300)
 }
 
-// 2. Találat kiválasztása
 const selectResult = (url) => {
   router.push(url)
   searchQuery.value = ""
@@ -108,7 +100,6 @@ const selectResult = (url) => {
   mobileOpen.value = false
 }
 
-// Útvonal váltáskor zárjon be mindent
 watch(() => route.path, () => {
   mobileOpen.value = false
   showResults.value = false
@@ -122,19 +113,41 @@ watch(() => route.path, () => {
       ? 'bg-[#0b102e]/80 border-white/10'
       : 'bg-white/80 border-black/10'"
   >
-    <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between gap-4">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
 
-      <RouterLink
-        to="/main"
-        class="text-2xl font-bold tracking-wide shrink-0"
-        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
-      >
-        Matura<span class="accent-text">Smart</span>
-      </RouterLink>
+      <div class="flex items-center gap-6 lg:gap-8 shrink-0">
+          
+          <RouterLink
+            to="/main"
+            class="text-2xl font-bold tracking-wide flex items-center gap-2"
+            :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+          >
+            Matura<span class="accent-text">Smart</span>
+          </RouterLink>
 
-      <div v-if="props.mode !== 'landing'" class="hidden md:block flex-1 max-w-md relative search-container mx-4">
-          <div class="relative">
-             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+          <div v-if="props.mode !== 'landing'" class="hidden lg:block h-6 w-px bg-white/10"></div>
+
+          <nav v-if="props.mode !== 'landing'" class="hidden lg:flex items-center gap-6">
+            <RouterLink to="/main" class="nav-link flex items-center gap-2 text-sm font-medium opacity-70 hover:opacity-100" :class="{ 'active opacity-100': route.path === '/main' }">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                Főoldal
+            </RouterLink>
+            <RouterLink to="/leaderboard" class="nav-link flex items-center gap-2 text-sm font-medium opacity-70 hover:opacity-100" :class="{ 'active opacity-100': route.path === '/leaderboard' }">
+                <span>🏆</span> Ranglista
+            </RouterLink>
+          </nav>
+           
+           <nav v-else class="hidden lg:flex items-center gap-6 text-sm font-medium">
+             <a @click.prevent="scrollToId('home')" class="nav-item cursor-pointer">Kezdőlap</a>
+             <a @click.prevent="scrollToId('features')" class="nav-item cursor-pointer">Funkciók</a>
+           </nav>
+      </div>
+
+      <div v-if="props.mode !== 'landing'" class="hidden md:block flex-1 max-w-xl relative search-container px-4">
+          <div class="relative group">
+             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500 group-focus-within:text-blue-400 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
@@ -144,11 +157,11 @@ watch(() => route.path, () => {
                 @input="handleSearchInput"
                 @focus="showResults = searchQuery.length >= 2"
                 type="text" 
-                class="w-full pl-10 pr-4 py-2 rounded-xl text-sm transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full pl-11 pr-4 py-2.5 rounded-xl text-sm transition-all border outline-none"
                 :class="theme === 'dark' 
-                   ? 'bg-[#1a1f40] border-white/10 text-white placeholder-gray-400' 
-                   : 'bg-gray-100 border-gray-200 text-gray-800 placeholder-gray-500'"
-                placeholder="Keresés tantárgyak, leckék között..."
+                   ? 'bg-[#1a1f40] border-white/10 text-white placeholder-gray-500 focus:bg-[#1e293b] focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10' 
+                   : 'bg-gray-100 border-gray-200 text-gray-800 placeholder-gray-500 focus:bg-white focus:border-blue-500'"
+                placeholder="Keress tantárgyat, témakört..."
              >
              <div v-if="isSearching" class="absolute inset-y-0 right-0 flex items-center pr-3">
                 <svg class="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -156,7 +169,7 @@ watch(() => route.path, () => {
           </div>
 
           <div v-if="showResults && searchResults.length > 0" 
-               class="absolute mt-2 w-full rounded-xl shadow-2xl overflow-hidden z-50 border"
+               class="absolute mt-2 w-[calc(100%-2rem)] left-4 rounded-xl shadow-2xl overflow-hidden z-50 border"
                :class="theme === 'dark' ? 'bg-[#1e293b] border-white/10' : 'bg-white border-gray-200'"
           >
              <ul class="max-h-80 overflow-y-auto">
@@ -167,51 +180,33 @@ watch(() => route.path, () => {
                    >
                       <span class="text-xl">{{ item.icon || (item.type === 'subject' ? '📘' : '📄') }}</span>
                       <div>
-                         <div class="text-sm font-bold">{{ item.title }}</div>
-                         <div class="text-[10px] uppercase font-bold opacity-60">{{ item.type === 'subject' ? 'Tantárgy' : 'Lecke' }}</div>
+                          <div class="text-sm font-bold">{{ item.title }}</div>
+                          <div class="text-[10px] uppercase font-bold opacity-60">{{ item.type === 'subject' ? 'Tantárgy' : 'Lecke' }}</div>
                       </div>
                    </button>
                 </li>
              </ul>
           </div>
-          
-          <div v-if="showResults && searchResults.length === 0 && !isSearching" 
-               class="absolute mt-2 w-full p-4 text-center text-sm rounded-xl shadow-xl border"
-               :class="theme === 'dark' ? 'bg-[#1e293b] border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'"
-          >
-             Nincs találat erre: "{{ searchQuery }}"
-          </div>
       </div>
+      <div v-else class="flex-1"></div>
 
-      <nav class="hidden lg:flex items-center gap-4 lg:gap-8 shrink-0">
 
-        <template v-if="props.mode === 'landing'">
-          <a @click.prevent="scrollToId('home')" class="nav-item" style="color: var(--accent); font-weight: 600;">Kezdőlap</a>
-          <a @click.prevent="scrollToId('features')" class="nav-item">Funkciók</a>
-          <a @click.prevent="scrollToId('mission')" class="nav-item">Célunk</a>
-          <a @click.prevent="scrollToId('faq')" class="nav-item">GYIK</a>
-        </template>
-
-        <template v-else>
-          <RouterLink to="/main" class="nav-link" :class="{ 'active': route.path === '/main' }">Vezérlőpult</RouterLink>
-          <RouterLink to="/leaderboard" class="nav-link" :class="{ 'active': route.path === '/leaderboard' }">Ranglista 🏆</RouterLink>
-        </template>
-      </nav>
-
-      <div class="flex items-center gap-4 shrink-0">
+      <div class="flex items-center gap-3 lg:gap-4 shrink-0">
 
         <button
           @click="toggleTheme"
-          class="text-xl hover:opacity-80 transition theme-btn"
-          :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+          class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-white/10"
+          :style="{ color: theme === 'dark' ? '#94a3b8' : '#64748b' }"
+          title="Téma váltása"
         >
-          🌓
+          <span v-if="theme==='dark'">🌙</span>
+          <span v-else>☀️</span>
         </button>
 
         <template v-if="props.mode === 'landing'">
           <RouterLink
             to="/login"
-            class="px-4 py-2 rounded-xl font-semibold shadow-md transition text-sm"
+            class="px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition hover:scale-105 text-sm"
             style="background: var(--accent); color: black;"
           >
             Belépés
@@ -220,57 +215,56 @@ watch(() => route.path, () => {
 
         <template v-else>
           <div
-            class="hidden sm:flex px-4 py-2 rounded-2xl shadow-lg text-sm items-center gap-2"
-            :style="theme === 'dark'
-              ? 'background: rgba(0,0,0,0.4); color: white;'
-              : 'background: rgba(0,0,0,0.05); color: #333;'"
+            class="hidden sm:flex px-3 py-1.5 rounded-lg text-xs font-bold items-center gap-1.5 border"
+            :class="theme === 'dark' ? 'bg-orange-500/10 border-orange-500/20 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600'"
           >
-            🔥 <span>{{ user.current_streak }}</span> <!-- később streak változó kell ide-->
+            🔥 <span>{{ user.current_streak || 0 }}</span>
           </div>
 
-          <RouterLink
-            to="/profile"
-            class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:scale-105 transition-transform overflow-hidden"
-            :style="user.avatar_url 
-              ? 'border: 2px solid #0b1029;' 
-              : 'background: linear-gradient(to bottom right, #2563eb, #4f46e5); border: 2px solid #0b1029;'"
-          >
-            <img 
-              v-if="user.avatar_url" 
-              :src="user.avatar_url" 
-              alt="Profil" 
-              class="w-full h-full object-cover"
-            />
-            
-            <span v-else>
-              {{ user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U' }}
-            </span>
-          </RouterLink>
-
-          <button
-            @click="handleLogout"
-            class="hidden lg:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer text-sm"
-            :class="theme === 'dark'
-              ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
-              : 'bg-red-100 text-red-600 hover:bg-red-200'"
-            title="Kijelentkezés"
-          >
-            Kilépés
-          </button>
-
           <button 
-          v-if="user.role === 'admin'" @click="$router.push('/admin')" class="hidden lg:flex items-center justify-center px-4 py-2 rounded-xl transition shadow-md font-medium cursor-pointer text-sm" 
+          v-if="user.role === 'admin'" @click="$router.push('/admin')" 
+          class="hidden lg:flex items-center justify-center px-3 py-1.5 rounded-lg transition text-xs font-bold border" 
           :class="theme === 'dark'
-              ? 'bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300'
-              : 'bg-red-100 text-red-600 hover:bg-red-200'"
+              ? 'bg-blue-600/10 border-blue-600/20 text-blue-400 hover:bg-blue-600/20'
+              : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'"
           title="Admin felület"
           >
             Admin
           </button>
+
+          <div class="flex items-center gap-2 pl-2 border-l border-white/10">
+              
+              <RouterLink
+                to="/profile"
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:ring-2 hover:ring-blue-500 transition-all overflow-hidden"
+                :style="user.avatar_url 
+                  ? 'border: 2px solid #1e293b;' 
+                  : 'background: linear-gradient(to bottom right, #3b82f6, #6366f1); border: 2px solid #1e293b;'"
+              >
+                <img 
+                  v-if="user.avatar_url" 
+                  :src="user.avatar_url" 
+                  alt="Profil" 
+                  class="w-full h-full object-cover"
+                />
+                <span v-else>{{ user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U' }}</span>
+              </RouterLink>
+
+              <button
+                @click="handleLogout"
+                class="hidden lg:flex w-9 h-9 items-center justify-center rounded-full transition text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                title="Kijelentkezés"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+              </button>
+          </div>
+
         </template>
 
         <button
-          class="lg:hidden text-3xl"
+          class="lg:hidden text-2xl p-2"
           @click="mobileOpen = !mobileOpen"
           :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
         >
@@ -317,22 +311,36 @@ watch(() => route.path, () => {
         </template>
 
         <template v-else>
-          <RouterLink to="/main" class="block nav-item" @click="mobileOpen = false">Vezérlőpult</RouterLink>
-          <RouterLink to="/tantargyak" class="block nav-item" @click="mobileOpen = false">Tantárgyak</RouterLink>
-          <RouterLink to="/calendar" class="block nav-item" @click="mobileOpen = false">Naptár 📅</RouterLink>
-          <RouterLink to="/results" class="block nav-item" @click="mobileOpen = false">Eredmények</RouterLink>
-          <RouterLink to="/leaderboard" class="block nav-item" @click="mobileOpen = false">Ranglista 🏆</RouterLink>
-          <RouterLink to="/profile" class="block nav-item" @click="mobileOpen = false">Profil</RouterLink>
-        </template>
-        
-        <button v-if="props.mode !== 'landing'"
-          @click="handleLogout"
-          class="w-full text-left px-4 py-3 rounded-xl font-medium cursor-pointer transition
-          bg-red-600/20 text-red-400 hover:bg-red-600/30 hover:text-red-300"
-        >
-          Kijelentkezés
-        </button>
+          <RouterLink to="/main" class="block nav-item flex items-center gap-3" @click="mobileOpen = false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            Főoldal
+          </RouterLink>
 
+          <RouterLink to="/leaderboard" class="block nav-item flex items-center gap-3" @click="mobileOpen = false">
+            <span>🏆</span> Ranglista
+          </RouterLink>
+
+          <RouterLink to="/profile" class="block nav-item flex items-center gap-3" @click="mobileOpen = false">
+             <span>👤</span> Profil
+          </RouterLink>
+          
+          <div class="pt-4 border-t border-gray-500/20 flex justify-center">
+            <button
+              @click="handleLogout"
+              class="p-3 rounded-full transition-colors group"
+              :class="theme === 'dark' ? 'bg-red-500/10 hover:bg-red-500/20' : 'bg-red-100 hover:bg-red-200'"
+              title="Kijelentkezés"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+                   class="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+            </button>
+          </div>
+
+        </template>
       </div>
     </transition>
   </header>
@@ -353,6 +361,7 @@ watch(() => route.path, () => {
   transition: all 0.2s;
   color: inherit;
   font-weight: 500;
+  position: relative;
 }
 .nav-link:hover {
   color: #60a5fa;
@@ -362,7 +371,6 @@ watch(() => route.path, () => {
   font-weight: 600;
 }
 
-/* Vue transitions */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
