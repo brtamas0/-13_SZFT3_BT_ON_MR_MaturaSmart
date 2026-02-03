@@ -1,4 +1,5 @@
 <script setup>
+import Users from "@pages/admin/users.vue"
 import { ref, onMounted, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 
@@ -224,15 +225,26 @@ watch(() => route.path, () => {
               ? 'background: rgba(0,0,0,0.4); color: white;'
               : 'background: rgba(0,0,0,0.05); color: #333;'"
           >
-            🔥 <span>{{ 32 }}</span> <!-- később streak változó kell ide-->
+            🔥 <span>{{ user.current_streak }}</span> <!-- később streak változó kell ide-->
           </div>
 
           <RouterLink
             to="/profile"
-            class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:scale-105 transition-transform"
-            style="background: linear-gradient(to bottom right, #2563eb, #4f46e5); border: 2px solid #0b1029;"
+            class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md hover:scale-105 transition-transform overflow-hidden"
+            :style="user.avatar_url 
+              ? 'border: 2px solid #0b1029;' 
+              : 'background: linear-gradient(to bottom right, #2563eb, #4f46e5); border: 2px solid #0b1029;'"
           >
-            {{ user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U' }}
+            <img 
+              v-if="user.avatar_url" 
+              :src="user.avatar_url" 
+              alt="Profil" 
+              class="w-full h-full object-cover"
+            />
+            
+            <span v-else>
+              {{ user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U' }}
+            </span>
           </RouterLink>
 
           <button
