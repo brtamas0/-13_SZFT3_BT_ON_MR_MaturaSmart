@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use App\Models\GlobalMessage;
 
 class AdminController extends Controller
 {
@@ -228,5 +229,32 @@ class AdminController extends Controller
         }
 
         return response()->json(['message' => 'Sorrend és mappa frissítve']);
+    }
+
+   
+
+    // Global rendszerüzenet küldés
+    public function sendSystemMessage(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'message' => 'required|string',
+            'type' => 'in:info,warning,danger,success',
+            'expires_at' => 'nullable|date|after:now',
+        ]);
+
+        // 1. Minden korábbi üzenetet inaktívvá teszünk (hogy ne torlódjanak)
+        GlobalMessage::where('is_active', true)->update(['is_active' => false]);
+
+        // 2. Létrehozzuk az újat
+        GlobalMessage::create([
+            'title' => $request->title,
+            'message' => $request->message,
+            'type' => $request->type ?? 'info',
+            'is_active' => true,
+            'expires_at' => $request->expires_at,
+        ]);
+
+        return response()->json(['message' => 'Globális üzenet beállítva!']);
     }
 }

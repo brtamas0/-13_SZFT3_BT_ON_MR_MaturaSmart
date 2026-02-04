@@ -14,7 +14,7 @@ const route = useRoute()
 const mobileOpen = ref(false)
 
 const theme = ref("dark")
-const user = ref({ full_name: "", current_streak: 0 })
+const user = ref({ full_name: "" })
 
 // --- KERESŐ VÁLTOZÓK ---
 const searchQuery = ref("")
@@ -23,40 +23,17 @@ const showResults = ref(false)
 const isSearching = ref(false)
 let searchTimeout = null
 
-onMounted(async () => {
-  // Téma betöltése
+onMounted(() => {
   const savedTheme = localStorage.getItem("theme") || "dark"
   theme.value = savedTheme
   document.documentElement.setAttribute("data-theme", savedTheme)
 
-  // User betöltése localStorage-ból
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     try {
       user.value = JSON.parse(storedUser)
     } catch (e) {
       console.error("Hiba a felhasználói adatok betöltésekor:", e)
-    }
-  }
-
-  // Friss adatok lekérése a backendről újra, mivel a streak számítása a backend middleware-ben történik
-  const token = localStorage.getItem('token')
-  if (token) {
-    try {
-        const response = await fetch('http://maturasmart.hu/api/user', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        })
-        
-        if (response.ok) {
-            const freshUser = await response.json()
-            user.value = freshUser
-            localStorage.setItem('user', JSON.stringify(freshUser))
-        }
-    } catch (e) {
-        console.error("Nem sikerült frissíteni a user adatokat:", e)
     }
   }
 

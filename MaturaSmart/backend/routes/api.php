@@ -11,6 +11,7 @@ use App\Http\Controllers\AxelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
     Route::post('/reset-password', [AuthController::class, 'resetpassword']);
+    Route::get('/global-message', [UserController::class, 'getGlobalMessage']);
 });
 
 /*
@@ -93,6 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/topics/{topic}/flashcards', [AdminController::class, 'storeFlashcard']);
         Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
 
+        Route::post('/system-message', [AdminController::class, 'sendSystemMessage']);
     });
 
 });

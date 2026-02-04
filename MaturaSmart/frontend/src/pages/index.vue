@@ -28,7 +28,7 @@ const goToLogin = () => {
 
 
 <template>
-  <BaseLayout>
+  <BaseLayout mode="landing">
 
     <BaseHeader mode="landing" />
 
