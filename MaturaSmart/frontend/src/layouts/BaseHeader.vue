@@ -119,7 +119,7 @@ watch(() => route.path, () => {
           
           <RouterLink
             to="/main"
-            class="text-2xl font-bold tracking-wide flex items-center gap-2"
+            class="text-2xl font-bold tracking-wide flex items-center"
             :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
           >
             Matura<span class="accent-text">Smart</span>
