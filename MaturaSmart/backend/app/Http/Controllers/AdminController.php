@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\SystemMessage;
 
 class AdminController extends Controller
 {
@@ -229,4 +231,17 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Sorrend és mappa frissítve']);
     }
+    public function sendSystemMessage(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    $users = User::all();
+
+    Notification::send($users, new SystemMessage($request->title, $request->message));
+
+    return response()->json(['message' => 'Rendszerüzenet sikeresen elküldve!']);
+}
 }

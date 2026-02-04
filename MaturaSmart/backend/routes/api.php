@@ -93,6 +93,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/topics/{topic}/flashcards', [AdminController::class, 'storeFlashcard']);
         Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
 
-    });
+        // 6. Rendszerüzenet küldése
+        Route::post('/admin/system-message', [AdminController::class, 'sendSystemMessage']);
 
+    });
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/stats', [AdminController::class, 'getStats']);
+    // EZT A SORT KERESD:
+    Route::post('/admin/system-message', [AdminController::class, 'sendSystemMessage']);
+});
 });
