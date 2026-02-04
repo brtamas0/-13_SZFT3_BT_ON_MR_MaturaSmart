@@ -172,6 +172,11 @@ const toggleTheme = () => {
                     <span v-if="isLoading" class="animate-spin">⏳</span>
                     <span v-else>Jelszó Mentése</span>
                 </button>
+                <div class="text-center mt-8 space-y-4">
+                <RouterLink to="/login" class="inline-block px-6 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors text-sm font-bold">
+                    ← Vissza a belépéshez
+                </RouterLink>
+            </div>
             </form>
             
         </div>
