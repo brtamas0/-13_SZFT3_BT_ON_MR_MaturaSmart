@@ -11,7 +11,6 @@ use App\Http\Controllers\AxelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,8 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- User ---
     Route::get('/user', function (Request $request) { return $request->user(); });
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/notifications', [UserController::class, 'getNotifications']);
-    Route::post('/notifications/{id}/read', [UserController::class, 'markNotificationAsRead']);
 
     // --- Student App ---
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -82,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // 4. Topics (Leckék)
         Route::get('/units/{unit}/topics', [AdminController::class, 'getTopics']);
         Route::post('/units/{unit}/topics', [AdminController::class, 'storeTopic']);
+        
+        // Ez a dinamikus ID-s route most már nem zavarja a reorder-t
         Route::put('/topics/{topic}', [AdminController::class, 'updateTopic']); 
         Route::delete('/topics/{topic}', [AdminController::class, 'destroyTopic']);
 
@@ -93,9 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/topics/{topic}/flashcards', [AdminController::class, 'getFlashcards']);
         Route::post('/topics/{topic}/flashcards', [AdminController::class, 'storeFlashcard']);
         Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
-
-        // 6. Rendszerüzenet küldése
-        Route::post('/system-message', [AdminController::class, 'sendSystemMessage']);
 
     });
 
