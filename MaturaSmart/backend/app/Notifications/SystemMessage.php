@@ -12,14 +12,16 @@ class SystemMessage extends Notification
     use Queueable;
     public $title;
     public $message;
+    public $expiresAt;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $message)
+    public function __construct($title, $message, $expiresAt = null)
     {
         $this->title = $title;
         $this->message = $message;
+        $this->expiresAt = $expiresAt;
     }
 
     /**
@@ -53,6 +55,7 @@ class SystemMessage extends Notification
         return [
             'title' => $this->title,
             'message' => $this->message,
+            'expires_at' => $this->expiresAt,
             'type' => 'system_announcement',
             'sender' => 'Adminisztrátor',
             'icon' => '📢'

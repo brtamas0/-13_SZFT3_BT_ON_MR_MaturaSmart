@@ -236,11 +236,16 @@ class AdminController extends Controller
     $request->validate([
         'title' => 'required|string|max:255',
         'message' => 'required|string',
+        'expires_at' => 'nullable|date|after:now',
     ]);
 
     $users = User::all();
 
-    Notification::send($users, new SystemMessage($request->title, $request->message));
+    Notification::send($users, new SystemMessage(
+        $request->title, 
+        $request->message,
+        $request->expires_at
+        ));
 
     return response()->json(['message' => 'Rendszerüzenet sikeresen elküldve!']);
 }
