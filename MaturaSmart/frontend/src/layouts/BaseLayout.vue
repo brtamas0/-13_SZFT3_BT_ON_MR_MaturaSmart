@@ -25,7 +25,7 @@ const props = defineProps({
 
     <BaseHeader v-if="props.mode !== 'landing'" :mode="props.mode" />
 
-    <main class="flex-grow relative z-10 flex flex-col w-full" :class="props.mode !== 'landing' ? 'pt-20' : ''">
+    <main class="flex-grow relative z-10 flex flex-col w-full" :class="props.mode !== 'landing' ? 'pt-12' : 'pt-5'">
       <slot />
     </main>
 

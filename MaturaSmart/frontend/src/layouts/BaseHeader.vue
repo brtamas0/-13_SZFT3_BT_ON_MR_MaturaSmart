@@ -344,7 +344,9 @@ watch(() => route.path, () => {
       </div>
     </transition>
   </header>
-  <div class="h-20"></div>
+  <div v-if="props.mode === 'landing'" class="h-16"></div>
+  <div v-else-if="route.path === '/main'" class="h-5"></div>
+
 </template>
 
 <style scoped>
