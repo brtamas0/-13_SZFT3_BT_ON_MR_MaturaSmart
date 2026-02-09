@@ -148,14 +148,14 @@ onUnmounted(() => {
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4">
                     <RouterLink 
                         :to="`/tantargyak/${lastTopic.subject.slug}/${lastTopic.slug}`" 
                         class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-center transition-all hover:scale-105 shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
                     >
                         <span>▶️</span> {{ lastTopic.progress === 100 ? 'Gyakorlás' : 'Folytatás' }}
                     </RouterLink>
-                    <button class="bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors border border-white/5">
+                    <button class="bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors border border-white/5 hidden">
                         Részletek
                     </button>
                 </div>
