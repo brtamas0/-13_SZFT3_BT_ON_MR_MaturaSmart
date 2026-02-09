@@ -192,7 +192,7 @@ watch(() => route.path, () => {
 
 
       <div class="flex items-center gap-3 lg:gap-4 shrink-0">
-
+      <!--
         <button
           @click="toggleTheme"
           class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-white/10"
@@ -202,7 +202,7 @@ watch(() => route.path, () => {
           <span v-if="theme==='dark'">🌙</span>
           <span v-else>☀️</span>
         </button>
-
+      -->
         <template v-if="props.mode === 'landing'">
           <RouterLink
             to="/login"
