@@ -148,7 +148,7 @@ watch(() => route.path, () => {
       <div v-if="props.mode !== 'landing'" class="hidden md:block flex-1 max-w-xl relative search-container px-4">
           <div class="relative group">
              <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500 group-focus-within:text-blue-400 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 hidden">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
              </span>
@@ -157,7 +157,7 @@ watch(() => route.path, () => {
                 @input="handleSearchInput"
                 @focus="showResults = searchQuery.length >= 2"
                 type="text" 
-                class="w-full pl-11 pr-4 py-2.5 rounded-xl text-sm transition-all border outline-none"
+                class="w-full pl-11 pr-4 py-2.5 rounded-xl text-sm transition-all border outline-none hidden"
                 :class="theme === 'dark' 
                    ? 'bg-[#1a1f40] border-white/10 text-white placeholder-gray-500 focus:bg-[#1e293b] focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10' 
                    : 'bg-gray-100 border-gray-200 text-gray-800 placeholder-gray-500 focus:bg-white focus:border-blue-500'"
@@ -286,7 +286,7 @@ watch(() => route.path, () => {
                 v-model="searchQuery"
                 @input="handleSearchInput"
                 type="text" 
-                class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none"
+                class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none hidden"
                 :class="theme === 'dark' 
                    ? 'bg-[#1a1f40] border-white/10 text-white placeholder-gray-400' 
                    : 'bg-gray-100 border-gray-200 text-gray-800 placeholder-gray-500'"
