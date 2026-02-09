@@ -133,7 +133,7 @@ const sendSystemMessage = async () => {
                     <div>
                         <label class="block text-gray-400 text-sm mb-1">Lejárat (Opcionális)</label>
                         <input v-model="messageForm.expires_at" type="datetime-local" 
-                            class="w-full bg-[#131b3d] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                            class="w-full bg-[#131b3d] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 [&::-webkit-calendar-picker-indicator]:invert">
                     </div>
                 </div>
             </div>
