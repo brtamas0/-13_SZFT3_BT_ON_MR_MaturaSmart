@@ -69,17 +69,17 @@ const sendSystemMessage = async () => {
 
     <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-[#131b3d] p-6 rounded-2xl border border-gray-800 shadow-lg relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">👥</div>
+            <div class="absolute top-0 right-0 p-4 opacity-50 text-6xl">👥</div>
             <h3 class="text-gray-400 text-sm uppercase tracking-wider">Felhasználók</h3>
             <p class="text-4xl font-bold text-white mt-2">{{ stats.users }}</p>
         </div>
         <div class="bg-[#131b3d] p-6 rounded-2xl border border-gray-800 shadow-lg relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">📚</div>
+            <div class="absolute top-0 right-0 p-4 opacity-50 text-6xl">📚</div>
             <h3 class="text-gray-400 text-sm uppercase tracking-wider">Tantárgyak</h3>
             <p class="text-4xl font-bold text-white mt-2">{{ stats.subjects }}</p>
         </div>
         <div class="bg-[#131b3d] p-6 rounded-2xl border border-gray-800 shadow-lg relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">📄</div>
+            <div class="absolute top-0 right-0 p-4 opacity-50 text-6xl">📄</div>
             <h3 class="text-gray-400 text-sm uppercase tracking-wider">Leckék száma</h3>
             <p class="text-4xl font-bold text-white mt-2">{{ stats.topics }}</p>
         </div>

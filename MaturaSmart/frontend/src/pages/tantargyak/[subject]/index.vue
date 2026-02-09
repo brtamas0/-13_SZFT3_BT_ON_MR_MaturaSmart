@@ -55,7 +55,7 @@ onMounted(async () => {
 
     <div v-else-if="subject" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
       
-      <div class="bg-[#10194E] border border-white/10 rounded-3xl p-8 mb-12 shadow-2xl relative overflow-hidden">
+      <div class="bg-[#10194E] border border-white/10 rounded-3xl p-8 mb-12 shadow-2xl relative overflow-hidden mt-12">
         <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
         
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -130,7 +130,7 @@ onMounted(async () => {
                              :class="topic.is_completed ? 'bg-green-500 shadow-[0_0_10px_#22c55e]' : 'bg-blue-600'">
                         </div>
                         
-                        <div v-if="topic.year_label" class="absolute left-[-50px] top-8 w-[50px] text-right pr-4 text-[10px] font-mono font-bold text-blue-400/70 hidden lg:block">
+                        <div v-if="topic.year_label" class="absolute left-[-50px] top-7 w-[50px] text-right pr-4 text-[18px] font-mono font-bold text-blue-400/70 hidden lg:block">
                             {{ topic.year_label }}
                         </div>
 

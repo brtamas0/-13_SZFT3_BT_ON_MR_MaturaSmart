@@ -308,7 +308,7 @@ EOT,
         $eng = Subject::create([
             'name' => 'Angol nyelv',
             'slug' => 'angol',
-            'icon' => '🇬🇧',
+            'icon' => '🗣️',
             'description' => 'Grammar, Vocabulary és érettségi felkészítő.'
         ]);
 
