@@ -35,12 +35,12 @@ const customRoutes = [
     component: ForgotPassword
   },
 
-{
-    // A :token --> URL-ben ott egy változó lesz
+  {
+    // A :token --> URL-ben változó 
     path: '/reset-password/:token',
     name: 'ResetPassword',
     component: ResetPassword
-},
+  },
 
   // VÉDETT OLDALAK (Diák nézet)
   {
@@ -62,7 +62,7 @@ const customRoutes = [
     }
   },
   {
-    path: '/ranglista',
+    path: '/leaderboard',
     name: 'Leaderboard',
     component: () => import('@/pages/leaderboard.vue'),
     meta: {
@@ -97,12 +97,22 @@ const customRoutes = [
         component: () => import('@/pages/admin/subjects.vue')
       },
       {
-        path: 'subjects/:id/builder', // URL: /admin/subjects/5/builder
+        path: 'subjects/:id/builder',
         name: 'CourseBuilder',
         component: () => import('@/pages/admin/course-builder.vue'),
         props: true
       }
     ]
+  },
+  {
+    path: '/404',
+    name: 'NotFound',
+    component: () => import('@/pages/notfound.vue'),
+    meta: { title: 'Nem található' }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
 ]
 
@@ -133,14 +143,12 @@ router.beforeEach((to, from, next) => {
     user = {}
   }
 
-  // 1. Ha be kell jelentkezni, de nincs token -> Login
   if (to.meta.requiresAuth && !token) {
-    return next('/login')
+    return next('login')
   }
 
-  // 2. Ha ADMIN jog kell, de a user NEM admin -> Vissza a főoldalra
   if (to.meta.requiresAdmin && user.role !== 'admin') {
-    return next('/main')
+    return next('main')
   }
 
   next()
