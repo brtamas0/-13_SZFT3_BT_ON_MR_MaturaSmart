@@ -4,11 +4,11 @@
 
     <div class="grid-bg"></div>
 
-    <button
+    <!-- <button
       @click="toggleTheme"
       class="absolute top-5 right-5 w-10 h-10 rounded-full border border-gray-300 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition z-50 shadow-sm">
       🌓
-    </button>
+    </button> -->
 
     <div class="relative z-10 text-center p-8 max-w-2xl w-full">
       <div class="text-gradient-404 mb-4">404</div>
