@@ -13,17 +13,20 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // --- UTOLSÓ LECKE LEKÉRDEZÉSE ---
         $lastTopicData = null;
         if ($user->last_topic_id) {
-            $topic = Topic::with('subject', 'questions')->find($user->last_topic_id);
+            $topic = Topic::with('subject')->find($user->last_topic_id);
             
             if ($topic) {
-                $totalQs = $topic->questions->count();
+                $totalQs = DB::table('questions')->where('topic_id', $topic->id)->count();
+                
                 $solvedQs = DB::table('question_user')
                     ->where('user_id', $user->id)
-                    ->whereIn('question_id', $topic->questions->pluck('id'))
+                    ->whereIn('question_id', function($query) use ($topic) {
+                        $query->select('id')->from('questions')->where('topic_id', $topic->id);
+                    })
                     ->where('is_correct', true)
+                    ->distinct('question_id')
                     ->count();
 
                 $topicProgress = $totalQs > 0 ? round(($solvedQs / $totalQs) * 100) : 0;
@@ -40,37 +43,45 @@ class DashboardController extends Controller
             }
         }
 
-        // --- TANTÁRGYAK LEKÉRDEZÉSE ---
-        $subjects = Subject::with('topics.questions')->get()->map(function ($subject) use ($user) {
-            
-            $totalQuestionsInSubject = $subject->topics->flatMap->questions->count();
-            $questionIds = $subject->topics->flatMap->questions->pluck('id');
-            
-            $solvedCount = DB::table('question_user')
-                ->where('user_id', $user->id)
-                ->whereIn('question_id', $questionIds)
-                ->where('is_correct', true)
-                ->count();
+        $subjects = Subject::with(['topics.questions'])->get()->map(function ($subject) use ($user) {
+            $topics = $subject->topics;
+            $totalTopicsCount = $topics->count(); 
+            $completedTopicsCount = 0;
 
-            $progress = $totalQuestionsInSubject > 0 
-                ? round(($solvedCount / $totalQuestionsInSubject) * 100) 
+            foreach ($topics as $topic) {
+                $questions = $topic->questions;
+                $totalQsInTopic = $questions->count();
+
+                if ($totalQsInTopic > 0) {
+                    $solvedInTopic = DB::table('question_user')
+                        ->where('user_id', $user->id)
+                        ->whereIn('question_id', $questions->pluck('id'))
+                        ->where('is_correct', true)
+                        ->distinct('question_id')
+                        ->count();
+                    if ($solvedInTopic >= $totalQsInTopic) {
+                        $completedTopicsCount++;
+                    }
+                }
+            }
+            $progress = $totalTopicsCount > 0 
+                ? round(($completedTopicsCount / $totalTopicsCount) * 100) 
                 : 0;
-            $colors = $this->getSubjectColors($subject->id);
 
-            $visuals = [
-                'icon' => $subject->icon ?? '📘', 
-                'color' => $colors['color'],
-                'bg' => $colors['bg'],
-                'bar_color' => $colors['bar_color']
-            ];
+            $colors = $this->getSubjectColors($subject->id);
 
             return [
                 'id' => $subject->id,
                 'title' => $subject->name, 
                 'slug' => $subject->slug,
                 'progress' => $progress, 
-                'total_topics' => $subject->topics->count(),
-                'visuals' => $visuals
+                'total_topics' => $totalTopicsCount,
+                'visuals' => [
+                    'icon' => $subject->icon ?? '📘', 
+                    'color' => $colors['color'],
+                    'bg' => $colors['bg'],
+                    'bar_color' => $colors['bar_color']
+                ]
             ];
         });
 
