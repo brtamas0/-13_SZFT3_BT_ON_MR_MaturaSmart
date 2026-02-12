@@ -37,12 +37,12 @@ const handleRegister = async () => {
     const data = await response.json()
 
     if (!response.ok) {
-        // Ha van validációs hibaüzenet a laraveltől, azt írjuk ki
+        
         const errorText = data.message || 'Hiba a regisztráció során.'
         if (data.errors?.email) throw new Error('Ez az email cím már foglalt!')
         throw new Error(errorText)
     }
-    // Sikeres regisztráció után tároljuk a tokent és a felhasználói adatokat
+    
     localStorage.setItem('token', data.token)
     localStorage.setItem('user', JSON.stringify(data.user))
 

@@ -14,13 +14,13 @@ const newUnitTitle = ref('')
 const showModal = ref(false)
 const actionToDelete = ref(null)
 
-// SZERKESZTŐ ÁLLAPOTOK
+
 const isEditing = ref(false)
 const activeTab = ref('content') 
 const editingTopic = ref(null) 
 const editorContent = ref('') 
 
-// KVÍZ VÁLTOZÓK
+
 const questions = ref([])
 const totalXp = computed(() => questions.value.reduce((sum, q) => sum + q.xp, 0))
 
@@ -35,14 +35,14 @@ const newQuestion = ref({
     ]
 })
 
-// FLASHCARD VÁLTOZÓK
+
 const flashcards = ref([])
 const newFlashcard = ref({ front: '', back: '' })
 
 onMounted(async () => { await fetchStructure() })
 
-// 1. STRUKTÚRA BETÖLTÉSE
-// course-builder.vue
+
+
 
 const fetchStructure = async () => {
     loading.value = true
@@ -71,7 +71,7 @@ const fetchStructure = async () => {
     } catch (e) { console.error(e) } finally { loading.value = false }
 }
 
-// 2. EDITOR MEGNYITÁSA
+
 const openEditor = async (topic) => {
     editingTopic.value = { 
         ...topic, 
@@ -84,7 +84,7 @@ const openEditor = async (topic) => {
     await loadFlashcards(topic.id)
 }
 
-// 3. KVÍZ MŰVELETEK
+
 const loadQuestions = async (topicId) => {
     const token = localStorage.getItem('token')
     const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/questions`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
@@ -113,7 +113,6 @@ const setCorrectAnswer = (index) => {
     newQuestion.value.answers.forEach((a, i) => a.is_correct = (i === index))
 }
 
-// 4. FLASHCARD MŰVELETEK
 const loadFlashcards = async (topicId) => {
     const token = localStorage.getItem('token')
     const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/flashcards`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
@@ -138,7 +137,7 @@ const deleteFlashcard = async (id) => {
     loadFlashcards(editingTopic.value.id)
 }
 
-// 5. MENTÉS
+
 const saveTopicSettings = async () => {
     const token = localStorage.getItem('token')
     let finalXp = editingTopic.value.xp
@@ -162,7 +161,7 @@ const saveTopicSettings = async () => {
     fetchStructure() 
 }
 
-// --- STRUKTÚRA MŰVELETEK ---
+
 const addUnit = async () => {
     const token = localStorage.getItem('token'); 
     await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); 
@@ -187,10 +186,10 @@ const addTopic = async (unit) => {
     fetchStructure(); 
 }
 
-// DRAG & DROP
+
 
 const onDragEnd = async (unit) => {
-    // 1. Újraszámoljuk a sorszámokat a kliensen
+    
     unit.topics.forEach((t, i) => t.order = i + 1)
     
     const token = localStorage.getItem('token')

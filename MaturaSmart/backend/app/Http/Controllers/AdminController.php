@@ -13,7 +13,6 @@ use App\Models\GlobalMessage;
 
 class AdminController extends Controller
 {
-    // STATISZTIKA
     public function stats()
     {
         return response()->json([
@@ -23,13 +22,11 @@ class AdminController extends Controller
         ]);
     }
 
-    // FELHASZNÁLÓK LISTÁZÁSA
     public function indexUsers()
     {
         return User::orderBy('role', 'asc')->orderBy('full_name', 'asc')->get();
     }
 
-    // JELSZÓ ELLENŐRZÉS
     public function verifyPassword(Request $request)
     {
         $request->validate(['password' => 'required']);
@@ -41,7 +38,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Hibás jelszó'], 403);
     }
 
-    // TANTÁRGYAK
     public function indexSubjects()
     {
         return Subject::withCount('units')->get();
@@ -66,7 +62,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Törölve']);
     }
 
-    // UNITOK (Mappák)
     public function getUnits(Subject $subject)
     {
         return $subject->units()->orderBy('order', 'asc')->get();
@@ -87,7 +82,6 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
-    // TOPICS (Leckék és Tesztek) KEZELÉSE
     public function getTopics(Unit $unit)
 {
     return $unit->topics()
@@ -107,7 +101,6 @@ class AdminController extends Controller
             'reading_weight' => 'nullable|integer|min:0|max:100', 
         ]);
 
-        // Slug generálás
         $baseSlug = \Illuminate\Support\Str::slug($validated['title']);
         $slug = $baseSlug;
         $counter = 1;
@@ -147,7 +140,6 @@ class AdminController extends Controller
         return $subject;
     }
 
-    // KVÍZ (Kérdések) KEZELÉSE
     public function getQuestions(Topic $topic)
     {
         return $topic->questions()->with('answers')->get();
@@ -163,7 +155,6 @@ class AdminController extends Controller
             'answers.*.is_correct' => 'boolean'
         ]);
 
-        // 1. Kérdés mentése
         $question = $topic->questions()->create([
             'content' => $validated['content'],
             'type' => 'multiple_choice',
@@ -171,7 +162,6 @@ class AdminController extends Controller
             'difficulty' => 1
         ]);
 
-        // 2. Válaszok mentése
         foreach ($validated['answers'] as $ans) {
             $question->answers()->create([
                 'text' => $ans['text'],
@@ -188,7 +178,6 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
-    // FLASHCARDOK KEZELÉSE
     public function getFlashcards(Topic $topic)
     {
         return $topic->flashcards()->get();
@@ -210,8 +199,6 @@ class AdminController extends Controller
         return response()->noContent();
     }
 
-    // SORRENDEZÉS
-
     public function reorderTopics(Request $request)
     {
         $validated = $request->validate([
@@ -231,9 +218,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Sorrend és mappa frissítve']);
     }
 
-   
-
-    // Global rendszerüzenet küldés
     public function sendSystemMessage(Request $request)
     {
         $request->validate([
@@ -243,10 +227,8 @@ class AdminController extends Controller
             'expires_at' => 'nullable|date|after:now',
         ]);
 
-        // 1. Minden korábbi üzenetet inaktívvá teszünk (hogy ne torlódjanak)
         GlobalMessage::where('is_active', true)->update(['is_active' => false]);
 
-        // 2. Létrehozzuk az újat
         GlobalMessage::create([
             'title' => $request->title,
             'message' => $request->message,

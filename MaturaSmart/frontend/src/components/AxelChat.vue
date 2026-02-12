@@ -19,7 +19,7 @@ const messages = ref([
 
 const chatContainer = ref(null)
 
-// Kép váltogatása gondolkodás közben
+
 const axelAvatar = computed(() => {
     return isThinking.value ? '/axel.png' : '/axel.png' //Az első később axel_thinking.png lesz
 })
@@ -189,7 +189,6 @@ const isSubmitting = computed(() => isThinking.value)
 </template>
 
 <style scoped>
-/* Lebegő animáció Axelnek */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }

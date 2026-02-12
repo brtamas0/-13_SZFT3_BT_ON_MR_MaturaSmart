@@ -6,7 +6,7 @@ import ForgotPassword from '../pages/forgotpassword.vue'
 import ResetPassword from '../pages/resetpassword.vue'
 
 const customRoutes = [
-  // PUBLIKUS OLDALAK
+  
   {
     path: '/',
     name: 'Landing',
@@ -36,13 +36,13 @@ const customRoutes = [
   },
 
   {
-    // A :token --> URL-ben változó 
+    
     path: '/reset-password/:token',
     name: 'ResetPassword',
     component: ResetPassword
   },
 
-  // VÉDETT OLDALAK (Diák nézet)
+  
   {
     path: '/main',
     name: 'Main',
@@ -71,13 +71,13 @@ const customRoutes = [
     }
   },
 
-  // ADMIN
+  
   {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: {
       requiresAuth: true,
-      requiresAdmin: true, // Csak admin léphet be
+      requiresAdmin: true, 
       title: 'Adminisztráció'
     },
     children: [
@@ -128,10 +128,10 @@ export const router = createRouter({
   }
 })
 
-// Cím beállítása
+
 router.beforeEach(setTitle)
 
-// AUTH guard
+
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
 

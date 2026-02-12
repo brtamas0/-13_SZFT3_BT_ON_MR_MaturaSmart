@@ -1,6 +1,4 @@
 <script setup>
-// Importáljuk a két komponenst
-// (Feltételezem, hogy a components mappában vannak, a Layouts mappa mellett/fölött)
 import BaseHeader from './BaseHeader.vue'
 import GlobalNotification from '../components/GlobalNotification.vue'
 

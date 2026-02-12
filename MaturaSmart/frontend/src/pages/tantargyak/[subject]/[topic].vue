@@ -13,7 +13,7 @@ const isLoading = ref(true)
 
 const testModuleRef = ref(null)
 
-// --- SCROLL & PROGRESS ---
+
 const maxScrollPercentage = ref(0) 
 
 const updateScroll = () => {
@@ -29,18 +29,18 @@ const updateScroll = () => {
 
 const selectedAnswers = ref({}) 
 
-// Javított progress számítás (Súlyozott)
+
 const totalProgress = computed(() => {
     if (!topic.value || topic.value.type === 'test') return 0
     
-    // 1. Súlyok lekérése (Ha null, alapértelmezett 50%)
+    
     const readWeight = topic.value.reading_weight ?? 50 
     const quizWeight = 100 - readWeight
 
-    // 2. Olvasás része (Görgetés % * Súly %)
+    
     const scrollPart = maxScrollPercentage.value * (readWeight / 100) 
 
-    // 3. Kvíz része
+    
     const totalQuestions = topic.value.questions ? topic.value.questions.length : 0 
     const answeredCount = Object.keys(selectedAnswers.value).length
     const quizPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0 
@@ -49,7 +49,7 @@ const totalProgress = computed(() => {
     return Math.round(scrollPart + quizPart)
 })
 
-// --- FLASHCARD LOGIKA ---
+
 const currentCardIndex = ref(0)
 const isFlipped = ref(false)
 
@@ -69,7 +69,7 @@ const prevCard = () => {
     setTimeout(() => { if (currentCardIndex.value > 0) currentCardIndex.value-- }, 300)
 }
 
-// --- ÁLTALÁNOS ---
+
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 const resultData = ref({ xp: 0, message: '', isFirstTime: true })
@@ -115,7 +115,7 @@ onUnmounted(() => { window.removeEventListener('scroll', updateScroll) })
 
 const navigateToTopic = (slug) => { router.push(`/tantargyak/${subjectSlug}/${slug}`) }
 
-// --- TESZT KEZELÉSE ---
+
 const handleTestCompletion = async (payload) => {
     const token = localStorage.getItem('token') 
     isSubmitting.value = true
@@ -142,7 +142,7 @@ const handleTestCompletion = async (payload) => {
     finally { isSubmitting.value = false }
 }
 
-// --- LECKE KEZELÉSE ---
+
 const selectAnswer = (questionId, answer) => {
   if (selectedAnswers.value[questionId]) return;
   selectedAnswers.value[questionId] = { id: answer.id, isCorrect: answer.is_correct }

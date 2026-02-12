@@ -10,7 +10,6 @@ const lastTopic = ref(null)
 const isLoading = ref(true)
 const user = ref(null)
 
-// --- ÉRETTSÉGI VISSZASZÁMLÁLÓ ---
 const examDate = new Date('2026-05-04T08:00:00')
 const remaining = ref({ days: 0, hours: 0, minutes: 0 })
 let timerInterval = null
@@ -29,7 +28,7 @@ const updateCountdown = () => {
   }
 }
 
-// Név formázása
+
 const firstName = computed(() => {
   if (!user.value || !user.value.full_name) return 'Tanuló'
   const parts = user.value.full_name.split(' ')

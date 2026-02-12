@@ -35,11 +35,11 @@ Route::middleware('throttle:60,1')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    // --- User ---
+    
     Route::get('/user', function (Request $request) { return $request->user(); });
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // --- Student App ---
+    
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/tantargyak', [SubjectController::class, 'index']);
     Route::get('/tantargyak/{slug}', [SubjectController::class, 'show']);
@@ -82,7 +82,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/units/{unit}/topics', [AdminController::class, 'getTopics']);
         Route::post('/units/{unit}/topics', [AdminController::class, 'storeTopic']);
         
-        // Ez a dinamikus ID-s route most már nem zavarja a reorder-t
         Route::put('/topics/{topic}', [AdminController::class, 'updateTopic']); 
         Route::delete('/topics/{topic}', [AdminController::class, 'destroyTopic']);
 

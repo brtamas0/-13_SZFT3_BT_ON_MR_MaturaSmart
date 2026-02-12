@@ -12,7 +12,6 @@ class ResetPasswordNotification extends Notification
 
     public $token;
 
-    // A konstruktorban megkapjuk a tokent
     public function __construct($token)
     {
         $this->token = $token;
@@ -25,7 +24,6 @@ class ResetPasswordNotification extends Notification
 
     public function toMail($notifiable)
     {
-        // Itt generáljuk a linket
         $url = env('FRONTEND_URL', 'http://maturasmart.hu') . "/reset-password/{$this->token}?email={$notifiable->getEmailForPasswordReset()}";
 
         return (new MailMessage)

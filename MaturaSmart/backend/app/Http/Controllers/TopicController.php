@@ -12,7 +12,7 @@ class TopicController extends Controller
     {
         $user = $request->user();
 
-        // Tantárgy, téma lekérése
+        
         $subject = Subject::where('slug', $subjectSlug)->firstOrFail();
         
         $topic = Topic::where('subject_id', $subject->id)
@@ -20,8 +20,8 @@ class TopicController extends Controller
                       ->with(['unit', 'flashcards', 'questions.answers'])
                       ->firstOrFail();
 
-        // NAVIGÁCIÓ
-        // Lekérjük az összes témát a tárgyon belül a helyes sorrendhez
+        
+        
         $allTopics = Topic::select('topics.id', 'topics.slug', 'topics.title', 'units.order as unit_order', 'topics.year', 'topics.order')
             ->join('units', 'topics.unit_id', '=', 'units.id')
             ->where('topics.subject_id', $subject->id)
@@ -30,12 +30,12 @@ class TopicController extends Controller
             ->orderBy('topics.order', 'asc') 
             ->get();
 
-        // Mostani index
+        
         $currentIndex = $allTopics->search(function($item) use ($topic) {
             return $item->id === $topic->id;
         });
 
-        // Előző és Következő téma
+        
         $prevTopic = ($currentIndex > 0) ? $allTopics[$currentIndex - 1] : null;
         $nextTopic = ($currentIndex < $allTopics->count() - 1) ? $allTopics[$currentIndex + 1] : null;
 

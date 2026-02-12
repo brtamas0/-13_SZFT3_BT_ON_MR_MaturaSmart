@@ -49,7 +49,6 @@ return new class extends Migration
             $table->timestamp('earned_at')->useCurrent();
         });
 
-        // Bolt, Inventory
         Schema::create('shop_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');

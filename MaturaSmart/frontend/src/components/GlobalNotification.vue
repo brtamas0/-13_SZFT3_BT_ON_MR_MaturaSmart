@@ -1,18 +1,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// --- ÁLLAPOT ---
+
 const globalMessage = ref(null)
 const showPopup = ref(false)
 const currentUserId = ref(null)
 
 onMounted(async () => {
-    // 1. Token ellenőrzés: Ha nincs token, azonnal kilépünk.
-    // Így nem jelentkezett be usernek sosem jelenik meg.
+    
+    
     const token = localStorage.getItem('token')
     if (!token) return;
 
-    // 2. User ID beszerzése (hogy tudjuk, ki zárta be)
+    
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
         try {
@@ -21,7 +21,7 @@ onMounted(async () => {
         } catch (e) { console.error(e) }
     }
 
-    // 3. Üzenet lekérése
+    
     try {
         const res = await fetch('http://backend.maturasmart.hu/api/global-message', {
             headers: { 
@@ -33,15 +33,15 @@ onMounted(async () => {
         if (res.ok) {
             const data = await res.json()
             
-            // Ha van aktív üzenet
+            
             if (data && data.id) {
-                // Egyedi kulcs: üzenetID + userID
+                
                 const userIdSuffix = currentUserId.value ? `_u${currentUserId.value}` : '_unknown'
                 const storageKey = `hide_msg_${data.id}${userIdSuffix}`
                 
                 const isHidden = localStorage.getItem(storageKey)
                 
-                // Ha még nem rejtette el, mutatjuk
+                
                 if (!isHidden) {
                     globalMessage.value = data
                     showPopup.value = true

@@ -14,23 +14,17 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // 1. Google Login indítása
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
-
-    // 2. Google Visszatérés kezelése
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            
-            // Van ilyen email címmel user?
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                // Nincs: Létrehozzuk
                 $user = User::create([
                     'full_name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -42,7 +36,6 @@ class AuthController extends Controller
                     'level' => 1,
                 ]);
             } else {
-                // HA VAN: Frissítjük az adatokat (Összekötés)
                 $updateData = [];
                 
                 if (!$user->google_id) {
@@ -56,25 +49,16 @@ class AuthController extends Controller
                     $user->update($updateData);
                 }
             }
-
-            // Token generálás a belépéshez (Sanctum)
             $token = $user->createToken('auth_token')->plainTextToken;
-
-            // Visszairányítás a Frontend oldalra (Vue)
             $frontendUrl = env('FRONTEND_URL', 'http://maturasmart.hu') . "/google-callback";
-
-            // A user adatokat átadjuk az URL-ben --> frontend tudja ki lépett be
             $userData = urlencode(json_encode($user));
             
             return redirect("{$frontendUrl}?token={$token}&user={$userData}");
 
         } catch (\Exception $e) {
-            // Hiba esetén visszaküldjük a login oldalra
             return redirect("http://maturasmart.hu/login?error=google_login_failed");
         }
     }
-
-    // 3. Sima Login
     public function login(Request $request)
     {
         $request->validate([
@@ -89,8 +73,6 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
-        
-        // Régi tokenek törlése
         $user->tokens()->delete();
         
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -101,15 +83,11 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
-    
-    // 4. Kijelentkezés
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
-
-    // 5. Sima Regisztráció
     public function register(Request $request)
     {
         $fields = $request->validate([
@@ -119,13 +97,9 @@ class AuthController extends Controller
                 'max:255',
                 function ($attribute, $value, $fail) {
                     $cleanName = Str::squish($value);
-                    
-                    // Csak betűk és pont (pl. Dr. Kiss)
                     if (!preg_match('/^[\p{L}\s\.]+$/u', $cleanName)) {
                         $fail('A név csak betűket tartalmazhat!');
                     }
-
-                    // Legalább két szó legyen (Vezetéknév Keresztnév)
                     if (!str_contains($cleanName, ' ')) {
                         $fail('Kérlek add meg a teljes nevedet (legalább 2 szó)!');
                     }
@@ -153,15 +127,10 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // 6. Profil Frissítés (Név)
     public function updateProfile(Request $request)
     {
         $user = $request->user();
-        
-        // Rate Limiting: userenként külön kulcs
         $key = 'profile-update:' . $user->id;
-
-        // Ha túl sokat próbálkozott (pl. 1 percen belül többször)
         if (RateLimiter::tooManyAttempts($key, 1)) {
             $seconds = RateLimiter::availableIn($key);
             $minutes = ceil($seconds / 60);
@@ -193,8 +162,6 @@ class AuthController extends Controller
         $user->update([
             'full_name' => Str::squish($request->full_name)
         ]);
-        
-        // Sikeres frissítés után beállítjuk az időkorlátot (5 perc)
         RateLimiter::hit($key, 5 * 60);
 
         return response()->json([
@@ -202,10 +169,8 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
-    // 7. Jelszó Emlékeztető Küldése
     public function sendResetLink(Request $request)
     {
-        // Validálás: kötelező az email, és léteznie kell a users táblában
         $validator = Validator::make($request->all(), [
             'email' => ['required', 'email', 'exists:users,email'],
         ], [
@@ -218,7 +183,6 @@ class AuthController extends Controller
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
 
-        // A Laravel beépített jelszókezelőjét használjuk
         $status = Password::sendResetLink($request->only('email'));
 
         if ($status === Password::RESET_LINK_SENT) {
@@ -236,7 +200,6 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
-        // Validálás
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
@@ -251,7 +214,6 @@ class AuthController extends Controller
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
-                //kiléptetjük az összes eszközről
                 $user->tokens()->delete(); 
             }
         );

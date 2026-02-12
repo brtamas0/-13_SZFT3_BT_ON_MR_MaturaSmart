@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
-    // Profil adatok lekérése
+    
     public function show(Request $request)
     {
         $user = $request->user();
@@ -30,7 +30,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    // Adatok frissítése
+    
     public function update(Request $request)
     {
         $user = $request->user();
@@ -46,7 +46,7 @@ class ProfileController extends Controller
         return response()->json(['message' => 'Profil sikeresen frissítve!', 'user' => $user]);
     }
 
-    // Jelszó csere
+    
     public function updatePassword(Request $request)
     {
         $request->validate([

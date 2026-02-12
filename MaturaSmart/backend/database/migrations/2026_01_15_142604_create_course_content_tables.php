@@ -34,7 +34,7 @@ return new class extends Migration
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained()->onDelete('set null');
             
-            $table->string('type')->default('lesson'); // 'lesson' (Tananyag) vagy 'test' (Témazáró)
+            $table->string('type')->default('lesson'); // 'lesson' (Tananyag) vagy 'test' (teszt)
             
             // Teszt specifikus mezők
             $table->integer('time_limit_minutes')->nullable(); 

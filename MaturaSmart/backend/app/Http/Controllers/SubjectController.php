@@ -18,10 +18,10 @@ class SubjectController extends Controller
     {
         $user = $request->user();
 
-        // Tantárgyak lekérdezése
+        
         $subject = Subject::where('slug', $slug)->firstOrFail();
 
-        // Unit, Topic lekérdezése
+        
         $units = Unit::where('subject_id', $subject->id)
             ->with(['topics' => function($query) {
                 $query->orderByRaw('ISNULL(year), year ASC')->orderBy('order', 'asc');
@@ -34,12 +34,12 @@ class SubjectController extends Controller
             $unit->topics->transform(function ($topic) use ($user) {
                 
                 if ($topic->type === 'test') {
-                    // TESZT ESETÉN: Százalékos ellenőrzés
                     
-                    // Összes kérdés száma a témában
+                    
+                    
                     $totalQuestions = DB::table('questions')->where('topic_id', $topic->id)->count();
                     
-                    // User helyes válaszainak száma ebben a témában
+                    
                     $correctAnswers = DB::table('question_user')
                         ->join('questions', 'questions.id', '=', 'question_user.question_id')
                         ->where('questions.topic_id', $topic->id)
@@ -47,7 +47,7 @@ class SubjectController extends Controller
                         ->where('question_user.is_correct', true)
                         ->count();
 
-                    // Százalék számítás
+                    
                     $percent = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
                     $passing = $topic->passing_percentage ?? 50;
 
@@ -76,7 +76,7 @@ class SubjectController extends Controller
             return $unit;
         });
 
-        // 4. Statisztikák számítása
+        
         $allTopics = $units->flatMap->topics;
         
         $totalCount = $allTopics->count();
@@ -84,7 +84,7 @@ class SubjectController extends Controller
         
         $progress = $totalCount > 0 ? round(($completedCount / $totalCount) * 100) : 0;
 
-        // 5. Válasz összeállítása
+        
         return response()->json([
             'id' => $subject->id,
             'name' => $subject->name,

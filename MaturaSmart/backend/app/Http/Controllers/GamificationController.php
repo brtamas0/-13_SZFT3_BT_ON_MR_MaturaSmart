@@ -36,7 +36,7 @@ class GamificationController extends Controller
         $topic = Topic::findOrFail($topicId);
         $questions = Question::where('topic_id', $topicId)->with('answers')->get();
 
-        // EREDMÉNY SZÁMÍTÁSA
+        
         $totalXpAvailable = 0;
         $earnedXpInThisSession = 0;
         
@@ -51,15 +51,15 @@ class GamificationController extends Controller
             }
         }
 
-        // Százalék számítás
+        
         $percentage = $totalXpAvailable > 0 ? ($earnedXpInThisSession / $totalXpAvailable) * 100 : 0;
 
-        // VIIZSGA ELLENŐRZÉS
+        
         if ($topic->type === 'test') {
             $passing = $topic->passing_percentage ?? 50;
             
             if ($percentage < $passing) {
-                // SIKERTELEN: Nem mentünk semmit, 0 XP.
+                
                 return response()->json([
                     'message' => "Sajnos a vizsga nem sikerült ({$percentage}%). Próbáld újra a pontokért!",
                     'xp_gained' => 0,
@@ -69,7 +69,7 @@ class GamificationController extends Controller
             }
         }
 
-        // 3. LÉPÉS: Siker; XP+mentés
+        
         $xpToGrant = 0;
         $correctCount = 0;
         
@@ -82,7 +82,7 @@ class GamificationController extends Controller
                 $isCorrectNow = true;
                 $correctCount++;
 
-                // Megnézzük, hogy megoldotta e már korábban helyesen
+                
                 $alreadySolved = DB::table('question_user')
                     ->where('user_id', $user->id)
                     ->where('question_id', $question->id)
@@ -100,7 +100,7 @@ class GamificationController extends Controller
             );
         }
 
-        // XP jóváírás
+        
         if ($xpToGrant > 0) {
             $user->increment('xp', $xpToGrant);
         }

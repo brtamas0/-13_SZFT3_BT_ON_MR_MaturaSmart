@@ -4,11 +4,11 @@ import { ref, onMounted } from 'vue'
 const stats = ref({ users: 0, subjects: 0, topics: 0 })
 const loading = ref(true)
 
-// --- MODAL VÁLTOZÓK ---
+
 const showMessageModal = ref(false)
 const messageForm = ref({ title: '', message: '', type: 'info', expires_at: '' })
 const isSending = ref(false)
-const statusMsg = ref(null) // Visszajelzés
+const statusMsg = ref(null) 
 
 onMounted(async () => {
     fetchStats()

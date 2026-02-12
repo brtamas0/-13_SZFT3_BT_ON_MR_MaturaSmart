@@ -15,7 +15,6 @@ const handleForgotPassword = async () => {
   successMessage.value = ''
 
   try {
-    // Backend API
     const response = await fetch('http://backend.maturasmart.hu/api/forgot-password', {
       method: 'POST',
       headers: {
@@ -33,7 +32,6 @@ const handleForgotPassword = async () => {
       throw new Error(data.message || 'Nem található felhasználó ezzel az email címmel.')
     }
 
-    // Sikeres küldés
     successMessage.value = 'Az emlékeztető emailt elküldtük! Nézd meg a spam mappát is. 📧'
     email.value = ''
 

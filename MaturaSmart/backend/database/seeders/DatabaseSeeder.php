@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // --- FELHASZNÁLÓK ---
+        
         $tomi = User::create([
             'email' => 'tomi@maturasmart.hu',
             'full_name' => 'Bíró Tamás Attila',
@@ -50,9 +50,9 @@ class DatabaseSeeder extends Seeder
             'level' => 5,
         ]);
 
-        // ==========================================
-        // MATEMATIKA
-        // ==========================================
+        
+        
+        
         $math = Subject::create([
             'name' => 'Matematika',
             'slug' => 'matematika',
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Algebra, Geometria és minden, ami számolás.'
         ]);
 
-        // 1. Mappa: Geometria
+        
         $geoUnit = Unit::create([
             'subject_id' => $math->id,
             'title' => 'Geometria',
@@ -104,7 +104,7 @@ class DatabaseSeeder extends Seeder
 EOT,
         ]);
 
-        // Kérdések a Matekhoz
+        
         $q1 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Melyik háromszögre igaz a Pitagorasz-tétel?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Derékszögű', 'is_correct' => true]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Egyenlő szárú', 'is_correct' => false]);
@@ -119,9 +119,9 @@ EOT,
         Flashcard::create(['topic_id' => $pythagoras->id, 'front' => 'Milyen háromszögre igaz?', 'back' => 'Csak a derékszögű háromszögre.']);
         Flashcard::create(['topic_id' => $pythagoras->id, 'front' => 'Mit nevezünk átfogónak?', 'back' => 'A derékszöggel szembeni oldalt.']);
 
-        // ==========================================
-        // TÖRTÉNELEM
-        // ==========================================
+        
+        
+        
         $history = Subject::create([
             'name' => 'Történelem',
             'slug' => 'tortenelem',
@@ -148,7 +148,7 @@ EOT,
             'content' => '<p>István király 1000-ben történt koronázásával...</p>'
         ]);
         
-        // --- 2. Mappa---
+        
         $torokUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'Török hódoltság kora',
@@ -161,7 +161,7 @@ EOT,
             'title' => 'A Nándorfehérvári diadal',
             'slug' => 'nandorfehervar',
             'description' => 'Hunyadi János győzelme a túlerővel szemben.',
-            'year' => 1456, // Timeline teszt
+            'year' => 1456, 
             'year_label' => '1456',
             'xp' => 120,
             'content' => '<p>A déli harangszó a győzelem emlékét őrzi...</p>'
@@ -179,7 +179,7 @@ EOT,
             'content' => '<p>Csele patak, II. Lajos király halála...</p>'
         ]);
 
-        // --- 3. Mappa: Újkor és Forradalmak ---
+        
         $revolutionsUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'Forradalmak kora',
@@ -222,7 +222,7 @@ EOT,
             'content' => '<p>Deák Ferenc, a haza bölcse és Ferenc József megállapodása.</p>'
         ]);
 
-        // --- 4. Mappa: A 20. század viharai ---
+        
         $modernUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'A 20. század viharai',
@@ -253,7 +253,7 @@ EOT,
             'content' => '<p>Október 23., a Budapesti Műszaki Egyetem diákjainak felvonulása...</p>'
         ]);
         
-        // --- 5. Mappa (időrend teszteléshez) ---
+        
         $worldUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'Egyetemes kitekintő',
@@ -284,11 +284,11 @@ EOT,
             'content' => '<p>Santa Maria, Pinta, Nina...</p>'
         ]);
         
-        // Kérdés Törihez
+        
 
-        // ==========================================
-        // IRODALOM
-        // ==========================================
+        
+        
+        
         $lit = Subject::create([
             'name' => 'Irodalom',
             'slug' => 'irodalom',
@@ -302,9 +302,9 @@ EOT,
             'order' => 1
         ]);
 
-        // ==========================================
-        // ANGOL
-        // ==========================================
+        
+        
+        
         $eng = Subject::create([
             'name' => 'Angol nyelv',
             'slug' => 'angol',
@@ -319,9 +319,9 @@ EOT,
         ]);
 
 
-        // ==========================================
-        // NYELVTAN
-        // ==========================================
+        
+        
+        
         $grammar = Subject::create([
             'name' => 'Magyar nyelvtan',
             'slug' => 'nyelvtan',
@@ -350,13 +350,13 @@ EOT,
             '
         ]);
         
-        // Kérdés Nyelvtanhoz
+        
         $q4 = Question::create(['topic_id' => $partsOfSpeech->id, 'type' => 'multiple_choice', 'content' => 'Milyen szófaj a "fut" szó?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Ige', 'is_correct' => true]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Főnév', 'is_correct' => false]);
 
 
-        // --- SHOP ITEMS ---
+        
         $freeze = ShopItem::create([
             'name' => 'Streak Freeze',
             'cost' => 50,
@@ -371,7 +371,7 @@ EOT,
             'icon' => '🪙',
         ]);
 
-        // --- ACHIEVEMENTS ---
+        
         Achievement::create([
             'name' => 'Első Lépések',
             'description' => 'Oldj meg egy feladatot hibátlanul.',
@@ -379,7 +379,7 @@ EOT,
             'icon' => '🥇',
         ]);
 
-        // --- INVENTORY ---
+        
         UserInventory::create([
             'user_id' => $tomi->id,
             'shop_item_id' => $freeze->id,

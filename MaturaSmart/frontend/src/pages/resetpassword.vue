@@ -5,25 +5,25 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-// Adatok a linkből és a formból
+
 const token = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
 
-// Állapotjelzők
+
 const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 const isDark = ref(true)
 
 onMounted(() => {
-  // 1. Téma beállítása
+  
   const saved = localStorage.getItem('theme') || 'dark'
   document.documentElement.setAttribute('data-theme', saved)
   isDark.value = saved === 'dark'
 
-  // 2. Adatok kinyerése az URL-ből
+  
   token.value = route.params.token
   email.value = route.query.email
 })

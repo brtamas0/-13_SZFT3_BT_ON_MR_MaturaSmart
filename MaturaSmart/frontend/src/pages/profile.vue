@@ -11,7 +11,7 @@ const formName = ref('')
 const profileMessage = ref({ text: '', type: '' })
 const passwordMessage = ref({ text: '', type: '' })
 
-// Jelszó form
+
 const passwordForm = ref({
     current_password: '',
     new_password: '',
@@ -19,7 +19,7 @@ const passwordForm = ref({
 })
 const isChangingPassword = ref(false)
 
-// Mock Jelvények
+
 const badges = ref([
     { id: 1, name: 'Korai Madár', icon: '🌅', desc: 'Tanulás reggel 8 előtt', earned: true },
     { id: 2, name: 'Streak Mester', icon: '🔥', desc: '7 napos sorozat', earned: false },
@@ -27,7 +27,7 @@ const badges = ref([
     { id: 4, name: 'Szorgos', icon: '📚', desc: '5 lecke befejezése', earned: true },
 ])
 
-// Szint számítás
+
 const levelInfo = computed(() => {
   if (!user.value) return { level: 1, nextLevelXp: 100, remainingXp: 100, progress: 0 }
   
@@ -77,13 +77,13 @@ const fetchProfile = async () => {
   }
 }
 
-// Profil adat frissítés
+
 const updateProfile = async () => {
   const token = localStorage.getItem('token')
   profileMessage.value = { text: '', type: '' }
 
   try {
-    // ...
+    
 const response = await fetch('http://backend.maturasmart.hu/api/profile/update', {
   method: 'PUT',
   headers: {
@@ -113,7 +113,7 @@ const response = await fetch('http://backend.maturasmart.hu/api/profile/update',
   }
 }
 
-// Jelszó frissítés
+
 const updatePassword = async () => {
     const token = localStorage.getItem('token')
     passwordMessage.value = { text: '', type: '' }
@@ -146,7 +146,7 @@ const updatePassword = async () => {
 
         passwordMessage.value = { text: '✅ Jelszó sikeresen megváltoztatva!', type: 'success' }
         
-        // Form törlése
+        
         passwordForm.value = { current_password: '', new_password: '', new_password_confirmation: '' }
         
         setTimeout(() => passwordMessage.value = { text: '', type: '' }, 3000)

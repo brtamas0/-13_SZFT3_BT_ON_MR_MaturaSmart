@@ -16,7 +16,7 @@ const mobileOpen = ref(false)
 const theme = ref("dark")
 const user = ref({ full_name: "" })
 
-// --- KERESŐ VÁLTOZÓK ---
+
 const searchQuery = ref("")
 const searchResults = ref([])
 const showResults = ref(false)
@@ -37,7 +37,7 @@ onMounted(() => {
     }
   }
 
-  // Kattintás figyelése a kereső bezárásához
+  
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-container')) {
       showResults.value = false
@@ -63,7 +63,7 @@ const handleLogout = () => {
   router.push("/login")
 }
 
-// --- KERESŐ ---
+
 
 const handleSearchInput = () => {
   if (searchTimeout) clearTimeout(searchTimeout)

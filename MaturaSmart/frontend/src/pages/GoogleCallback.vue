@@ -6,20 +6,20 @@ const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
-  // Kivesszük az adatokat az URL-ből
+  
   const token = route.query.token
   const userJson = route.query.user
 
   if (token && userJson) {
     try {
-      // Token mentése
+      
       localStorage.setItem('token', token)
       
-      // User adat mentése (mivel JSON stringként jött, nem kell stringify)
+      
       localStorage.setItem('user', userJson)
       
-      // Átirányítás a vezérlőpultra
-      // Késleltetés a jobb megjelenítésért
+      
+      
       setTimeout(() => {
           router.push('/main')
       }, 500)
@@ -29,7 +29,7 @@ onMounted(() => {
       router.push('/login?error=data_parse_error')
     }
   } else {
-    // Ha nincs token, visszadobjuk a loginra
+    
     router.push('/login?error=no_token')
   }
 })

@@ -8,11 +8,11 @@ const router = useRouter()
 const isCreating = ref(false)
 const newSubject = ref({ name: '', description: '', icon: '📘' })
 
-// Állapotok
+
 const loading = ref(true)
 const error = ref(null)
 
-// Modal állapot
+
 const showModal = ref(false)
 const itemToDelete = ref(null)
 
@@ -20,7 +20,7 @@ onMounted(async () => {
     await fetchSubjects() 
 })
 
-// Adatok lekérése
+
 const fetchSubjects = async () => {
     loading.value = true
     error.value = null
@@ -45,7 +45,7 @@ const fetchSubjects = async () => {
     }
 }
 
-// Új létrehozása
+
 const createSubject = async () => {
     if (!newSubject.value.name) return alert("A név kötelező!")
 
@@ -63,7 +63,7 @@ const createSubject = async () => {
         
         if (!res.ok) throw new Error('Hiba a mentéskor')
 
-        // Sikeres mentés után
+        
         isCreating.value = false
         newSubject.value = { name: '', description: '', icon: '📘' }
         fetchSubjects()
@@ -72,13 +72,13 @@ const createSubject = async () => {
     }
 }
 
-// Törlés előkészítése
+
 const confirmDelete = (id) => {
     itemToDelete.value = id
     showModal.value = true
 }
 
-// Törlés végrehajtása
+
 const executeDelete = async () => {
     showModal.value = false
     const token = localStorage.getItem('token')

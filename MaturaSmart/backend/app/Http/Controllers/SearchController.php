@@ -16,9 +16,9 @@ class SearchController extends Controller
             return response()->json([]);
         }
 
-        // 1. Keresés a Tantárgyak között
+        
         $subjects = Subject::where('name', 'LIKE', "%{$query}%")
-            ->select('id', 'name as title', 'slug', 'icon') // Egységesítjük a mezőneveket
+            ->select('id', 'name as title', 'slug', 'icon') 
             ->take(3)
             ->get()
             ->map(function ($item) {
@@ -27,7 +27,7 @@ class SearchController extends Controller
                 return $item;
             });
 
-        // 2. Keresés a Leckék között
+        
         $topics = Topic::with('subject')
             ->where('title', 'LIKE', "%{$query}%")
             ->select('id', 'title', 'slug', 'subject_id', 'type')
@@ -40,7 +40,7 @@ class SearchController extends Controller
                 return $item;
             });
 
-        // Összefésüljük az eredményeket
+        
         return response()->json([
             'results' => $subjects->concat($topics)
         ]);
