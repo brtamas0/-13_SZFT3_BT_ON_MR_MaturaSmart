@@ -34,14 +34,10 @@ return new class extends Migration
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained()->onDelete('set null');
             
-            $table->string('type')->default('lesson'); // 'lesson' (Tananyag) vagy 'test' (teszt)
+            $table->string('type')->default('lesson'); 
             
-            // Teszt specifikus mezők
             $table->integer('time_limit_minutes')->nullable(); 
             $table->integer('passing_percentage')->default(50); 
-
-            // Olvasás vs Kvíz arány (0-100)
-            // 75: 75%ban az olvasás számít a progressnél
             $table->integer('reading_weight')->default(50); 
 
             $table->string('title');
@@ -51,7 +47,6 @@ return new class extends Migration
             $table->integer('xp')->default(0);             
             $table->integer('order')->default(0);
             
-            // Idővonal
             $table->integer('year')->nullable();
             $table->string('year_label')->nullable();
 
@@ -98,10 +93,21 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->timestamps();
         });
+
+        // 8. Videók
+        Schema::create('videos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('topic_id')->constrained()->onDelete('cascade');
+            $table->string('title')->nullable();
+            $table->string('url');
+            $table->integer('order')->default(0); 
+            $table->timestamps();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('videos');
         Schema::dropIfExists('flashcards');
         Schema::dropIfExists('question_user');
         Schema::dropIfExists('answers');
