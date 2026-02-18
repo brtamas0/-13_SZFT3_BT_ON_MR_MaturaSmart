@@ -225,7 +225,7 @@ const finishLesson = async () => {
 
     <div v-else-if="topic" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
       
-      <div class="relative rounded-3xl overflow-hidden p-8 md:p-12 mb-10 border border-white/10 shadow-2xl group">
+      <div class="relative rounded-3xl overflow-hidden p-8 md:p-12 mb-10 border border-white/10 shadow-2xl group mt-10">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/40 to-[#0b1029] z-0"></div>
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[100px] group-hover:bg-blue-400/30 transition-colors duration-700"></div>
         
