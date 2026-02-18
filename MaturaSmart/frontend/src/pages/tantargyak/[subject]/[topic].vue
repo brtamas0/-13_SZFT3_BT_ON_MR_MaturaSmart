@@ -13,7 +13,6 @@ const isLoading = ref(true)
 
 const testModuleRef = ref(null)
 
-
 const maxScrollPercentage = ref(0) 
 
 const updateScroll = () => {
@@ -29,18 +28,14 @@ const updateScroll = () => {
 
 const selectedAnswers = ref({}) 
 
-
 const totalProgress = computed(() => {
     if (!topic.value || topic.value.type === 'test') return 0
-    
     
     const readWeight = topic.value.reading_weight ?? 50 
     const quizWeight = 100 - readWeight
 
-    
     const scrollPart = maxScrollPercentage.value * (readWeight / 100) 
 
-    
     const totalQuestions = topic.value.questions ? topic.value.questions.length : 0 
     const answeredCount = Object.keys(selectedAnswers.value).length
     const quizPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0 
@@ -74,6 +69,25 @@ const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 const resultData = ref({ xp: 0, message: '', isFirstTime: true })
 const subjectSlug = route.params.subject 
+
+// --- ÚJ: YouTube URL segédfüggvény ---
+const getYoutubeEmbedUrl = (urlOrId) => {
+    if (!urlOrId) return '';
+    
+    // Ha ez már egy ID (pl. 11 karakter hosszú és nincsenek benne szlėssek)
+    if (urlOrId.length === 11 && !urlOrId.includes('/')) {
+        return `https://www.youtube-nocookie.com/embed/${urlOrId}`;
+    }
+
+    // Ha teljes URL, kinyerjük belőle az ID-t
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = urlOrId.match(regExp);
+
+    const id = (match && match[2].length === 11) ? match[2] : null;
+    
+    return id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
+}
+// -------------------------------------
 
 const fetchTopicData = async (newTopicSlug) => {
   isLoading.value = true
@@ -251,6 +265,30 @@ const finishLesson = async () => {
                 </div>
             </div>
 
+            <div v-if="topic.videos && topic.videos.length > 0" class="space-y-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">🎬</span>
+                    <h2 class="text-2xl font-bold text-white">Ajánlott Videók</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <div v-for="video in topic.videos" :key="video.id" class="group bg-[#1e293b] border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:border-blue-500/30 transition-all duration-300">
+                        <div class="aspect-video w-full relative">
+                            <iframe 
+                                class="absolute top-0 left-0 w-full h-full"
+                                :src="getYoutubeEmbedUrl(video.url || video.youtube_id)"
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                        <div class="p-4" v-if="video.title">
+                            <h3 class="text-white font-bold text-lg group-hover:text-blue-300 transition-colors">{{ video.title }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="bg-[#1e293b] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
                 
