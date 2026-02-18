@@ -11,17 +11,14 @@ class TopicController extends Controller
     public function show(Request $request, $subjectSlug, $topicSlug)
     {
         $user = $request->user();
-
         
         $subject = Subject::where('slug', $subjectSlug)->firstOrFail();
         
         $topic = Topic::where('subject_id', $subject->id)
                       ->where('slug', $topicSlug)
-                      ->with(['unit', 'flashcards', 'questions.answers'])
+                      ->with(['unit', 'flashcards', 'questions.answers', 'videos'])
                       ->firstOrFail();
 
-        
-        
         $allTopics = Topic::select('topics.id', 'topics.slug', 'topics.title', 'units.order as unit_order', 'topics.year', 'topics.order')
             ->join('units', 'topics.unit_id', '=', 'units.id')
             ->where('topics.subject_id', $subject->id)
@@ -30,12 +27,10 @@ class TopicController extends Controller
             ->orderBy('topics.order', 'asc') 
             ->get();
 
-        
         $currentIndex = $allTopics->search(function($item) use ($topic) {
             return $item->id === $topic->id;
         });
 
-        
         $prevTopic = ($currentIndex > 0) ? $allTopics[$currentIndex - 1] : null;
         $nextTopic = ($currentIndex < $allTopics->count() - 1) ? $allTopics[$currentIndex + 1] : null;
 
@@ -49,6 +44,8 @@ class TopicController extends Controller
 
             'description' => $topic->description,
             'content' => $topic->content,
+            'videos' => $topic->videos,
+            
             'flashcards' => $topic->flashcards,
             'questions' => $topic->questions->map(function($q) {
                  return $q;

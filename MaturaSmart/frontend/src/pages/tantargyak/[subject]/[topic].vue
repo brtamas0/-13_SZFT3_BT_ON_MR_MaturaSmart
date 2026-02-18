@@ -70,16 +70,11 @@ const showSuccessModal = ref(false)
 const resultData = ref({ xp: 0, message: '', isFirstTime: true })
 const subjectSlug = route.params.subject 
 
-// --- ÚJ: YouTube URL segédfüggvény ---
 const getYoutubeEmbedUrl = (urlOrId) => {
     if (!urlOrId) return '';
-    
-    // Ha ez már egy ID (pl. 11 karakter hosszú és nincsenek benne szlėssek)
     if (urlOrId.length === 11 && !urlOrId.includes('/')) {
         return `https://www.youtube-nocookie.com/embed/${urlOrId}`;
     }
-
-    // Ha teljes URL, kinyerjük belőle az ID-t
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = urlOrId.match(regExp);
 
@@ -87,8 +82,6 @@ const getYoutubeEmbedUrl = (urlOrId) => {
     
     return id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
 }
-// -------------------------------------
-
 const fetchTopicData = async (newTopicSlug) => {
   isLoading.value = true
   topic.value = null
