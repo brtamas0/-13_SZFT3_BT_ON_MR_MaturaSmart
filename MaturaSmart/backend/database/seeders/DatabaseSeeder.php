@@ -14,12 +14,12 @@ use App\Models\ShopItem;
 use App\Models\Achievement;
 use App\Models\UserInventory;
 use App\Models\Flashcard;
+use App\Models\Video;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        
         $tomi = User::create([
             'email' => 'tomi@maturasmart.hu',
             'full_name' => 'Bíró Tamás Attila',
@@ -50,9 +50,6 @@ class DatabaseSeeder extends Seeder
             'level' => 5,
         ]);
 
-        
-        
-        
         $math = Subject::create([
             'name' => 'Matematika',
             'slug' => 'matematika',
@@ -60,7 +57,6 @@ class DatabaseSeeder extends Seeder
             'description' => 'Algebra, Geometria és minden, ami számolás.'
         ]);
 
-        
         $geoUnit = Unit::create([
             'subject_id' => $math->id,
             'title' => 'Geometria',
@@ -104,7 +100,20 @@ class DatabaseSeeder extends Seeder
 EOT,
         ]);
 
+        Video::create([
+            'topic_id' => $pythagoras->id,
+            'title' => 'Pitagorasz-tétel érthetően (Matek Oázis)',
+            'url' => 'h_W_uOqjKqM',
+            'order' => 1
+        ]);
         
+        Video::create([
+            'topic_id' => $pythagoras->id,
+            'title' => 'Gyakorló feladatok',
+            'url' => 'https://www.youtube.com/watch?v=AnotherID', 
+            'order' => 2
+        ]);
+
         $q1 = Question::create(['topic_id' => $pythagoras->id, 'type' => 'multiple_choice', 'content' => 'Melyik háromszögre igaz a Pitagorasz-tétel?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Derékszögű', 'is_correct' => true]);
         Answer::create(['question_id' => $q1->id, 'text' => 'Egyenlő szárú', 'is_correct' => false]);
@@ -120,8 +129,6 @@ EOT,
         Flashcard::create(['topic_id' => $pythagoras->id, 'front' => 'Mit nevezünk átfogónak?', 'back' => 'A derékszöggel szembeni oldalt.']);
 
         
-        
-        
         $history = Subject::create([
             'name' => 'Történelem',
             'slug' => 'tortenelem',
@@ -134,8 +141,7 @@ EOT,
             'title' => 'Az Államalapítás kora',
             'order' => 1
         ]);
-
-        Topic::create([
+        $allamalapitas = Topic::create([
             'subject_id' => $history->id,
             'unit_id' => $arpadUnit->id,
             'title' => 'Az Államalapítás',
@@ -147,7 +153,13 @@ EOT,
             'order' => 1,
             'content' => '<p>István király 1000-ben történt koronázásával...</p>'
         ]);
-        
+
+        Video::create([
+            'topic_id' => $allamalapitas->id,
+            'title' => 'István a király - Koronázás',
+            'url' => 'dQw4w9WgXcQ',
+            'order' => 1
+        ]);
         
         $torokUnit = Unit::create([
             'subject_id' => $history->id,
@@ -179,7 +191,6 @@ EOT,
             'content' => '<p>Csele patak, II. Lajos király halála...</p>'
         ]);
 
-        
         $revolutionsUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'Forradalmak kora',
@@ -222,7 +233,6 @@ EOT,
             'content' => '<p>Deák Ferenc, a haza bölcse és Ferenc József megállapodása.</p>'
         ]);
 
-        
         $modernUnit = Unit::create([
             'subject_id' => $history->id,
             'title' => 'A 20. század viharai',
@@ -241,7 +251,7 @@ EOT,
             'content' => '<p>A versailles-i Nagy Trianon kastélyban írták alá...</p>'
         ]);
 
-        Topic::create([
+        $forradalom56 = Topic::create([
             'subject_id' => $history->id,
             'unit_id' => $modernUnit->id,
             'title' => 'Az 1956-os forradalom',
@@ -252,7 +262,13 @@ EOT,
             'xp' => 180,
             'content' => '<p>Október 23., a Budapesti Műszaki Egyetem diákjainak felvonulása...</p>'
         ]);
-        
+
+        Video::create([
+            'topic_id' => $forradalom56->id,
+            'title' => '1956 eseményei 10 percben',
+            'url' => 'dQw4w9WgXcQ',
+            'order' => 1
+        ]);
         
         $worldUnit = Unit::create([
             'subject_id' => $history->id,
@@ -284,11 +300,6 @@ EOT,
             'content' => '<p>Santa Maria, Pinta, Nina...</p>'
         ]);
         
-        
-
-        
-        
-        
         $lit = Subject::create([
             'name' => 'Irodalom',
             'slug' => 'irodalom',
@@ -301,9 +312,6 @@ EOT,
             'title' => 'Költészet',
             'order' => 1
         ]);
-
-        
-        
         
         $eng = Subject::create([
             'name' => 'Angol nyelv',
@@ -317,10 +325,6 @@ EOT,
             'title' => 'Grammar',
             'order' => 1
         ]);
-
-
-        
-        
         
         $grammar = Subject::create([
             'name' => 'Magyar nyelvtan',
@@ -350,13 +354,10 @@ EOT,
             '
         ]);
         
-        
         $q4 = Question::create(['topic_id' => $partsOfSpeech->id, 'type' => 'multiple_choice', 'content' => 'Milyen szófaj a "fut" szó?', 'xp' => 10, 'difficulty' => 1]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Ige', 'is_correct' => true]);
         Answer::create(['question_id' => $q4->id, 'text' => 'Főnév', 'is_correct' => false]);
 
-
-        
         $freeze = ShopItem::create([
             'name' => 'Streak Freeze',
             'cost' => 50,
@@ -371,7 +372,6 @@ EOT,
             'icon' => '🪙',
         ]);
 
-        
         Achievement::create([
             'name' => 'Első Lépések',
             'description' => 'Oldj meg egy feladatot hibátlanul.',
@@ -379,16 +379,13 @@ EOT,
             'icon' => '🥇',
         ]);
 
-        
         UserInventory::create([
             'user_id' => $tomi->id,
             'shop_item_id' => $freeze->id,
             'quantity' => 2,
         ]);
 
-        echo "Adatok feltöltve Unitokkal és Timeline adatokkal! \n";
+        echo "Adatok feltöltve Unitokkal, Videókkal és Timeline adatokkal! \n";
         echo "Tomi: tomi@maturasmart.hu\n";
-        echo "Nati: nati@maturasmart.hu\n";
-        echo "Roli: roli@maturasmart.hu\n";
     }
 }
