@@ -3,6 +3,10 @@
 :root {
     --font-family: 'Inter', system-ui, -apple-system, sans-serif;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --text-primary-rgb: 15, 23, 42;
+    --text-secondary-rgb: 71, 85, 105;
+    --text-accent-rgb: 45, 114, 182;
+    --text-danger-rgb: 217, 78, 120;
 }
 
 html {
@@ -13,6 +17,10 @@ html {
     --bg-color: #0f172a;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
+    --text-primary-rgb: 248, 250, 252;
+    --text-secondary-rgb: 148, 163, 184;
+    --text-accent-rgb: 125, 211, 252;
+    --text-danger-rgb: 251, 113, 133;
     --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
