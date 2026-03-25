@@ -1,16 +1,34 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRoute } from 'vue-router'
 const route = useRoute()
 const isActive = (path) => route.path === path
+const theme = ref('dark')
+
+onMounted(() => {
+  theme.value = localStorage.getItem('theme') || 'dark'
+  document.documentElement.setAttribute('data-theme', theme.value)
+})
+
+const toggleTheme = () => {
+  theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-theme', theme.value)
+  localStorage.setItem('theme', theme.value)
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-[#0b102e] text-white flex font-sans"> 
     <aside class="w-64 bg-[#06091a] border-r border-white/5 flex flex-col fixed h-full z-40">
       <div class="p-6 border-b border-white/5">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-          AdminPanel
-        </h1>
+        <div class="flex items-center justify-between gap-3">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+            AdminPanel
+          </h1>
+          <button @click="toggleTheme" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border border-white/10 hover:bg-white/10 transition">
+            {{ theme === 'dark' ? '🌙' : '☀️' }}
+          </button>
+        </div>
       </div>
       
       <nav class="flex-1 p-4 space-y-2">

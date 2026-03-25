@@ -234,3 +234,24 @@ onUnmounted(() => clearInterval(timerInterval.value))
 
     </div>
 </template>
+
+<style scoped>
+[data-theme="light"] [class*="bg-[#161b22]"],
+[data-theme="light"] [class*="bg-[#1e293b]"],
+[data-theme="light"] [class*="bg-[#0f172a]"],
+[data-theme="light"] [class*="bg-gray-800"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] [class*="text-white"],
+[data-theme="light"] [class*="text-gray-300"],
+[data-theme="light"] [class*="text-gray-400"],
+[data-theme="light"] [class*="text-gray-500"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] [class*="hover:bg-gray-800"]:hover {
+  background: rgba(45, 114, 182, 0.08) !important;
+}
+</style>
