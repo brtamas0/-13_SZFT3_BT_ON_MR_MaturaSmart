@@ -119,7 +119,7 @@ watch(() => route.path, () => {
         <RouterLink
         to="/"
         class="text-2xl font-bold tracking-wide shrink-0"
-        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+        :style="{ color: 'var(--text-primary)' }"
       >
         Matura<span class="accent-text">Smart</span>
       </RouterLink>
@@ -244,7 +244,7 @@ watch(() => route.path, () => {
         <button
           @click="toggleTheme"
           class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-white/10"
-          :style="{ color: theme === 'dark' ? '#94a3b8' : '#64748b' }"
+          :style="{ color: 'var(--text-secondary)' }"
           title="Téma váltása"
         >
           <span v-if="theme==='dark'">🌙</span>
@@ -314,7 +314,7 @@ watch(() => route.path, () => {
         <button
           class="lg:hidden text-2xl p-2"
           @click="mobileOpen = !mobileOpen"
-          :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+          :style="{ color: 'var(--text-primary)' }"
         >
           ☰
         </button>
@@ -410,16 +410,20 @@ watch(() => route.path, () => {
 }
 .nav-link {
   transition: all 0.2s;
-  color: inherit;
+  color: var(--text-primary);
   font-weight: 500;
   position: relative;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.45rem;
 }
 .nav-link:hover {
-  color: #60a5fa;
+  color: var(--accent);
+  background: rgba(45, 114, 182, 0.1);
 }
 .nav-link.active {
-  color: #60a5fa;
+  color: var(--accent);
   font-weight: 600;
+  background: rgba(45, 114, 182, 0.14);
 }
 
 .fade-enter-active,

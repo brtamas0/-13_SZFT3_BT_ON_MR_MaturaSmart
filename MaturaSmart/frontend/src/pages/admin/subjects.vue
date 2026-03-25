@@ -104,7 +104,7 @@ const executeDelete = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="admin-subjects-page">
     <div class="flex justify-between items-end mb-10 border-b border-gray-800 pb-6">
         <div>
             <h1 class="text-3xl font-bold text-white mb-2">Tantárgyak</h1>
@@ -183,4 +183,21 @@ const executeDelete = async () => {
 <style scoped>
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+[data-theme="light"] .admin-subjects-page [class*="bg-[#131b3d]"],
+[data-theme="light"] .admin-subjects-page [class*="bg-[#0b102e]"],
+[data-theme="light"] .admin-subjects-page [class*="bg-gray-900"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .admin-subjects-page [class*="text-white"],
+[data-theme="light"] .admin-subjects-page [class*="text-gray-400"],
+[data-theme="light"] .admin-subjects-page [class*="text-gray-500"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .admin-subjects-page button:hover {
+  color: #ffffff !important;
+}
 </style>

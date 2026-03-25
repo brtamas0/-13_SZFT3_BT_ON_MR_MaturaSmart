@@ -170,7 +170,7 @@ const updatePassword = async () => {
         </div>
     </div>
 
-    <div v-else-if="user" class="min-h-screen pb-20 overflow-hidden relative bg-gradient-to-b from-[#0b1029] to-[#031625]">
+    <div v-else-if="user" class="profile-page min-h-screen pb-20 overflow-hidden relative bg-gradient-to-b from-[#0b1029] to-[#031625]">
       
       <div class="absolute inset-0 bg-[#020617]" 
            style="mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%); pointer-events: none;">
@@ -414,5 +414,21 @@ const updatePassword = async () => {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+[data-theme="light"] .profile-page {
+    background: linear-gradient(180deg, var(--surface-1), var(--surface-2)) !important;
+}
+
+[data-theme="light"] .profile-page [class*="bg-[#020617]"],
+[data-theme="light"] .profile-page [class*="bg-[#0f172a]"],
+[data-theme="light"] .profile-page [class*="bg-[#0b1029]"],
+[data-theme="light"] .profile-page [class*="bg-[#1e293b]"] {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .profile-page [class*="text-white"] {
+    color: var(--text-primary) !important;
 }
 </style>

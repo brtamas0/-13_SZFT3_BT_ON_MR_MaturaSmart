@@ -69,7 +69,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="min-h-screen bg-[#020617] flex items-center justify-center text-white relative overflow-hidden p-4 font-sans">
+    class="auth-login-page min-h-screen bg-[#020617] flex items-center justify-center text-white relative overflow-hidden p-4 font-sans">
   <!--
     <button @click="toggleTheme"
       class="absolute top-5 right-5 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all cursor-pointer border border-white/5 shadow-lg"
@@ -211,5 +211,28 @@ onMounted(() => {
 
 .animate-fade-in-down {
   animation: fade-in-down 0.8s ease-out forwards;
+}
+
+[data-theme="light"] .auth-login-page {
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-2));
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .auth-login-page [class*="bg-[#020617]"],
+[data-theme="light"] .auth-login-page [class*="bg-[#0b1121]"] {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .auth-login-page [class*="from-[#0f172a]"],
+[data-theme="light"] .auth-login-page [class*="via-[#1e1b4b]"],
+[data-theme="light"] .auth-login-page [class*="to-[#312e81]"] {
+  background: linear-gradient(145deg, #e4f1fa, #aedae1) !important;
+}
+
+[data-theme="light"] .auth-login-page input {
+  background: #ffffff !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(45, 114, 182, 0.25) !important;
 }
 </style>

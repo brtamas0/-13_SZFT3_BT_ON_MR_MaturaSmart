@@ -62,7 +62,7 @@ const sendSystemMessage = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="admin-dashboard-page">
     <h1 class="text-3xl font-bold mb-8 text-white">Vezérlőpult</h1>
 
     <div v-if="loading" class="text-blue-400 animate-pulse">Adatok betöltése...</div>
@@ -156,3 +156,17 @@ const sendSystemMessage = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+[data-theme="light"] .admin-dashboard-page [class*="bg-[#131b3d]"],
+[data-theme="light"] .admin-dashboard-page [class*="bg-[#0b102e]"],
+[data-theme="light"] .admin-dashboard-page [class*="bg-gray-700"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .admin-dashboard-page [class*="text-white"],
+[data-theme="light"] .admin-dashboard-page [class*="text-gray-400"] {
+  color: var(--text-primary) !important;
+}
+</style>

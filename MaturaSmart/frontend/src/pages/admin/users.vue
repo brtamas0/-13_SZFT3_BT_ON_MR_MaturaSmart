@@ -37,7 +37,7 @@ const fetchUsers = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="admin-users-page">
     <div class="flex justify-between items-end mb-8 border-b border-gray-800 pb-4">
         <div>
             <h1 class="text-3xl font-bold text-white mb-2">Felhasználók</h1>
@@ -119,5 +119,24 @@ const fetchUsers = async () => {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+</style>
+<style scoped>
+[data-theme="light"] .admin-users-page [class*="bg-[#131b3d]"],
+[data-theme="light"] .admin-users-page [class*="bg-[#0b102e]"],
+[data-theme="light"] .admin-users-page [class*="bg-gray-800"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .admin-users-page [class*="text-white"],
+[data-theme="light"] .admin-users-page [class*="text-gray-300"],
+[data-theme="light"] .admin-users-page [class*="text-gray-400"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .admin-users-page [class*="bg-blue-500/10"],
+[data-theme="light"] .admin-users-page [class*="bg-red-500/10"] {
+  background: rgba(45, 114, 182, 0.12) !important;
 }
 </style>
