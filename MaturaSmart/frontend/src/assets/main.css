@@ -105,6 +105,13 @@ a { text-decoration: none; color: inherit; }
   border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
+
+[data-theme="light"] {
+  --text-secondary: #334155;
+  --app-background-gradient: linear-gradient(to bottom, #f1f5ff, #e9efff, #dde7fb);
+  --app-noise-opacity: 0.015;
+}
+
 [data-theme="light"] [class*="bg-[#1e293b]/"],
 [data-theme="light"] [class*="bg-[#0b1029]/"],
 [data-theme="light"] [class*="bg-[#0f172a]/"] {
@@ -116,18 +123,16 @@ a { text-decoration: none; color: inherit; }
 [data-theme="light"] [class*="text-slate-300"],
 [data-theme="light"] [class*="text-gray-500"],
 [data-theme="light"] [class*="text-gray-400"] {
-  color: #3f5f79 !important;
+  color: #334155 !important;
 }
 
-
-[data-theme="light"] .lesson-badge {
-  background-color: #b0dde4 !important;
-  border-color: rgba(40, 111, 180, 0.22) !important;
-  color: #1f4d75 !important;
+[data-theme="light"] [class*="text-white"] {
+  color: #0f172a !important;
 }
 
-[data-theme="light"] .subject-progress-track {
-  background-color: #c9e4ef !important;
+[data-theme="light"] [class*="bg-blue-600"],
+[data-theme="light"] [class*="bg-indigo-600"] {
+  color: #ffffff !important;
 }
 
 /* --- NAVIGÁCIÓ --- */
