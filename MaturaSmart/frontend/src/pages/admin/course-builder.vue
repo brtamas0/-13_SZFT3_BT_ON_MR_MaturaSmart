@@ -441,4 +441,30 @@ const executeDelete = async () => {
 [data-theme="light"] .course-builder-page [class*="text-gray-500"] {
     color: var(--text-primary) !important;
 }
+
+[data-theme="light"] .course-builder-page .bg-\[\#131b3d\] {
+    background: #f8fbff !important;
+}
+
+[data-theme="light"] .course-builder-page .bg-\[\#0b102e\]\/50,
+[data-theme="light"] .course-builder-page .bg-\[\#0b102e\] {
+    background: #eef4ff !important;
+}
+
+[data-theme="light"] .course-builder-page .bg-\[\#0d1117\],
+[data-theme="light"] .course-builder-page .bg-\[\#161b22\] {
+    background: #f1f5f9 !important;
+}
+
+[data-theme="light"] .course-builder-page .text-blue-200 {
+    color: #1e40af !important;
+}
+
+[data-theme="light"] .course-builder-page .text-gray-600 {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .course-builder-page .text-gray-300 {
+    color: #334155 !important;
+}
 </style>
