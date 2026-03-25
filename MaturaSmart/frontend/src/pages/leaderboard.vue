@@ -12,7 +12,7 @@ const currentUser = ref(null)
 const originalBodyStyle = document.body.style.backgroundColor
 
 onMounted(async () => {
-  document.body.style.backgroundColor = '#020617'
+  document.body.style.backgroundColor = 'var(--bg-color)'
 
   const storedUser = localStorage.getItem('user')
   if (storedUser) currentUser.value = JSON.parse(storedUser)

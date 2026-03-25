@@ -57,7 +57,7 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#020617] flex items-center justify-center text-white p-4 font-sans relative overflow-hidden">
+  <div class="register-page min-h-screen bg-[#020617] flex items-center justify-center text-white p-4 font-sans relative overflow-hidden">
     
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px]"></div>
@@ -174,3 +174,28 @@ const handleRegister = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+[data-theme="light"] .register-page {
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-2));
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .register-page [class*="bg-[#0b1029]/80"],
+[data-theme="light"] .register-page [class*="bg-[#020617]"] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .register-page [class*="from-[#0f172a]"],
+[data-theme="light"] .register-page [class*="via-[#1e1b4b]"],
+[data-theme="light"] .register-page [class*="to-[#312e81]"] {
+  background: linear-gradient(145deg, #e4f1fa, #aedae1) !important;
+}
+
+[data-theme="light"] .register-page input {
+  background: #ffffff !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(45, 114, 182, 0.25) !important;
+}
+</style>

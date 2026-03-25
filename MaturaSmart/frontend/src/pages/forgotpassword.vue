@@ -61,7 +61,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#020617] flex items-center justify-center text-white relative overflow-hidden p-4 font-sans">
+  <div class="auth-page min-h-screen bg-[#020617] flex items-center justify-center text-white relative overflow-hidden p-4 font-sans">
     
     <!-- <button 
       @click="toggleTheme" 
@@ -169,5 +169,28 @@ onMounted(() => {
 
 .animate-fade-in-down {
   animation: fade-in-down 0.8s ease-out forwards;
+}
+
+[data-theme="light"] .auth-page {
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-2));
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .auth-page [class*="bg-[#020617]"],
+[data-theme="light"] .auth-page [class*="bg-[#0b1121]"] {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .auth-page [class*="from-[#0f172a]"],
+[data-theme="light"] .auth-page [class*="via-[#1e1b4b]"],
+[data-theme="light"] .auth-page [class*="to-[#312e81]"] {
+  background: linear-gradient(145deg, #e4f1fa, #aedae1) !important;
+}
+
+[data-theme="light"] .auth-page input {
+  background: #ffffff !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(45, 114, 182, 0.25) !important;
 }
 </style>
