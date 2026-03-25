@@ -124,10 +124,6 @@ a { text-decoration: none; color: inherit; }
 [data-theme="light"] [class*="bg-[#06091a]"],
 [data-theme="light"] [class*="bg-[#0d1117]"],
 [data-theme="light"] [class*="bg-[#161b22]"],
-[data-theme="light"] [class*="from-[#0b1029]"],
-[data-theme="light"] [class*="to-[#031625]"],
-[data-theme="light"] [class*="from-blue-900"],
-[data-theme="light"] [class*="to-[#0b1029]"],
 [data-theme="light"] [class*="from-[#0f172a]"],
 [data-theme="light"] [class*="via-[#1e1b4b]"],
 [data-theme="light"] [class*="to-[#312e81]"] {
@@ -148,17 +144,11 @@ a { text-decoration: none; color: inherit; }
   color: #2d72b6 !important;
 }
 
-[data-theme="light"] [class*="text-white"] {
-  color: #1a3550 !important;
-}
-
 [data-theme="light"] [class*="bg-blue-600"],
 [data-theme="light"] [class*="bg-blue-500"],
 [data-theme="light"] [class*="from-blue-600"],
 [data-theme="light"] [class*="to-indigo-500"],
-[data-theme="light"] [class*="bg-indigo-600"],
-[data-theme="light"] [class*="from-blue-500"],
-[data-theme="light"] [class*="to-indigo-600"] {
+[data-theme="light"] [class*="bg-indigo-600"] {
   --tw-gradient-from: #2d72b6 var(--tw-gradient-from-position) !important;
   --tw-gradient-to: #5798cf var(--tw-gradient-to-position) !important;
   color: #ffffff !important;
@@ -184,6 +174,36 @@ a { text-decoration: none; color: inherit; }
 
 [data-theme="light"] .subject-progress-track {
   background-color: #c9e4ef !important;
+}
+
+
+[data-theme="light"] {
+  --text-secondary: #334155;
+  --app-background-gradient: linear-gradient(to bottom, #f1f5ff, #e9efff, #dde7fb);
+  --app-noise-opacity: 0.015;
+}
+
+[data-theme="light"] [class*="bg-[#1e293b]/"],
+[data-theme="light"] [class*="bg-[#0b1029]/"],
+[data-theme="light"] [class*="bg-[#0f172a]/"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+[data-theme="light"] [class*="text-slate-500"],
+[data-theme="light"] [class*="text-slate-400"],
+[data-theme="light"] [class*="text-slate-300"],
+[data-theme="light"] [class*="text-gray-500"],
+[data-theme="light"] [class*="text-gray-400"] {
+  color: #334155 !important;
+}
+
+[data-theme="light"] [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] [class*="bg-blue-600"],
+[data-theme="light"] [class*="bg-indigo-600"] {
+  color: #ffffff !important;
 }
 
 /* --- NAVIGÁCIÓ --- */
