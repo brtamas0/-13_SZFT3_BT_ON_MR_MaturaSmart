@@ -11,12 +11,12 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="layout-wrapper min-h-screen flex flex-col relative bg-[#020617] text-white selection:bg-blue-500/30 font-sans">
+  <div class="layout-wrapper min-h-screen flex flex-col relative selection:bg-blue-500/30 font-sans">
     
-    <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0b1029] via-[#05091a] to-[#020617]"></div>
-        <div class="absolute inset-0 opacity-[0.15]" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
-        <div class="absolute bottom-0 left-0 right-0 h-96 bg-blue-900/10 blur-[100px]"></div>
+    <div class="layout-background fixed inset-0 z-0 pointer-events-none">
+        <div class="layout-gradient absolute inset-0"></div>
+        <div class="layout-noise absolute inset-0"></div>
+        <div class="layout-glow absolute bottom-0 left-0 right-0 h-96 blur-[100px]"></div>
     </div>
 
     <GlobalNotification />
@@ -27,9 +27,35 @@ const props = defineProps({
       <slot />
     </main>
 
-    <footer class="text-center py-8 text-xs font-medium text-slate-500 relative z-10 border-t border-white/5 bg-[#020617]/80 mt-auto backdrop-blur-sm">
+    <footer class="layout-footer text-center py-8 text-xs font-medium relative z-10 mt-auto backdrop-blur-sm">
       <p>&copy; {{ new Date().getFullYear() }} MaturaSmart – A jövő érettségije</p>
     </footer>
 
   </div>
 </template>
+
+<style scoped>
+.layout-wrapper {
+  background: var(--bg-color);
+  color: var(--text-primary);
+}
+
+.layout-gradient {
+  background: var(--app-background-gradient);
+}
+
+.layout-noise {
+  opacity: var(--app-noise-opacity);
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+}
+
+.layout-glow {
+  background: var(--app-glow-color);
+}
+
+.layout-footer {
+  color: var(--text-secondary);
+  border-top: 1px solid var(--glass-border);
+  background: var(--app-footer-bg);
+}
+</style>
