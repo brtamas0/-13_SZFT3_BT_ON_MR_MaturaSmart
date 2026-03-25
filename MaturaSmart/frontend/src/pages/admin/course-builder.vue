@@ -220,7 +220,7 @@ const executeDelete = async () => {
 </script>
 
 <template>
-  <div class="h-full flex flex-col">
+  <div class="course-builder-page h-full flex flex-col">
     <div v-if="!isEditing" class="flex-1 overflow-y-auto">
         <div class="flex items-center gap-4 mb-8 border-b border-gray-800 pb-4">
             <RouterLink to="/admin/subjects" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm font-bold text-gray-300 transition">← Vissza</RouterLink>
@@ -426,4 +426,19 @@ const executeDelete = async () => {
 .prose-invert h1, .prose-invert h2, .prose-invert h3 { color: white; font-weight: bold; }
 .prose-invert p { color: #cbd5e1; }
 .prose-invert strong { color: white; }
+
+[data-theme="light"] .course-builder-page [class*="bg-[#131b3d]"],
+[data-theme="light"] .course-builder-page [class*="bg-[#0b102e]"],
+[data-theme="light"] .course-builder-page [class*="bg-[#161b22]"],
+[data-theme="light"] .course-builder-page [class*="bg-[#0d1117]"],
+[data-theme="light"] .course-builder-page [class*="bg-gray-800"] {
+    background: #ffffff !important;
+    border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .course-builder-page [class*="text-white"],
+[data-theme="light"] .course-builder-page [class*="text-gray-400"],
+[data-theme="light"] .course-builder-page [class*="text-gray-500"] {
+    color: var(--text-primary) !important;
+}
 </style>

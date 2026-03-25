@@ -196,7 +196,7 @@ const finishLesson = async () => {
       </div>
     </div>
 
-    <div v-else-if="topic && topic.type === 'test'" class="fixed inset-0 z-[100] bg-[#0b1029] overflow-y-auto">
+    <div v-else-if="topic && topic.type === 'test'" class="topic-page fixed inset-0 z-[100] bg-[#0b1029] overflow-y-auto">
         <div class="w-full min-h-screen flex flex-col">
             <div class="w-full bg-[#1e293b] border-b border-gray-800 px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-lg">
                 <div class="flex items-center gap-4">
@@ -223,7 +223,7 @@ const finishLesson = async () => {
         </div>
     </div>
 
-    <div v-else-if="topic" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
+    <div v-else-if="topic" class="topic-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
       
       <div class="relative rounded-3xl overflow-hidden p-8 md:p-12 mb-10 border border-white/10 shadow-2xl group mt-10">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/40 to-[#0b1029] z-0"></div>
@@ -515,4 +515,17 @@ const finishLesson = async () => {
   100% { transform: scale(1); opacity: 1; }
 }
 .animate-pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+[data-theme="light"] .topic-page [class*="bg-[#0b1029]"],
+[data-theme="light"] .topic-page [class*="bg-[#1e293b]"],
+[data-theme="light"] .topic-page [class*="bg-[#0f172a]"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .topic-page [class*="text-white"],
+[data-theme="light"] .topic-page [class*="text-gray-400"],
+[data-theme="light"] .topic-page [class*="text-gray-500"] {
+  color: var(--text-primary) !important;
+}
 </style>

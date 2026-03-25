@@ -53,7 +53,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-else-if="subject" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
+    <div v-else-if="subject" class="subject-index-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
       
       <div class="bg-[#10194E] border border-white/10 rounded-3xl p-8 mb-12 shadow-2xl relative overflow-hidden mt-12">
         <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
@@ -198,3 +198,18 @@ onMounted(async () => {
 
   </BaseLayout>
 </template>
+
+<style scoped>
+[data-theme="light"] .subject-index-page [class*="bg-[#10194E]"],
+[data-theme="light"] .subject-index-page [class*="bg-[#1e293b]"],
+[data-theme="light"] .subject-index-page [class*="bg-[#0f172a]"] {
+  background: #ffffff !important;
+  border-color: rgba(45, 114, 182, 0.2) !important;
+}
+
+[data-theme="light"] .subject-index-page [class*="text-white"],
+[data-theme="light"] .subject-index-page [class*="text-gray-400"],
+[data-theme="light"] .subject-index-page [class*="text-gray-500"] {
+  color: var(--text-primary) !important;
+}
+</style>

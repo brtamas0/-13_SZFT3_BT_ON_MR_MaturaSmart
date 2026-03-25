@@ -410,16 +410,20 @@ watch(() => route.path, () => {
 }
 .nav-link {
   transition: all 0.2s;
-  color: inherit;
+  color: var(--text-primary);
   font-weight: 500;
   position: relative;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.45rem;
 }
 .nav-link:hover {
-  color: #60a5fa;
+  color: var(--accent);
+  background: rgba(45, 114, 182, 0.1);
 }
 .nav-link.active {
-  color: #60a5fa;
+  color: var(--accent);
   font-weight: 600;
+  background: rgba(45, 114, 182, 0.14);
 }
 
 .fade-enter-active,
