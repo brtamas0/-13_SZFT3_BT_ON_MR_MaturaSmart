@@ -225,16 +225,16 @@ const updatePassword = async () => {
                             </div>
                         </div>
                         
-                        <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden relative z-10">
+                        <div class="level-progress-track w-full h-3 bg-slate-800 rounded-full overflow-hidden relative z-10">
                             <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000" :style="{ width: levelInfo.progress + '%' }"></div>
                         </div>
-                        <div class="text-[10px] text-slate-500 mt-2 text-center relative z-10">
-                            Még <span class="text-white font-bold">{{ levelInfo.remainingXp }} XP</span> a szintlépéshez
+                        <div class="xp-helper-text text-[10px] text-slate-500 mt-2 text-center relative z-10">
+                            Még <span class="xp-helper-value text-white font-bold">{{ levelInfo.remainingXp }} XP</span> a szintlépéshez
                         </div>
                     </div>
 
                     <div class="flex flex-wrap justify-center gap-2">
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border" :class="user.role === 'admin' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'">
+                        <span class="role-pill px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border" :class="user.role === 'admin' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'">
                             {{ user.role === 'student' ? 'diák' : user.role }}
                         </span>
                         <span v-if="user.graduation_year" class="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider">
@@ -430,5 +430,29 @@ const updatePassword = async () => {
 
 [data-theme="light"] .profile-page [class*="text-white"] {
     color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .profile-page .level-progress-track {
+    background: #cbd5e1 !important;
+}
+
+[data-theme="light"] .profile-page .xp-helper-text {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .profile-page .xp-helper-value {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .profile-page .role-pill.bg-red-500\/10 {
+    background: rgba(220, 38, 38, 0.18) !important;
+    color: #991b1b !important;
+    border-color: rgba(185, 28, 28, 0.45) !important;
+}
+
+[data-theme="light"] .profile-page .role-pill.bg-blue-500\/10 {
+    background: rgba(37, 99, 235, 0.16) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(29, 78, 216, 0.35) !important;
 }
 </style>

@@ -531,4 +531,38 @@ const finishLesson = async () => {
 [data-theme="light"] .topic-page [class*="text-gray-500"] {
   color: var(--text-primary) !important;
 }
+
+[data-theme="light"] .topic-page .topic-hero {
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+[data-theme="light"] .topic-page .topic-hero > .absolute.inset-0.bg-gradient-to-r {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.18), rgba(99, 102, 241, 0.12)) !important;
+}
+
+[data-theme="light"] .topic-page .topic-hero nav {
+  color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .topic-page .topic-hero p {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .topic-page .card-front {
+  background: linear-gradient(135deg, #1e3a8a, #1e293b) !important;
+  border-color: rgba(129, 140, 248, 0.65) !important;
+}
+
+[data-theme="light"] .topic-page .card-front h4,
+[data-theme="light"] .topic-page .card-front span {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .topic-page .card-back {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-theme="light"] .topic-page .bg-blue-600\/10.border.border-blue-500\/20 p {
+  color: #1e3a8a !important;
+}
 </style>

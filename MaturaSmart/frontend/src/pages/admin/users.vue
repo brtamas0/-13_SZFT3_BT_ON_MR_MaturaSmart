@@ -89,7 +89,7 @@ const fetchUsers = async () => {
 
                     <td class="p-4">
                         <span 
-                            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-sm"
+                            class="role-chip px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-sm"
                             :class="user.role === 'admin' 
                                 ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-red-900/20' 
                                 : 'bg-blue-500/10 text-blue-400 border-blue-500/30 shadow-blue-900/20'"
@@ -133,5 +133,17 @@ const fetchUsers = async () => {
 [data-theme="light"] .admin-users-page [class*="text-gray-300"],
 [data-theme="light"] .admin-users-page [class*="text-gray-400"] {
   color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .admin-users-page .role-chip.bg-red-500\/10 {
+  background: rgba(220, 38, 38, 0.18) !important;
+  color: #991b1b !important;
+  border-color: rgba(185, 28, 28, 0.45) !important;
+}
+
+[data-theme="light"] .admin-users-page .role-chip.bg-blue-500\/10 {
+  background: rgba(37, 99, 235, 0.16) !important;
+  color: #1d4ed8 !important;
+  border-color: rgba(29, 78, 216, 0.35) !important;
 }
 </style>
