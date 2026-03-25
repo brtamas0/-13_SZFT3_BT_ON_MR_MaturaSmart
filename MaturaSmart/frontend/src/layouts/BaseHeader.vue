@@ -119,7 +119,7 @@ watch(() => route.path, () => {
         <RouterLink
         to="/"
         class="text-2xl font-bold tracking-wide shrink-0"
-        :style="{ color: 'var(--text-primary)' }"
+        :style="{ color: theme === 'dark' ? 'white' : 'var(--text-primary)' }"
       >
         Matura<span class="accent-text">Smart</span>
       </RouterLink>
@@ -314,7 +314,7 @@ watch(() => route.path, () => {
         <button
           class="lg:hidden text-2xl p-2"
           @click="mobileOpen = !mobileOpen"
-          :style="{ color: 'var(--text-primary)' }"
+          :style="{ color: theme === 'dark' ? 'white' : 'var(--text-primary)' }"
         >
           ☰
         </button>

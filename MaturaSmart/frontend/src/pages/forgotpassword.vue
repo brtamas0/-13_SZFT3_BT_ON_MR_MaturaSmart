@@ -193,9 +193,4 @@ onMounted(() => {
   color: var(--text-primary) !important;
   border-color: rgba(45, 114, 182, 0.25) !important;
 }
-
-[data-theme="light"] .auth-page [class*="bg-slate-800"] {
-  background: #2d72b6 !important;
-  color: #ffffff !important;
-}
 </style>

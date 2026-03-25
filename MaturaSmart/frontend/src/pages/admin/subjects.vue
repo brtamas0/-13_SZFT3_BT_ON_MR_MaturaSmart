@@ -196,8 +196,4 @@ const executeDelete = async () => {
 [data-theme="light"] .admin-subjects-page [class*="text-gray-500"] {
   color: var(--text-primary) !important;
 }
-
-[data-theme="light"] .admin-subjects-page button:hover {
-  color: #ffffff !important;
-}
 </style>

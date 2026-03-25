@@ -134,9 +134,4 @@ const fetchUsers = async () => {
 [data-theme="light"] .admin-users-page [class*="text-gray-400"] {
   color: var(--text-primary) !important;
 }
-
-[data-theme="light"] .admin-users-page [class*="bg-blue-500/10"],
-[data-theme="light"] .admin-users-page [class*="bg-red-500/10"] {
-  background: rgba(45, 114, 182, 0.12) !important;
-}
 </style>

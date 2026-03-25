@@ -531,17 +531,4 @@ const finishLesson = async () => {
 [data-theme="light"] .topic-page [class*="text-gray-500"] {
   color: var(--text-primary) !important;
 }
-
-[data-theme="light"] .topic-page .topic-hero [class*="bg-gradient-to-r"] {
-  background: linear-gradient(90deg, #aedae1, #d9ecf5) !important;
-}
-
-[data-theme="light"] .topic-page [class*="card-front"],
-[data-theme="light"] .topic-page [class*="card-back"],
-[data-theme="light"] .topic-page [class*="bg-blue-900/5"],
-[data-theme="light"] .topic-page [class*="bg-blue-900/10"] {
-  background: #eef7fc !important;
-  color: var(--text-primary) !important;
-  border-color: rgba(45, 114, 182, 0.25) !important;
-}
 </style>
