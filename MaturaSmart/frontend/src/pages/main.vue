@@ -208,7 +208,7 @@ onUnmounted(() => {
                 {{ s.visuals.icon }}
               </div>
               <div
-                class="px-3 py-1 rounded-full border border-white/5 bg-[#0f172a] text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                class="lesson-badge px-3 py-1 rounded-full border border-white/5 bg-[#0f172a] text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 {{ s.total_topics }} Lecke
               </div>
             </div>
@@ -225,7 +225,7 @@ onUnmounted(() => {
                 <span class="text-xs font-bold" :class="s.visuals.color">{{ s.progress }}%</span>
               </div>
 
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="subject-progress-track w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                 <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-500 relative transition-all duration-1000"
                   :style="{ width: s.progress + '%' }">
                 </div>
