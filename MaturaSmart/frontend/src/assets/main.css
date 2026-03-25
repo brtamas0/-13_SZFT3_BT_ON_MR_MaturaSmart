@@ -51,6 +51,17 @@ html {
   --accent-glow: none;
 
   --card-hover: #f1f5f9;
+  --app-background-gradient: linear-gradient(to bottom, #f8fafc, #eef2ff, #e2e8f0);
+  --app-noise-opacity: 0.04;
+  --app-glow-color: rgba(37, 99, 235, 0.1);
+  --app-footer-bg: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] {
+  --app-background-gradient: linear-gradient(to bottom, #0b1029, #05091a, #020617);
+  --app-noise-opacity: 0.15;
+  --app-glow-color: rgba(30, 58, 138, 0.16);
+  --app-footer-bg: rgba(2, 6, 23, 0.8);
 }
 
 
@@ -80,6 +91,31 @@ a { text-decoration: none; color: inherit; }
 .layout-wrapper {
   background: var(--bg-color);
   min-height: 100vh;
+}
+
+[data-theme="light"] [class*="bg-[#10194E]"] {
+  background-color: #e0ebff !important;
+}
+
+[data-theme="light"] [class*="bg-[#0b102e]"] {
+  background-color: #edf2ff !important;
+}
+
+[data-theme="light"] [class*="bg-[#1e293b]"],
+[data-theme="light"] [class*="bg-[#131b40]"] {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] [class*="bg-[#10194E]"] [class*="text-white"],
+[data-theme="light"] [class*="bg-[#0b102e]"] [class*="text-white"],
+[data-theme="light"] [class*="bg-[#1e293b]"] [class*="text-white"],
+[data-theme="light"] [class*="bg-[#131b40]"] [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] [class*="border-white/10"],
+[data-theme="light"] [class*="border-white/5"] {
+  border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
 /* --- NAVIGÁCIÓ --- */

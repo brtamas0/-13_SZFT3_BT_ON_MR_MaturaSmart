@@ -10,6 +10,9 @@ import App from '@/App.vue'
 
 import '@assets/main.css'
 
+const savedTheme = localStorage.getItem('theme') || 'dark'
+document.documentElement.setAttribute('data-theme', savedTheme)
+
 createApp(App)
   .use(createPinia().use(piniaPluginPersistedstate))
   .use(router)
