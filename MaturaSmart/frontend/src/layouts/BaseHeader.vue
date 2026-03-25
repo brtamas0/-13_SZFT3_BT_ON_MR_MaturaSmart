@@ -119,7 +119,7 @@ watch(() => route.path, () => {
         <RouterLink
         to="/"
         class="text-2xl font-bold tracking-wide shrink-0"
-        :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+        :style="{ color: theme === 'dark' ? 'white' : 'var(--text-primary)' }"
       >
         Matura<span class="accent-text">Smart</span>
       </RouterLink>
@@ -244,7 +244,7 @@ watch(() => route.path, () => {
         <button
           @click="toggleTheme"
           class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-white/10"
-          :style="{ color: theme === 'dark' ? '#94a3b8' : '#64748b' }"
+          :style="{ color: 'var(--text-secondary)' }"
           title="Téma váltása"
         >
           <span v-if="theme==='dark'">🌙</span>
@@ -314,7 +314,7 @@ watch(() => route.path, () => {
         <button
           class="lg:hidden text-2xl p-2"
           @click="mobileOpen = !mobileOpen"
-          :style="{ color: theme === 'dark' ? 'white' : '#1a1a1a' }"
+          :style="{ color: theme === 'dark' ? 'white' : 'var(--text-primary)' }"
         >
           ☰
         </button>
