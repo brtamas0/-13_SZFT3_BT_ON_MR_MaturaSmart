@@ -233,7 +233,7 @@ const generateMaterial = async () => {
 
     aiLoading.value = true
     try {
-        const res = await fetch(`${API_BASE_URL}/admin/ai/generate-material`, {
+        const res = await fetch('http://backend.vm1.test/api/admin/ai/generate-material', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
