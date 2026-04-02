@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import PasswordConfirmModal from '@/components/PasswordConfirmModal.vue'
 import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps(['id'])
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://backend.maturasmart.hu/api'
 
 const units = ref([])
 const subjectName = ref('')
@@ -19,6 +20,12 @@ const isEditing = ref(false)
 const activeTab = ref('content') 
 const editingTopic = ref(null) 
 const editorContent = ref('') 
+
+const showAiModal = ref(false)
+const aiSourceText = ref('')
+const aiSourceFile = ref(null)
+const aiSourceFileName = ref('')
+const aiLoading = ref(false)
 
 
 const questions = ref([])
@@ -68,6 +75,7 @@ const fetchStructure = async () => {
             unit.newTopicType = 'lesson'
         }
         units.value = data
+        subjectName.value = data[0]?.subject?.name || ''
     } catch (e) { console.error(e) } finally { loading.value = false }
 }
 
@@ -185,6 +193,75 @@ const addTopic = async (unit) => {
     unit.newTopicTitle = ''; 
     fetchStructure(); 
 }
+
+const handleAiFileChange = (event) => {
+    const file = event.target.files?.[0]
+    aiSourceFile.value = file || null
+    aiSourceFileName.value = file?.name || ''
+}
+
+const resetAiModal = () => {
+    aiSourceText.value = ''
+    aiSourceFile.value = null
+    aiSourceFileName.value = ''
+    aiLoading.value = false
+}
+
+const openAiModal = () => {
+    showAiModal.value = true
+}
+
+const closeAiModal = () => {
+    showAiModal.value = false
+    resetAiModal()
+}
+
+const generateMaterial = async () => {
+    if (!aiSourceText.value.trim() && !aiSourceFile.value) {
+        alert('Adj meg szöveget vagy tölts fel egy fájlt!')
+        return
+    }
+
+    const token = localStorage.getItem('token')
+    const formData = new FormData()
+    formData.append('source_text', aiSourceText.value)
+    if (aiSourceFile.value) {
+        formData.append('source_file', aiSourceFile.value)
+    }
+    formData.append('topic_title', editingTopic.value?.title || '')
+    formData.append('subject_name', subjectName.value || '')
+
+    aiLoading.value = true
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/ai/generate-material`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            body: formData
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data?.error || 'Sikertelen AI hívás')
+
+        if (data?.html) {
+            editorContent.value = data.html
+            closeAiModal()
+        }
+    } catch (error) {
+        console.error(error)
+        alert(error.message || 'Nem sikerült tananyagot generálni.')
+    } finally {
+        aiLoading.value = false
+    }
+}
+
+watch(showAiModal, (isOpen) => {
+    if (!isOpen) resetAiModal()
+})
+
+
 
 
 
@@ -321,6 +398,57 @@ const executeDelete = async () => {
             </div>
             <div class="w-1/2 flex flex-col bg-[#0b102e] border-l border-gray-700">
                 <div class="flex-1 p-8 prose prose-invert max-w-none overflow-y-auto text-gray-200" v-html="editorContent"></div>
+            </div>
+        </div>
+
+        <button
+            v-if="activeTab === 'content'"
+            @click="openAiModal"
+            class="fixed bottom-6 right-6 z-[70] bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-full font-bold shadow-2xl shadow-blue-900/40 flex items-center gap-2"
+        >
+            <span>✨</span>
+            <span>Tananyag generálás</span>
+        </button>
+
+        <div v-if="showAiModal" class="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4" @click.self="closeAiModal">
+            <div class="w-full max-w-2xl bg-[#131b3d] border border-gray-700 rounded-2xl shadow-2xl">
+                <div class="flex items-center justify-between p-5 border-b border-gray-700">
+                    <h3 class="text-white text-lg font-bold">Tananyag generálás</h3>
+                    <button class="text-gray-400 hover:text-white" @click="closeAiModal">✕</button>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="text-gray-300 text-sm font-semibold block mb-2">Forrás szöveg</label>
+                        <textarea
+                            v-model="aiSourceText"
+                            class="w-full min-h-[180px] bg-[#0b102e] border border-gray-700 rounded-xl p-3 text-white outline-none focus:border-blue-500"
+                            placeholder="Írd ide a generálás alapjául szolgáló vázlatot, jegyzetet vagy instrukciót..."
+                        ></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-gray-300 text-sm font-semibold block mb-2">Forrás feltöltés (kép/pdf/txt/docx)</label>
+                        <input
+                            type="file"
+                            accept=".txt,.pdf,.docx,image/png,image/jpeg,image/webp"
+                            @change="handleAiFileChange"
+                            class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-500"
+                        />
+                        <p v-if="aiSourceFileName" class="text-xs text-blue-300 mt-2">Kiválasztva: {{ aiSourceFileName }}</p>
+                    </div>
+                </div>
+
+                <div class="p-5 border-t border-gray-700 flex justify-end gap-3">
+                    <button @click="closeAiModal" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:text-white">Mégse</button>
+                    <button
+                        @click="generateMaterial"
+                        :disabled="aiLoading"
+                        class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-bold"
+                    >
+                        {{ aiLoading ? 'Generálás...' : 'Generálás indítása' }}
+                    </button>
+                </div>
             </div>
         </div>
 

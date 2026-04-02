@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ContentGenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/flashcards/{flashcard}', [AdminController::class, 'destroyFlashcard']);
 
         Route::post('/system-message', [AdminController::class, 'sendSystemMessage']);
+        Route::post('/ai/generate-material', [ContentGenController::class, 'generate']);
     });
 
 });
