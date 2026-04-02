@@ -242,8 +242,21 @@ const generateMaterial = async () => {
             body: formData
         })
 
-        const data = await res.json()
-        if (!res.ok) throw new Error(data?.error || 'Sikertelen AI hívás')
+        const raw = await res.text()
+        let data = {}
+
+        try {
+            data = raw ? JSON.parse(raw) : {}
+        } catch {
+            data = { error: raw || 'Sikertelen AI hívás' }
+        }
+
+        if (!res.ok) {
+            const detail = data?.details
+                ? ` (${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)})`
+                : ''
+            throw new Error((data?.error || 'Sikertelen AI hívás') + detail)
+        }
 
         if (data?.html) {
             editorContent.value = data.html

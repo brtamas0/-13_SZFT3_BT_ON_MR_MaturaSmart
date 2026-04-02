@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,12 @@ class ContentGenController extends Controller
 {
     public function generate(Request $request)
     {
+        $requestTimeout = (int) env('CONTENTGEN_TIMEOUT_SECONDS', 180);
+        $requestTimeout = max(30, $requestTimeout);
+
+        if (function_exists('set_time_limit')) {
+            set_time_limit($requestTimeout + 10);
+        }
         $validated = $request->validate([
             'source_text' => ['nullable', 'string', 'max:50000'],
             'source_file' => ['nullable', 'file', 'max:10240', 'mimetypes:text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp'],
@@ -38,23 +45,42 @@ class ContentGenController extends Controller
             ['role' => 'user', 'content' => $this->buildUserPrompt($textSource, $fileContext, $topicTitle, $subjectName)],
         ];
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.$apiKey,
-            'Content-Type' => 'application/json',
-            'HTTP-Referer' => config('app.url', 'https://maturasmart.hu'),
-            'X-Title' => 'MaturaSmart Course Builder',
-        ])->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model' => 'nvidia/nemotron-3-super-120b-a12b:free',
-            'messages' => $messages,
-            'temperature' => 0.45,
-            'top_p' => 0.9,
-            'max_tokens' => 3000,
-        ]);
+
+        $referer = $request->headers->get('origin')
+            ?: config('app.url')
+            ?: $request->getSchemeAndHttpHost();
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer '.$apiKey,
+                'Content-Type' => 'application/json',
+                'HTTP-Referer' => $referer,
+                'X-Title' => 'MaturaSmart Course Builder',
+            ])
+                ->connectTimeout(20)
+                ->timeout($requestTimeout)
+                ->post('https://openrouter.ai/api/v1/chat/completions', [
+                    'model' => 'nvidia/nemotron-3-super-120b-a12b:free',
+                    'messages' => $messages,
+                    'temperature' => 0.45,
+                    'top_p' => 0.9,
+                    'max_tokens' => 3000,
+                ]);
+        } catch (ConnectionException $e) {
+            Log::warning('Content generation timeout/connection error', [
+                'timeout_seconds' => $requestTimeout,
+                'message' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'error' => 'Az AI szolgáltatás túl lassan válaszolt. Próbáld újra, vagy növeld a CONTENTGEN_TIMEOUT_SECONDS értékét.',
+            ], 504);
+        }
 
         if (!$response->successful()) {
             return response()->json([
                 'error' => 'Hiba történt a tananyag-generálás közben.',
-                'details' => $response->json(),
+                'details' => $response->json() ?: $response->body(),
             ], 500);
         }
 
