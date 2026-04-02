@@ -5,7 +5,7 @@ import PasswordConfirmModal from '@/components/PasswordConfirmModal.vue'
 import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps(['id'])
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://backend.maturasmart.hu/api'
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://backend.maturasmart.hu'}/api`
 
 const units = ref([])
 const subjectName = ref('')
@@ -56,14 +56,14 @@ const fetchStructure = async () => {
     const token = localStorage.getItem('token')
     try {
 
-        const res = await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, {
+        const res = await fetch(`${API_BASE_URL}/admin/subjects/${props.id}/units`, {
             headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
         })
         
         const data = await res.json()
         
         for (let unit of data) {
-            const tRes = await fetch(`http://backend.vm1.test/api/admin/units/${unit.id}/topics?t=${Date.now()}`, {
+            const tRes = await fetch(`${API_BASE_URL}/admin/units/${unit.id}/topics?t=${Date.now()}`, {
                 headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
             })
             
@@ -95,14 +95,14 @@ const openEditor = async (topic) => {
 
 const loadQuestions = async (topicId) => {
     const token = localStorage.getItem('token')
-    const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/questions`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
+    const res = await fetch(`${API_BASE_URL}/admin/topics/${topicId}/questions`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
     if(res.ok) questions.value = await res.json()
 }
 
 const addQuestion = async () => {
     if(!newQuestion.value.content) return alert("Írd be a kérdést!")
     const token = localStorage.getItem('token')
-    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}/questions`, {
+    await fetch(`${API_BASE_URL}/admin/topics/${editingTopic.value.id}/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
         body: JSON.stringify(newQuestion.value)
@@ -113,7 +113,7 @@ const addQuestion = async () => {
 
 const deleteQuestion = async (id) => {
     const token = localStorage.getItem('token')
-    await fetch(`http://backend.vm1.test/api/admin/questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
+    await fetch(`${API_BASE_URL}/admin/questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
     loadQuestions(editingTopic.value.id)
 }
 
@@ -123,14 +123,14 @@ const setCorrectAnswer = (index) => {
 
 const loadFlashcards = async (topicId) => {
     const token = localStorage.getItem('token')
-    const res = await fetch(`http://backend.vm1.test/api/admin/topics/${topicId}/flashcards`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
+    const res = await fetch(`${API_BASE_URL}/admin/topics/${topicId}/flashcards`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }})
     if(res.ok) flashcards.value = await res.json()
 }
 
 const addFlashcard = async () => {
     if(!newFlashcard.value.front || !newFlashcard.value.back) return
     const token = localStorage.getItem('token')
-    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}/flashcards`, {
+    await fetch(`${API_BASE_URL}/admin/topics/${editingTopic.value.id}/flashcards`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
         body: JSON.stringify(newFlashcard.value)
@@ -141,7 +141,7 @@ const addFlashcard = async () => {
 
 const deleteFlashcard = async (id) => {
     const token = localStorage.getItem('token')
-    await fetch(`http://backend.vm1.test/api/admin/flashcards/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
+    await fetch(`${API_BASE_URL}/admin/flashcards/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
     loadFlashcards(editingTopic.value.id)
 }
 
@@ -153,7 +153,7 @@ const saveTopicSettings = async () => {
         finalXp = totalXp.value
     }
 
-    await fetch(`http://backend.vm1.test/api/admin/topics/${editingTopic.value.id}`, {
+    await fetch(`${API_BASE_URL}/admin/topics/${editingTopic.value.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
         body: JSON.stringify({ 
@@ -172,14 +172,14 @@ const saveTopicSettings = async () => {
 
 const addUnit = async () => {
     const token = localStorage.getItem('token'); 
-    await fetch(`http://backend.vm1.test/api/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); 
+    await fetch(`${API_BASE_URL}/admin/subjects/${props.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, body: JSON.stringify({ title: newUnitTitle.value, order: units.value.length + 1 }) }); 
     newUnitTitle.value = ''; fetchStructure(); 
 }
 
 const addTopic = async (unit) => { 
     if(!unit.newTopicTitle) return;
     const token = localStorage.getItem('token'); 
-    await fetch(`http://backend.vm1.test/api/admin/units/${unit.id}/topics`, { 
+    await fetch(`${API_BASE_URL}/admin/units/${unit.id}/topics`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }, 
         body: JSON.stringify({ 
@@ -233,7 +233,7 @@ const generateMaterial = async () => {
 
     aiLoading.value = true
     try {
-        const res = await fetch('http://backend.vm1.test/api/admin/ai/generate-material', {
+        const res = await fetch(`${API_BASE_URL}/admin/ai/generate-material`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -271,7 +271,7 @@ const onDragEnd = async (unit) => {
     
     const token = localStorage.getItem('token')
     try {
-        await fetch('http://backend.maturasmart.hu/api/admin/topics/reorder', {
+        await fetch(`${API_BASE_URL}/admin/topics/reorder`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json', 
@@ -292,7 +292,7 @@ const onDragEnd = async (unit) => {
 
 const reqDelete = (type, id) => { actionToDelete.value = { type, id }; showModal.value = true }
 const executeDelete = async () => { 
-    showModal.value = false; const token = localStorage.getItem('token'); const endpoint = actionToDelete.value.type === 'unit' ? `units/${actionToDelete.value.id}` : `topics/${actionToDelete.value.id}`; await fetch(`http://backend.vm1.test/api/admin/${endpoint}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } }); fetchStructure(); 
+    showModal.value = false; const token = localStorage.getItem('token'); const endpoint = actionToDelete.value.type === 'unit' ? `units/${actionToDelete.value.id}` : `topics/${actionToDelete.value.id}`; await fetch(`${API_BASE_URL}/admin/${endpoint}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } }); fetchStructure(); 
 }
 </script>
 
