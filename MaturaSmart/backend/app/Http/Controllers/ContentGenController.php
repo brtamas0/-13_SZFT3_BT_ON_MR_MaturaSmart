@@ -25,7 +25,7 @@ class ContentGenController extends Controller
             return response()->json(['error' => 'Adj meg szöveges forrást vagy tölts fel fájlt.'], 422);
         }
 
-        $apiKey = trim((string) env('OPENROUTER_API_KEY', ''));
+        $apiKey = env('OPENROUTER_API_KEY');
         if (!$apiKey) {
             return response()->json(['error' => 'Hiányzik az OPENROUTER_API_KEY a backend környezetből.'], 500);
         }
@@ -38,58 +38,27 @@ class ContentGenController extends Controller
             ['role' => 'user', 'content' => $this->buildUserPrompt($textSource, $fileContext, $topicTitle, $subjectName)],
         ];
 
-        $requestBody = [
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.$apiKey,
+            'Content-Type' => 'application/json',
+            'HTTP-Referer' => config('app.url', 'https://maturasmart.hu'),
+            'X-Title' => 'MaturaSmart Course Builder',
+        ])->post('https://openrouter.ai/api/v1/chat/completions', [
             'model' => 'nvidia/nemotron-3-super-120b-a12b:free',
             'messages' => $messages,
             'temperature' => 0.45,
             'top_p' => 0.9,
             'max_tokens' => 3000,
-            'stream' => false,
-        ];
-
-        $response = Http::baseUrl('https://openrouter.ai/api/v1')
-            ->acceptJson()
-            ->asJson()
-            ->withToken($apiKey)
-            ->withHeaders([
-                'Referer' => config('app.url', 'https://maturasmart.hu'),
-                'HTTP-Referer' => config('app.url', 'https://maturasmart.hu'),
-                'X-Title' => 'MaturaSmart Course Builder',
-            ])
-            ->timeout(90)
-            ->retry(2, 700)
-            ->post('/chat/completions', $requestBody);
+        ]);
 
         if (!$response->successful()) {
-            Log::warning('OpenRouter lesson generation failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
             return response()->json([
                 'error' => 'Hiba történt a tananyag-generálás közben.',
-                'details' => $response->json() ?: $response->body(),
+                'details' => $response->json(),
             ], 500);
         }
 
-        $responseJson = $response->json();
-        $content = data_get($responseJson, 'choices.0.message.content', '');
-
-        if (!is_string($content) || trim($content) === '') {
-            $content = (string) data_get($responseJson, 'output.0.content.0.text', '');
-        }
-
-        if (trim($content) === '') {
-            Log::warning('OpenRouter returned empty generation content', [
-                'response' => $responseJson,
-            ]);
-
-            return response()->json([
-                'error' => 'Az AI válasz üres volt.',
-                'details' => $responseJson,
-            ], 502);
-        }
-
+        $content = data_get($response->json(), 'choices.0.message.content', '');
         $html = $this->extractHtml($content);
 
         return response()->json([
