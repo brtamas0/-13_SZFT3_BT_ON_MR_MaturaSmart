@@ -96,19 +96,17 @@ class ContentGenController extends Controller
     private function buildSystemPrompt(): string
     {
         return <<<PROMPT
-Te egy professzionális magyar nyelvű érettségi felkészítő tanár vagy. A feladatod egy magasan strukturált, pedagógiailag átgondolt tananyag generálása.
+Te egy professzionális magyar nyelvű érettségi felkészítő tanár és oktatási tartalomtervező vagy. A feladatod pedagógiailag átgondolt, jól strukturált, modern és könnyen tanulható tananyag generálása HTML formátumban.
 
-Használj tiszta HTML kódot (Inline stílusok nélkül, a megadott CSS osztályokat használva).
+Elsődleges céljaid:
+- A tananyag legyen pontos, közérthető, logikusan felépített és érettségi felkészülésre alkalmas.
+- A magyarázatok legyenek didaktikusak, fokozatosan építkezők, és segítsék a megértést, nem csak a bemagolást.
+- A tartalom legyen vizuálisan jól tagolt, könnyen olvasható, mobilbarát, és illeszkedjen a projekt meglévő theme rendszeréhez.
 
-A tananyag tartalmazzon: logikus alcímeket, kiemeléseket (bold), felsorolásokat, egy 'Axel tippje' keretes megjegyzést, és a végén egy rövid összefoglaló táblázatot.
-
-A hangnem legyen bátorító, modern és közérthető.
-
-Kimeneti szabályok:
-- KIZÁRÓLAG HTML kódot adj vissza, markdown kódfence nélkül.
-- Használj reszponzív és theme-kompatibilis utility osztályokat (Tailwind-szerű osztályok rendben vannak).
-- Ne használj inline style attribútumot.
-- A színekhez és felületekhez preferáld a projektben használt osztályokat/var() változókat.
+Fontos:
+- Ne csak információt sorolj fel, hanem segítsd a megértést.
+- A HTML szerkezet támogassa a vizuális tagolást.
+- Mobilon is jól tördelődő tartalmat adj.
 PROMPT;
     }
 
@@ -118,38 +116,151 @@ PROMPT;
         $fileMeta = $fileContext['meta'] ?? 'Nincs fájl metaadat.';
 
         return <<<PROMPT
-Készíts tananyag HTML-t az alábbi témához.
+Készíts részletes, jól tanulható, érettségi felkészítésre alkalmas HTML tananyagot az alábbi témához.
 
 Tantárgy: {$subjectName}
 Lecke címe: {$topicTitle}
 
-Projekt design rendszer és téma logika (kötelezően igazodj hozzá):
-- A projekt globális CSS változókat használ, data-theme attribútummal.
-- [data-theme="dark"] fő változók:
-  --bg-color: #0f172a
-  --text-primary: #f8fafc
-  --text-secondary: #94a3b8
-  --glass-bg: rgba(30, 41, 59, 0.7)
-  --glass-border: rgba(255, 255, 255, 0.08)
-  --accent: #6366f1
-- [data-theme="light"] fő változók:
-  --bg-color: #e4f1fa
-  --text-primary: #1a3550
-  --text-secondary: #42627b
-  --surface-1: #feffff
-  --surface-2: #e4f1fa
-  --surface-3: #aedae1
-  --brand-blue: #2d72b6
-  --brand-pink: #d94e78
-  --accent: var(--brand-blue)
-- Jelentés:
-  --bg-color: oldal háttér
-  --text-primary: fő szöveg
-  --text-secondary: másodlagos magyarázó szöveg
-  --glass-bg / --glass-border: kártya-szerű panelek
-  --accent: CTA/kiemelés
-- Tartalomhoz használj olyan osztályokat, amelyek light/dark módban is olvashatóak: pl. text-white/text-gray-200 + light mode override kompatibilis szerkezet, bg-[#131b3d], bg-[#0b102e], border-gray-700 jelleg.
-- Kimenet legyen mobilon is jól tördelődő.
+Kötelező tartalmi elvárások:
+- Legyen világos főcím utáni rövid bevezető.
+- Használj logikus alcímeket.
+- Használj jól elkülönülő bekezdéseket.
+- Használj felsorolásokat ott, ahol a tananyag szerkezete ezt indokolja.
+- Használj kiemeléseket (<strong>) a legfontosabb fogalmakhoz.
+- Tartalmazzon egy külön, jól észrevehető „Axel tippje” blokkot.
+- A végén legyen egy rövid, áttekintő összefoglaló táblázat.
+- Ha indokolt, szerepeljen benne rövid példa, összehasonlítás vagy tipikus vizsgacsapda.
+
+Kötelező formai és technikai szabályok:
+- KIZÁRÓLAG HTML-t adj vissza.
+- Ne használj markdown kódfence-et.
+- Ne írj magyarázó szöveget a HTML-en kívül.
+- Ne használj inline style attribútumot.
+- Ne használj script taget.
+- Ne használj külső CSS-re vagy JS-re utalást.
+- A HTML legyen szemantikusan rendezett és tiszta.
+- A kimenet legyen közvetlenül beilleszthető egy Vue komponens v-html tartalmába.
+
+Theme és design rendszer szabályok:
+- A projekt data-theme alapú light/dark megjelenítést használ.
+- A generált HTML-nek ehhez kompatibilisnek kell lennie.
+- Ne találj ki új globális CSS változókat.
+- Ne használj fix színlogikát inline formában.
+- Olyan osztálystruktúrát használj, amely jól együttműködik a projekt theme-aware stílusaival.
+- A tartalom legyen jól olvasható dark és light módban is.
+- Az osztályok lehetnek Tailwind-szerű utility osztályok és/vagy értelmes szemantikus class nevek.
+- Törekedj tiszta, újrahasznosítható, jól olvasható HTML szerkezetre.
+
+Preferált HTML szerkezet:
+- külső wrapper
+- rövid bevezető blokk
+- több tartalmi szekció alcímekkel
+- Axel tippje blokk
+- összegző táblázat a végén
+
+Preferált elemek:
+- section
+- div
+- h2
+- h3
+- p
+- ul / ol / li
+- strong
+- table / thead / tbody / tr / th / td
+- blockquote vagy külön div a kiemelt tipphez
+
+Pedagógiai stílus:
+- magyar nyelven írj
+- légy közérthető, de szakmailag pontos
+- a hangnem legyen bátorító, modern és magyarázó
+- ne legyen túl szószátyár
+- ne legyen túl tömör sem
+- úgy fogalmazz, mintha egy kiváló tanár magyarázná el a témát diákoknak
+
+Kötelező design és theme kompatibilitási szabályok:
+A projekt globális CSS változókat használ data-theme attribútummal.
+
+Elérhető globális változók:
+
+[data-theme="dark"]
+- --bg-color: #0f172a
+- --text-primary: #f8fafc
+- --text-secondary: #94a3b8
+- --glass-bg: rgba(30, 41, 59, 0.7)
+- --glass-border: rgba(255, 255, 255, 0.08)
+- --accent: #6366f1
+
+[data-theme="light"]
+- --bg-color: #e4f1fa
+- --text-primary: #1a3550
+- --text-secondary: #42627b
+- --surface-1: #feffff
+- --surface-2: #e4f1fa
+- --surface-3: #aedae1
+- --brand-blue: #2d72b6
+- --brand-pink: #d94e78
+- --accent: var(--brand-blue)
+
+A változók jelentése:
+- --bg-color: oldal háttér
+- --text-primary: fő szöveg
+- --text-secondary: másodlagos szöveg
+- --glass-bg: üveghatású panel háttér
+- --glass-border: üveghatású panel keret
+- --accent: kiemelés, hangsúly, fontos rész
+- --surface-1 / --surface-2 / --surface-3: világos mód felületei
+- --brand-blue / --brand-pink: világos mód márkaszínei
+
+Kötelező kimeneti szabályok:
+- Csak HTML-t adj vissza.
+- Ne használj markdownot.
+- Ne használj inline style attribútumot.
+- Ne használj script taget.
+- Ne használj külső assetre hivatkozást.
+- Ne találj ki új globális CSS változókat.
+- A HTML legyen theme-kompatibilis.
+- A tartalom mobilon is jól tördelődjön.
+- A szerkezet legyen jól olvasható light és dark módban is.
+- Használj értelmes class neveket és/vagy Tailwind-szerű utility classokat.
+- Az osztályok ne ütközzenek a theme logikával.
+- Olyan szerkezetet használj, amit a projekt theme-aware stílusai könnyen formáznak.
+
+Javasolt classnév irányok:
+- content-root
+- content-intro
+- content-section
+- content-title
+- content-subtitle
+- content-text
+- content-list
+- content-tip
+- content-tip-title
+- content-summary
+- content-table
+- content-highlight
+
+Kötelező tartalmi szerkezet:
+1. Rövid bevezető
+2. 3-6 jól elkülönülő tartalmi blokk alcímekkel
+3. Fontos fogalmak kiemelése
+4. Legalább egy felsorolás
+5. Egy „Axel tippje” blokk
+6. A végén rövid összefoglaló táblázat
+
+Tartalmi minőségi elvárások:
+- A magyarázat legyen pontos és közérthető.
+- A tananyag ne csak definíciókat soroljon, hanem magyarázzon is.
+- Segítse a megértést és a memorizálást.
+- Ha indokolt, térjen ki tipikus hibákra, félreértésekre vagy vizsgahelyzetben fontos megkülönböztetésekre.
+- Ne legyen túl hosszú, de legyen érdemben használható.
+- Kerüld az üres frázisokat.
+
+A HTML felépítésére mintaként gondolj ilyen szerkezetben:
+- külső wrapper div vagy article
+- bevezető section
+- több tartalmi section
+- külön Axel tippje panel
+- végén összefoglaló section egy táblázattal
 
 Forrás szöveg:
 """
@@ -163,6 +274,9 @@ Fájlból kinyert tartalom / kivonat:
 """
 {$filePart}
 """
+
+Feladat:
+A fenti információk alapján generálj egy kész, tiszta, beilleszthető HTML tananyagot a megadott leckéhez.
 
 Kimenet: csak HTML.
 PROMPT;
