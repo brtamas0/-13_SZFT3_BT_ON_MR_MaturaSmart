@@ -45,6 +45,7 @@ const handleRegister = async () => {
     
     localStorage.setItem('token', data.token)
     localStorage.setItem('user', JSON.stringify(data.user))
+    localStorage.setItem('showPostRegisterTutorial', 'true')
 
     router.push('/main')
 
