@@ -9,6 +9,31 @@ const subjects = ref([])
 const lastTopic = ref(null)
 const isLoading = ref(true)
 const user = ref(null)
+const showTutorial = ref(false)
+const tutorialStep = ref(0)
+
+const tutorialSteps = [
+  {
+    emoji: '👋',
+    title: 'Üdv a MaturaSmartban!',
+    description: 'Ez a főoldalad, ahol minden fontos dolgot egy helyen látsz az érettségi felkészülésedhez.'
+  },
+  {
+    emoji: '⏳',
+    title: 'Nézd a visszaszámlálót',
+    description: 'A felső blokk mutatja, mennyi időd van még az írásbeliig. Érdemes naponta ránézni.'
+  },
+  {
+    emoji: '📚',
+    title: 'Válassz egy tantárgyat',
+    description: 'Lent a tantárgykártyákra kattintva azonnal elkezdheted a tanulást és a haladást.'
+  },
+  {
+    emoji: '🚀',
+    title: 'Folytasd ott, ahol abbahagytad',
+    description: 'A „Folytatás” kártyával egy kattintással visszaugrasz az utoljára tanult leckédhez.'
+  }
+]
 
 const examDate = new Date('2026-05-04T08:00:00')
 const remaining = ref({ days: 0, hours: 0, minutes: 0 })
@@ -42,6 +67,11 @@ onMounted(async () => {
   if (!token || !storedUser) { router.push('/login'); return }
   user.value = JSON.parse(storedUser)
 
+  if (localStorage.getItem('showPostRegisterTutorial') === 'true') {
+    showTutorial.value = true
+    localStorage.removeItem('showPostRegisterTutorial')
+  }
+
   updateCountdown()
   timerInterval = setInterval(updateCountdown, 60000)
 
@@ -70,11 +100,59 @@ onMounted(async () => {
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
 })
+
+const nextTutorialStep = () => {
+  if (tutorialStep.value < tutorialSteps.length - 1) {
+    tutorialStep.value += 1
+    return
+  }
+
+  closeTutorial()
+}
+
+const closeTutorial = () => {
+  showTutorial.value = false
+  tutorialStep.value = 0
+}
 </script>
 
 <template>
   <BaseLayout>
     <BaseHeader mode="app" />
+
+    <div v-if="showTutorial"
+      class="fixed inset-0 z-[120] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-xl rounded-3xl border border-white/10 bg-[#10194E] shadow-2xl p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4 mb-6">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-widest text-blue-300 mb-2">Gyors útmutató</div>
+            <h2 class="text-2xl font-black text-white">
+              {{ tutorialSteps[tutorialStep].emoji }} {{ tutorialSteps[tutorialStep].title }}
+            </h2>
+          </div>
+          <button @click="closeTutorial"
+            class="text-slate-300 hover:text-white text-sm px-3 py-1 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+            Kihagyás
+          </button>
+        </div>
+
+        <p class="text-blue-100/90 text-base mb-8 leading-relaxed">
+          {{ tutorialSteps[tutorialStep].description }}
+        </p>
+
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span v-for="(_, idx) in tutorialSteps" :key="idx" class="w-2.5 h-2.5 rounded-full transition-all"
+              :class="idx === tutorialStep ? 'bg-blue-400 w-6' : 'bg-slate-600'"></span>
+          </div>
+
+          <button @click="nextTutorialStep"
+            class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl transition-colors">
+            {{ tutorialStep === tutorialSteps.length - 1 ? 'Kezdjük!' : 'Tovább' }}
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div v-if="isLoading" class="flex justify-center items-center h-[80vh]">
       <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
